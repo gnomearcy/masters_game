@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Extrude splines example zz85</title>
+    
+    <script async type="application/dart" src="file_main.dart"></script>
+    <script async src="packages/browser/dart.js"></script>
+    
+  </head>
+  <body>
+    <div style="position: absolute; top: 10px; width: 100%">
+          Spline Extrusion Examples by zz85
+          <br>
+          Select spline:
+          <select id="curvetype">
+          </select>
+          <br>
+          Scale: 
+          <select id="scale">
+               <option>1</option>
+               <option>2</option>               
+               <option>3</option>               
+               <option>4</option>
+               <option>8</option>
+               <option>12</option>               
+          </select>
+          <br>
+          Extrusion segments:
+          <select id="segments">
+               <option>3</option>
+               <option>50</option>
+               <option>100</option>               
+               <option>200</option>               
+               <option>400</option>
+               <option>500</option>
+          </select>
+          <br>
+          Radius segments:
+          <select id="radiussegments">
+               <option>1</option>
+               <option>2</option>               
+               <option>3</option>               
+               <option>4</option>
+               <option>5</option>
+               <option>6</option>               
+               <option>8</option>               
+               <option>12</option>
+          </select>
+          <br>
+          Closed:
+          <input id="closed" type="checkbox"></input>
+          <br>
+          <input id="animation" type="button" value="Camera Spline Animation View: OFF"></input>
+          <br>
+          Look Ahead: <input id="lookahead" type="checkbox"></input>
+          <br>
+          Camera Helper <input id="camerahelper" type="checkbox"></input>
+          <br>
+          Strafe: <span id="strafe"></span>
+     </div>
+  </body>
+</html>

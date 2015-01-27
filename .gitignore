@@ -1,0 +1,4 @@
+packages/*
+web/textures*
+web/obj*
+web/utilities/packages/*

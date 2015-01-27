@@ -1,0 +1,8 @@
+name: project_main
+author: tomislav_martincic
+description: masters degree project
+dependencies:
+  browser: any
+  three:
+    git: https://github.com/threeDart/three.dart
+  vector_math: any
