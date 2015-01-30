@@ -395,6 +395,7 @@ init()
      //TESTIRAM PATH
      if(loadiraj)
           loadPath();
+     ShaderMaterial sm = new ShaderMaterial();
 
      //MOVING OBJECT
      Texture tex = ImageUTILS.loadTexture(objectTexture);
@@ -430,9 +431,13 @@ init()
      renderer.domElement.addEventListener('touchstart', onDocumentTouchStart, false);
      renderer.domElement.addEventListener('touchmove', onDocumentTouchMove, false);
      window.addEventListener('resize', onWindowResize, false);
+     
 }
 
-animate(num time) {
+
+
+animate(num time) 
+{
      update();
      render();
      window.requestAnimationFrame(animate);
