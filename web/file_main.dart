@@ -61,7 +61,8 @@ SplineCurve3 blenderClosedSpline;
 
 
 // Keep a dictionary of Curve instances
-HashMap<String, Curve> splines = {
+HashMap<String, Curve> splines = 
+{
      "PipeSpline": pipeSpline,
      "SampleClosedSpline": sampleClosedSpline,
      "CubicBezier": cubicBezier,
@@ -136,6 +137,8 @@ double strafeTotal = 0.0;
 double side = 2.0; //square "a"
 
 Stopwatch sw = new Stopwatch();
+
+PointLight followBoxLight = new PointLight(0xffffff, intensity: 1.0);
 
 //Sine movement up down
 double getSine(int elapsedTicks)
@@ -354,6 +357,11 @@ addRandomObstacles()
           
           Mesh obstacle = new Mesh(new CubeGeometry(10.0, 10.0, 10.0), new MeshBasicMaterial(color:0xff0000));
           obstacle.position.setFrom(finalPos);
+          
+          //Add random lights to obstacle positions
+//          PointLight light = new PointLight(0xffffff, intensity: 1.0);
+//          light.position.setFrom(obstacle.position);
+//          scene.add(light);
 //          obstacle.scale = new Vector3(scale, scale, scale);
           scene.add(obstacle);
           parent.add(obstacle);
@@ -383,11 +391,11 @@ init()
 //     light.position.setValues(0.0, 100.0, 0.0);
 //     light.lookAt(scene.position);    
 //     scene.add(light);
-     SpotLight spotlight = new SpotLight(0xffffff, 1.0, 0.0, Math.PI/2, 7);
-     spotlight.position.setValues(0.0, 150.0, 0.0);
+//     SpotLight spotlight = new SpotLight(0xffffff, 1.0, 0.0, Math.PI/2, 7);
+//     spotlight.position.setValues(0.0, 150.0, 0.0);
 //     scene.add(spotlight);
      
-     PointLight spotlightFollower = new PointLight(0xffffff, intensity: 1.0, distance: 0);
+     PointLight spotlightFollower = new PointLight(0xffffff, intensity: 1.0, distance: 0);     
      
      parent = new Object3D();
      scene.add(parent);
@@ -406,6 +414,8 @@ init()
      splineCamera = new PerspectiveCamera(84.0, window.innerWidth / window.innerHeight, 0.01, 3000.0);
      splineCamera.position.setValues(0.0, 4.3, 10.0);
      splineCamera.lookAt(new Vector3.zero());
+     spotlightFollower.position.setFrom(splineCamera.position);
+     spotlightFollower.lookAt(new Vector3.zero());
      movingObject.add(splineCamera);     
      movingObject.add(spotlightFollower);
      
