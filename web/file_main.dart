@@ -61,8 +61,7 @@ SplineCurve3 blenderClosedSpline;
 
 
 // Keep a dictionary of Curve instances
-HashMap<String, Curve> splines = 
-{
+HashMap<String, Curve> splines = {
      "PipeSpline": pipeSpline,
      "SampleClosedSpline": sampleClosedSpline,
      "CubicBezier": cubicBezier,
@@ -107,9 +106,12 @@ List<TubeGeometry> tubes;
 
 bool loadiraj = true;
 int demoNr = 14;
-String path = 'obj_main/demo' + demoNr.toString() + '_path.obj';
-String track = 'obj_main/demo' + demoNr.toString() + '_track.obj';
-String trackTexture = 'textures_main/demo' + demoNr.toString() + '_uvlayout.png';
+//String path = 'obj_main/demo' + demoNr.toString() + '_path.obj';
+//String track = 'obj_main/demo' + demoNr.toString() + '_track.obj';
+//String trackTexture = 'textures_main/demo' + demoNr.toString() + '_uvlayout.png';
+String path = 'obj_main/zahe_put.obj';
+String track = 'obj_main/zahe_traka_ogromna.obj';
+String trackTexture = 'textures_main/zah_layout.png';
 
 String objectTexture = 'textures_main/crate.png';
 PathParser pp;
@@ -141,13 +143,12 @@ Stopwatch sw = new Stopwatch();
 PointLight followBoxLight = new PointLight(0xffffff, intensity: 1.0);
 
 //Sine movement up down
-double getSine(int elapsedTicks)
-{
+double getSine(int elapsedTicks) {
      double t = elapsedTicks / 1000000;
      double amplitude = 2.0;
      double period = 3.0;
      double frequency = 1 / period;
-     
+
      return amplitude * Math.sin(2 * Math.PI * frequency * t);
 }
 
@@ -177,7 +178,7 @@ void main() {
      });
 
 
-//     init();     
+//     init();
 //     initDOM();
 //     animate(0);
 //
@@ -203,14 +204,14 @@ void addTube() {
 
      //blenderClosedSpline.points.length - 1 => broj segmenata -> broj tangenti u svakom segmentu
      tube = new TubeGeometry(extrudePath, blenderClosedSpline.points.length - 1, 2.0, radiusSegments, closed2, false);
-     
+
      addGeometry(tube, 0xff00ff);
      setScale();
 }
 
 void addGeometry(Geometry tube, num color) {
      tubeMesh = SceneUtils.createMultiMaterialObject(tube, [new MeshLambertMaterial(color: color), new MeshBasicMaterial(color: 0x000000, opacity: 0.3, wireframe: true, transparent: true)]);
-     
+
      parent.add(tubeMesh);
 }
 
@@ -231,11 +232,11 @@ void addGeometryTest(Geometry tube, num color) {
 }
 
 void loadPath() {
-     
-     
+
+
      Texture tex = ImageUTILS.loadTexture(trackTexture);
      Material mat = new MeshPhongMaterial(map: tex);
-     
+
      var loader = new OBJLoader();
 
      loader.load(track).then((object) {
@@ -281,8 +282,7 @@ double distance(Vector3 a, Vector3 b) {
      return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
 }
 
-void initDOM() 
-{
+void initDOM() {
      String dropdown = "";
      splines.forEach((key, value) {
           dropdown += '<option value="' + key + '"';
@@ -323,41 +323,36 @@ void initDOM()
      addTube();
 }
 
-addRandomObstacles()
-{
+addRandomObstacles() {
      SplineCurve3 curve = tube.path;
-     
+
      Math.Random random = new Math.Random();
      double randomNr;
      int step = 20;
      int brojac = step;
      Vector3 start, end;
-         
-     while(brojac < curve.points.length)
-     {
-//          
+
+     while (brojac < curve.points.length) {
+//
 //          print(brojac);
-//          
+//
 //          //random broj od 0 do 1
 //          //pozicija dva cvora, puta random broj
 //          //
-          
+
           randomNr = random.nextDouble();
           print(randomNr);
           start = curve.points.elementAt(brojac).clone();
           start.scale(scale);
-          
-          if(brojac == curve.points.length)               
-               end = curve.points.elementAt(0).clone().scale(scale);
-          else
-               end = curve.points.elementAt(brojac + 1).clone().scale(scale);
+
+          if (brojac == curve.points.length) end = curve.points.elementAt(0).clone().scale(scale); else end = curve.points.elementAt(brojac + 1).clone().scale(scale);
           Vector3 difference = end - start;
           difference.multiply(new Vector3(randomNr, randomNr, randomNr));
           Vector3 finalPos = start + difference;
-          
-          Mesh obstacle = new Mesh(new CubeGeometry(10.0, 10.0, 10.0), new MeshBasicMaterial(color:0xff0000));
+
+          Mesh obstacle = new Mesh(new CubeGeometry(10.0, 10.0, 10.0), new MeshBasicMaterial(color: 0xff0000));
           obstacle.position.setFrom(finalPos);
-          
+
           //Add random lights to obstacle positions
 //          PointLight light = new PointLight(0xffffff, intensity: 1.0);
 //          light.position.setFrom(obstacle.position);
@@ -365,14 +360,13 @@ addRandomObstacles()
 //          obstacle.scale = new Vector3(scale, scale, scale);
           scene.add(obstacle);
           parent.add(obstacle);
-          
+
           brojac += step;
      }
 }
 
 
-init() 
-{
+init() {
 
      container = document.createElement('div');
      document.body.append(container);
@@ -389,37 +383,36 @@ init()
 //     scene.add(light2);
 //     DirectionalLight light = new DirectionalLight(0xffffff, 1.0); //color, intensity
 //     light.position.setValues(0.0, 100.0, 0.0);
-//     light.lookAt(scene.position);    
+//     light.lookAt(scene.position);
 //     scene.add(light);
 //     SpotLight spotlight = new SpotLight(0xffffff, 1.0, 0.0, Math.PI/2, 7);
 //     spotlight.position.setValues(0.0, 150.0, 0.0);
 //     scene.add(spotlight);
-     
-     PointLight spotlightFollower = new PointLight(0xffffff, intensity: 1.0, distance: 0);     
-     
+
+     PointLight spotlightFollower = new PointLight(0xffffff, intensity: 1.0, distance: 0);
+
      parent = new Object3D();
      scene.add(parent);
 
      //TESTIRAM PATH
-     if(loadiraj)
-          loadPath();
+     if (loadiraj) loadPath();
      ShaderMaterial sm = new ShaderMaterial();
 
      //MOVING OBJECT
      Texture tex = ImageUTILS.loadTexture(objectTexture);
      movingObject = new Mesh(new CubeGeometry(side, side, side), new MeshBasicMaterial(map: tex));
 //     parent.add(movingObject);
-     
+
 
      splineCamera = new PerspectiveCamera(84.0, window.innerWidth / window.innerHeight, 0.01, 3000.0);
      splineCamera.position.setValues(0.0, 4.3, 10.0);
      splineCamera.lookAt(new Vector3.zero());
      spotlightFollower.position.setFrom(splineCamera.position);
      spotlightFollower.lookAt(new Vector3.zero());
-     movingObject.add(splineCamera);     
+     movingObject.add(splineCamera);
      movingObject.add(spotlightFollower);
-     
-     
+
+
      parent.add(movingObject);
      cameraHelper = new CameraHelper(splineCamera);
      scene.add(cameraHelper);
@@ -441,13 +434,12 @@ init()
      renderer.domElement.addEventListener('touchstart', onDocumentTouchStart, false);
      renderer.domElement.addEventListener('touchmove', onDocumentTouchMove, false);
      window.addEventListener('resize', onWindowResize, false);
-     
+
 }
 
 
 
-animate(num time) 
-{
+animate(num time) {
      update();
      render();
      window.requestAnimationFrame(animate);
@@ -468,20 +460,19 @@ update() {
      strafeElem.innerHtml = strafeTotal.toString();
 }
 
-render() 
-{
-    
+render() {
+
      double levitation = 0.0;
-     
+
 //     if(!sw.isRunning)
 //     {
 //          sw.start();
 //     }
 //     else
 //     {
-//          levitation = getSine(sw.elapsedTicks);     
+//          levitation = getSine(sw.elapsedTicks);
 //     }
-     
+
      SplineCurve3 putanja;
 //     offset = 15.0, offsetObject = 12.0
 //     double offset = 15.0;
@@ -495,7 +486,7 @@ render()
      //t in range [0 ... 1], get points at curve, and scale it since the curve is scaled.
 //     putanja = tube.path;
      putanja = blenderClosedSpline;
-        
+
      Vector3 posObject = (putanja.getPointAt((t + 2 / putanja.length) % 1)).multiply(new Vector3(scale, scale, scale));
 
      //interpolation - moving object
@@ -514,18 +505,18 @@ render()
      normalObject.setFrom(binormalObject).crossInto(tangentObject, normalObject);
      posObject.add(normalObject.clone().add(new Vector3(0.0, offsetObject, 0.0)));
      movingObject.position.setFrom(posObject);
-     
-     
+
+
      print("ScenePos: ${scene.position}, P: ${movingObject.position}");
-     
-     
+
+
      //Object lookAt
      Vector3 smjerGledanja = tangentObject.clone().normalize().scale(2.0).add(movingObject.position);
      Matrix4 lookAtObjectMatrix = new Matrix4.identity();
      lookAtObjectMatrix = makeLookAt(lookAtObjectMatrix, smjerGledanja, movingObject.position, normalObject);
      movingObject.matrix = lookAtObjectMatrix;
      movingObject.rotation = calcEulerFromRotationMatrix(movingObject.matrix);
-     
+
      //Adjust strafe movement
      Vector3 toMove = binormalObject.clone().normalize();
      toMove.multiply(new Vector3(strafeTotal, strafeTotal, strafeTotal));
