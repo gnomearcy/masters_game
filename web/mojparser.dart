@@ -4,13 +4,7 @@ import 'dart:html';
 import 'dart:async';
 
 class MojParser
-{
-
-  /// Loads and parses an obj file from an [url]
-  ///
-  /// A group of [Object3D] is return
-  /// 
-  /// 
+{      
      RegExp vertex_pattern = new RegExp(r"v( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)");
      RegExp normal_pattern = new RegExp(r"vn( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)");
      RegExp uv_pattern = new RegExp(r"vt( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)");     

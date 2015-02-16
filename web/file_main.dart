@@ -82,7 +82,7 @@ Object3D tubeMesh;
 TubeGeometry tube;
 bool animation = false;
 bool lookAhead = false;
-double scale = 4.0;
+double scale = 2.5;
 bool showCameraHelper = false;
 
 int radiusSegments;
@@ -106,12 +106,9 @@ List<TubeGeometry> tubes;
 
 bool loadiraj = true;
 int demoNr = 14;
-//String path = 'obj_main/demo' + demoNr.toString() + '_path.obj';
-//String track = 'obj_main/demo' + demoNr.toString() + '_track.obj';
-//String trackTexture = 'textures_main/demo' + demoNr.toString() + '_uvlayout.png';
-String path = 'obj_main/zahe_put.obj';
-String track = 'obj_main/zahe_traka_ogromna.obj';
-String trackTexture = 'textures_main/zah_layout.png';
+String path = 'track_work1/track_work1_path.obj';
+String track = 'track_work1/track_work1_track.obj';
+String trackTexture = 'track_work1/track_layout_1_out.jpg';
 
 String objectTexture = 'textures_main/crate.png';
 PathParser pp;
@@ -123,7 +120,7 @@ double camera_far = 5000.0;
 Vector3 camera_pos = new Vector3(100.0, 100.0, 100.0);
 
 //"Speed"
-int loopSeconds = 40;
+int loopSeconds = 500;
 
 Mesh movingObject;
 int i = 0;
