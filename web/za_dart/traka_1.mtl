@@ -1,0 +1,32 @@
+# Blender MTL File: 'zajebancija.blend'
+# Material Count: 3
+
+newmtl Material
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.031266 0.033250 0.640000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd D:\\- DEV -\\blender\\zahebancija\\zid_layout_test1_small_export.jpg
+
+newmtl zidbocni1_mat
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd combined_layout_test1_export.jpg
+
+newmtl zidbocni1_mat_NONE
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd D:\\- DEV -\\blender\\zahebancija\\zidbocni1_layout_test1_export.jpg

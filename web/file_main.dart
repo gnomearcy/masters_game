@@ -9,7 +9,6 @@ import 'dart:math' as Math;
 import 'utilities/PathParser.dart';
 import 'utilities/WindowHelper.dart';
 import 'utilities/Keyboard.dart';
-import 'utilities/Logger.dart';
 
 var text;
 var targetRotation = 0;
@@ -36,6 +35,7 @@ SelectElement scaleElem;
 CheckboxInputElement showCurve;
 ButtonInputElement animBtnElem;
 SpanElement strafeElem;
+ButtonInputElement startStopElem;
 
 var pipeSpline = new SplineCurve3([new Vector3(0.0, 10.0, -10.0), new Vector3(10.0, 0.0, -10.0), new Vector3(20.0, 0.0, 0.0), new Vector3(30.0, 0.0, 10.0), new Vector3(30.0, 0.0, 20.0), new Vector3(20.0, 0.0, 30.0), new Vector3(10.0, 0.0, 30.0), new Vector3(0.0, 0.0, 30.0), new Vector3(-10.0, 10.0, 30.0), new Vector3(-10.0, 20.0, 30.0), new Vector3(0.0, 30.0, 30.0), new Vector3(10.0, 30.0, 30.0), new Vector3(20.0, 30.0, 15.0), new Vector3(10.0, 30.0, 10.0), new Vector3(0.0, 30.0, 10.0), new Vector3(-10.0, 20.0, 10.0), new Vector3(-10.0, 10.0, 10.0), new Vector3(0.0, 0.0, 10.0), new Vector3(10.0, -10.0, 10.0), new Vector3(20.0, -15.0, 10.0), new Vector3(30.0, -15.0, 10.0), new Vector3(40.0, -15.0, 10.0), new Vector3(50.0, -15.0, 10.0), new Vector3(60.0, 0.0, 10.0), new Vector3(70.0, 0.0, 0.0), new Vector3(80.0, 0.0, 0.0), new Vector3(90.0, 0.0, 0.0), new Vector3(100.0, 0.0, 0.0)]);
 
@@ -65,18 +65,34 @@ double scale = 1.0;
 
 bool loadiraj = true;
 int demoNr = 14;
-String path = 'track_work1/track_work2_path.obj';
-String track = 'track_work1/track_work2_track.obj';
-String trackTexture = 'track_work1/track_layout_1_out.jpg';
+//String path = 'za_dart/krivulja_1.obj';
+//String track = 'za_dart/traka_1.obj';
+//String trackTexture = 'za_dart/combined_layout_test1_export.jpg';
+String path = 'za_dart/krivulja_1.obj';
+String track = 'testiram_jedan_segment/testiram_jedan_segment_4.obj';
+String trackTexture = 'testiram_jedan_segment/combined_layout_test1_export.jpg';
 
 //Camera specs
 double camera_fov = 75.0;
 double camera_near = 0.1;
 double camera_far = 5000.0;
-Vector3 camera_pos = new Vector3(100.0, 100.0, 100.0);
+//Vector3 camera_pos = new Vector3(100.0, 100.0, 100.0);
+Vector3 camera_pos = new Vector3(-80.0, 10.0, 0.0);
+Vector3 lookAtvector = new Vector3(0.0, 20.0, 0.0);
 
+//Orthographic camera
+double top = 50.0;
+double bottom = 50.0;
+double left = 50.0;
+double right = 50.0;
+OrthographicCamera orthoCam = new OrthographicCamera(left, right, top, bottom);
+bool useOrtho = false;
+//
+
+bool toggleRender = false;
 //"Speed"
 int loopSeconds = 35;
+bool moving = true;
 
 double strafe = 5.0;
 double strafeDt = 0.5;
@@ -128,6 +144,19 @@ void main()
           });
 }
 
+void addLights()
+{
+     AmbientLight ambientLight = new AmbientLight(0xffffff);
+     PointLight spotLight = new PointLight(0xffffff, intensity: 1.0);
+     spotLight.position = new Vector3.zero();     
+     PointLight spotLightCamera = new PointLight(0xffffff, intensity: 0.1);
+     spotLightCamera.position.setFrom(camera_pos);
+     
+     scene.add(ambientLight);
+     scene.add(spotLight);
+     scene.add(spotLightCamera);     
+}
+
 void addTube() 
 {
      if(tubeMesh != null)
@@ -165,6 +194,8 @@ void loadPath()
           
           //Cache locally
           trackMesh = object;
+          trackMesh.scale.scale(3.0);
+          trackMesh.position.y = 2.0;
           parent.add(trackMesh);
      });
 }
@@ -178,6 +209,10 @@ void animateCamera(bool toggle)
      }
 }
 
+void moveToggle()
+{
+     moving = !moving;
+}
 
 //Sine movement up down
 double getSine(int elapsedTicks) 
@@ -219,7 +254,7 @@ void initDOM()
      curveTypeElem.onChange.listen((e) => addTube());
 
      scaleElem = querySelector('#scale');
-     scaleElem.selectedIndex = 0; //1
+     scaleElem.selectedIndex = 4; //1 changed 06.03.2015.
      scaleElem.onChange.listen((e) => setScale());     
 
      showCurve = querySelector('#showcurve');
@@ -229,6 +264,9 @@ void initDOM()
      animBtnElem.onClick.listen((e) => animateCamera(true));
 
      strafeElem = querySelector("#strafe");
+     
+     startStopElem = querySelector('#startstop');
+     startStopElem.onClick.listen((e) => moveToggle());
 
      addTube();
 }
@@ -300,6 +338,14 @@ init()
           loadPath(); 
      }     
 
+     //changed 06.03.2015.
+     //Lights
+     addLights();
+     //Ortho Cam
+     orthoCam.position.setFrom(new Vector3(-150.0, 0.0, 0.0));
+     orthoCam.lookAt(lookAtvector);
+     scene.add(orthoCam);
+     
      //Moving object - initialisation
      Texture tex = ImageUTILS.loadTexture(objectTexture);
      movingObject = new Mesh(new CubeGeometry(side, side, side), new MeshBasicMaterial(map: tex));
@@ -310,12 +356,12 @@ init()
      spotlightFollower.lookAt(spotlightFollower_lookAt);
      movingObject.add(splineCamera);
      movingObject.add(spotlightFollower);
-     parent.add(movingObject);
+//     parent.add(movingObject); //changed 06.03.2015.
      
      plane = new Mesh(new PlaneGeometry(1000.0, 1000.0), new MeshBasicMaterial(color: 0x00ff00));
      plane.rotation.x = -90.0 * Math.PI / 180.0;
      plane.position.z = -200.0;
-     parent.add(plane);
+//     parent.add(plane);
 
      renderer = new WebGLRenderer(antialias: true);
      renderer.setClearColor(new Color(0xf0f0f0), 1.0); //Alpha = 1.0?)
@@ -329,8 +375,6 @@ init()
      window.addEventListener('resize', onWindowResize, false);
 
 }
-
-
 
 animate(num time) 
 {
@@ -417,63 +461,66 @@ update()
 
 render() 
 {
-//     ClosedSplineCurve3 putanja;
-     double levitation = 0.0;
-//     offset = 15.0, offsetObject = 12.0
-//     double offset = 15.0;
-//     double offsetObject = side / 2 + 2.0 + levitation; //5.0 = amplituda u getSine();
+     if(toggleRender)
+     {
+          if(moving)
+          {
+               double levitation = 0.0;
 
-     //camera animation
-     int time = new DateTime.now().millisecondsSinceEpoch;
-     int looptime = loopSeconds * 1000;
-     double t = (time % looptime) / looptime;
+               //camera animation
+               int time = new DateTime.now().millisecondsSinceEpoch;
+               int looptime = loopSeconds * 1000;
+               double t = (time % looptime) / looptime;
 
-     //t in range [0 ... 1], get points at curve, and scale it since the curve is scaled.
-//     putanja = tube.path;
-//     putanja = mainCurve;
+               Vector3 posObject = (mainCurve.getPointAt((t + 2 / mainCurve.length) % 1));
 
-//     Vector3 posObject = (mainCurve.getPointAt((t + 2 / mainCurve.length) % 1)).multiply(new Vector3(scale, scale, scale));
-     Vector3 posObject = (mainCurve.getPointAt((t + 2 / mainCurve.length) % 1));
+               //interpolation - moving object
+               int segments = tube.tangents.length;
+               double t2 = (t + 2 / mainCurve.length) % 1;
+               double pickt2 = t2 * segments;
+               int pick2 = pickt2.floor();
+               int pickNext2 = (pick2 + 1) % segments;
 
-
-     //interpolation - moving object
-     int segments = tube.tangents.length;
-     double t2 = (t + 2 / mainCurve.length) % 1;
-     double pickt2 = t2 * segments;
-     int pick2 = pickt2.floor();
-     int pickNext2 = (pick2 + 1) % segments;
-
-     //Object position
-     binormalObject = tube.binormals[pickNext2] - tube.binormals[pick2];
-     double bScaleObject = pickt2 - pick2;
-     binormalObject.multiply(new Vector3(bScaleObject, bScaleObject, bScaleObject));
-     binormalObject.add(tube.binormals[pick2]);
-     tangentObject = -mainCurve.getTangentAt(t2);
-     normalObject.setFrom(binormalObject).crossInto(tangentObject, normalObject);
-     posObject.add(normalObject.clone());
-     movingObject.position.setFrom(posObject);
-//     movingObject.position.y = 0.0;
+               //Object position
+               binormalObject = tube.binormals[pickNext2] - tube.binormals[pick2];
+               double bScaleObject = pickt2 - pick2;
+               binormalObject.multiply(new Vector3(bScaleObject, bScaleObject, bScaleObject));
+               binormalObject.add(tube.binormals[pick2]);
+               tangentObject = -mainCurve.getTangentAt(t2);
+               normalObject.setFrom(binormalObject).crossInto(tangentObject, normalObject);
+               posObject.add(normalObject.clone());
+               movingObject.position.setFrom(posObject);
 
 
-     print("ScenePos: ${scene.position}, P: ${movingObject.position}");
+//     print("ScenePos: ${scene.position}, P: ${movingObject.position}");
 
 
-     //Object lookAt
-     Vector3 smjerGledanja = tangentObject.clone().normalize().add(movingObject.position);
-     Matrix4 lookAtObjectMatrix = new Matrix4.identity();
-     lookAtObjectMatrix = makeLookAt(lookAtObjectMatrix, smjerGledanja, movingObject.position, normalObject);
-     movingObject.matrix = lookAtObjectMatrix;
-     movingObject.rotation = calcEulerFromRotationMatrix(movingObject.matrix);
+               //Object lookAt
+               Vector3 smjerGledanja = tangentObject.clone().normalize().add(movingObject.position);
+               Matrix4 lookAtObjectMatrix = new Matrix4.identity();
+               lookAtObjectMatrix = makeLookAt(lookAtObjectMatrix, smjerGledanja, movingObject.position, normalObject);
+               movingObject.matrix = lookAtObjectMatrix;
+               movingObject.rotation = calcEulerFromRotationMatrix(movingObject.matrix);
 
-     //Adjust strafe movement
-     Vector3 toMove = binormalObject.clone().normalize();
-     toMove.multiply(new Vector3(strafeTotal, strafeTotal, strafeTotal));
-     posObject.add(toMove);
-     movingObject.position.setFrom(posObject);
-     movingObject.position.y = side / 2;
+               //Adjust strafe movement
+               Vector3 toMove = binormalObject.clone().normalize();
+               toMove.multiply(new Vector3(strafeTotal, strafeTotal, strafeTotal));
+               posObject.add(toMove);
+               movingObject.position.setFrom(posObject);
+               movingObject.position.y = side / 2;
 
-//     cameraHelper.update();
-     camera.lookAt(scene.position);
+          }
+     }
+     
+//changed 06.03.2015.
+//     camera.lookAt(scene.position);
+     camera.lookAt(lookAtvector);
+
      parent.rotation.y += (targetRotation - parent.rotation.y) * 0.05;
-     renderer.render(scene, animation == true ? splineCamera : camera);
+     
+     if(useOrtho)
+          renderer.render(scene, animation == true ? splineCamera : orthoCam);
+     else
+          renderer.render(scene, animation == true ? splineCamera : camera);
+
 }
