@@ -69,8 +69,12 @@ int demoNr = 14;
 //String track = 'za_dart/traka_1.obj';
 //String trackTexture = 'za_dart/combined_layout_test1_export.jpg';
 String path = 'za_dart/krivulja_1.obj';
-String track = 'testiram_jedan_segment/testiram_jedan_segment_4.obj';
+String track = 'testiram_jedan_segment/testiram_jedan_segment_6.obj';
 String trackTexture = 'testiram_jedan_segment/combined_layout_test1_export.jpg';
+
+//ZidBocni2 testiranje
+//String track = 'za_dart/zid_bocni2_testiram2.obj';
+//String trackTexture = 'za_dart/combined_layout_test1_export.jpg';
 
 //Camera specs
 double camera_fov = 75.0;
@@ -89,6 +93,7 @@ OrthographicCamera orthoCam = new OrthographicCamera(left, right, top, bottom);
 bool useOrtho = false;
 //
 
+bool toogleAxes = false;
 bool toggleRender = false;
 //"Speed"
 int loopSeconds = 35;
@@ -141,19 +146,20 @@ void main()
           initDOM();
           addRandomObstacles();
           animate(0);
-          });
+          });     
 }
 
 void addLights()
 {
      AmbientLight ambientLight = new AmbientLight(0xffffff);
-     PointLight spotLight = new PointLight(0xffffff, intensity: 1.0);
-     spotLight.position = new Vector3.zero();     
+     
+     PointLight spotLightCenter = new PointLight(0xffffff, intensity: 1.0);
+     spotLightCenter.position = new Vector3.zero();     
      PointLight spotLightCamera = new PointLight(0xffffff, intensity: 0.1);
      spotLightCamera.position.setFrom(camera_pos);
      
      scene.add(ambientLight);
-     scene.add(spotLight);
+//     scene.add(spotLightCenter);
      scene.add(spotLightCamera);     
 }
 
@@ -325,6 +331,7 @@ init()
      scene = new Scene();
      keyboard = new Keyboard();
      sw = new Stopwatch();
+     if(toogleAxes)
      makeAxes();
 
      PointLight spotlightFollower = new PointLight(0xffffff, intensity: 1.0, distance: 0);
@@ -394,6 +401,31 @@ update()
      if (keyboard.isPressed(KeyCode.A)) {
           strafeTotal += strafeDt;
           if (strafeTotal >= strafeMax) strafeTotal = strafeMax;
+     }
+     
+     if(keyboard.isPressed(KeyCode.T))
+     {
+          parent.position.x += 2.5;
+     }
+     if(keyboard.isPressed(KeyCode.G))
+     {
+          parent.position.x -= 2.5;
+     }
+     if(keyboard.isPressed(KeyCode.H))
+     {
+          parent.position.z += 2.5;
+     }
+     if(keyboard.isPressed(KeyCode.F))
+     {
+          parent.position.z -= 2.5;
+     }
+     if(keyboard.isPressed(KeyCode.R))
+     {
+          parent.position.y += 2.5;
+     }
+     if(keyboard.isPressed(KeyCode.Z))
+     {
+          parent.position.y -= 2.5;
      }
 
      strafeElem.innerHtml = strafeTotal.toString();
