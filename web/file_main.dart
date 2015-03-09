@@ -68,39 +68,37 @@ int demoNr = 14;
 //String path = 'za_dart/krivulja_1.obj';
 //String track = 'za_dart/traka_1.obj';
 //String trackTexture = 'za_dart/combined_layout_test1_export.jpg';
-String path = 'za_dart/krivulja_1.obj';
-String track = 'testiram_jedan_segment/testiram_jedan_segment_6.obj';
+//String path = 'za_dart/krivulja_1.obj';
+//String track = 'testiram_jedan_segment/testiram_jedan_segment_6.obj';
 String trackTexture = 'testiram_jedan_segment/combined_layout_test1_export.jpg';
 
 //ZidBocni2 testiranje
 //String track = 'za_dart/zid_bocni2_testiram2.obj';
 //String trackTexture = 'za_dart/combined_layout_test1_export.jpg';
 
+//Testiram cijelu traku
+String path = 'testiram_cijelu_traku/testiram_cijelu_traku_krivulja9.obj';
+String track = 'testiram_cijelu_traku/testiram_cijelu_traku_traka9.obj';
+
 //Camera specs
 double camera_fov = 75.0;
 double camera_near = 0.1;
 double camera_far = 5000.0;
-//Vector3 camera_pos = new Vector3(100.0, 100.0, 100.0);
-Vector3 camera_pos = new Vector3(-80.0, 10.0, 0.0);
-Vector3 lookAtvector = new Vector3(0.0, 20.0, 0.0);
+Vector3 camera_pos = new Vector3(100.0, 100.0, 100.0);
+Vector3 camera_pos_preview = new Vector3(-80.0, 10.0, 0.0);
+Vector3 lookAtvector = new Vector3.zero();
+Vector3 lookAtvector_preview = new Vector3(0.0, 20.0, 0.0);
 
-//Orthographic camera
-double top = 50.0;
-double bottom = 50.0;
-double left = 50.0;
-double right = 50.0;
-OrthographicCamera orthoCam = new OrthographicCamera(left, right, top, bottom);
-bool useOrtho = false;
-//
-
-bool toogleAxes = false;
-bool toggleRender = false;
-//"Speed"
-int loopSeconds = 35;
+//Toggle panel
+bool previewing = false;
+bool toogleAxes = true;
 bool moving = true;
 
-double strafe = 5.0;
-double strafeDt = 0.5;
+//"Speed"
+int loopSeconds = 50;
+
+double strafe = 1.0;
+double strafeDt = strafe / 10.0;
 double strafeMin = -strafe;
 double strafeMax = strafe;
 double strafeTotal = 0.0;
@@ -113,12 +111,12 @@ PointLight followBoxLight = new PointLight(0xffffff, intensity: 1.0);
 
 //Moving object
 Mesh movingObject;
-double side = 1.0; //square "a"
+double side = 0.2; //square "a"
 String objectTexture = 'textures_main/crate.png';
 double movingCam_fov = 75.0;
 double movingCam_near = 0.1;
 double movingCam_far = 5000.0;
-Vector3 movingCam_pos = new Vector3(0.0, side, 6.0); //parented to moving object
+Vector3 movingCam_pos = new Vector3(0.0, side, side * 6.0); //parented to moving object
 Vector3 movingCam_lookAt = new Vector3.zero();
 Vector3 spotlightFollower_lookAt = new Vector3.zero();
 
@@ -126,7 +124,7 @@ Vector3 spotlightFollower_lookAt = new Vector3.zero();
 ClosedSplineCurve3 mainCurve;
 Object3D tubeMesh;
 TubeGeometry tube;
-bool closed = true;
+bool closed = false;
 int radiussegments = 1;
 int segments = 100;
 double radius = 2.0;
@@ -200,8 +198,12 @@ void loadPath()
           
           //Cache locally
           trackMesh = object;
-          trackMesh.scale.scale(3.0);
-          trackMesh.position.y = 2.0;
+          if(previewing)
+          {
+               trackMesh.scale.scale(3.0);
+               trackMesh.position.y = 2.0;  
+          }
+          
           parent.add(trackMesh);
      });
 }
@@ -326,15 +328,24 @@ init()
      document.body.append(container);
 
      camera = new PerspectiveCamera(camera_fov, window.innerWidth / window.innerHeight, camera_near, camera_far);
-     camera.position.setFrom(camera_pos);
+     if(previewing)
+     {
+          camera.position.setFrom(camera_pos_preview);
+     }
+     else
+     {
+          camera.position.setFrom(camera_pos);      
+     }    
 
      scene = new Scene();
      keyboard = new Keyboard();
      sw = new Stopwatch();
+     
      if(toogleAxes)
-     makeAxes();
+     {
+          makeAxes();
+     }
 
-     PointLight spotlightFollower = new PointLight(0xffffff, intensity: 1.0, distance: 0);
 
      parent = new Object3D();
      scene.add(parent);
@@ -347,11 +358,7 @@ init()
 
      //changed 06.03.2015.
      //Lights
-     addLights();
-     //Ortho Cam
-     orthoCam.position.setFrom(new Vector3(-150.0, 0.0, 0.0));
-     orthoCam.lookAt(lookAtvector);
-     scene.add(orthoCam);
+//     addLights();
      
      //Moving object - initialisation
      Texture tex = ImageUTILS.loadTexture(objectTexture);
@@ -359,16 +366,25 @@ init()
      splineCamera = new PerspectiveCamera(movingCam_fov, window.innerWidth / window.innerHeight, movingCam_near, movingCam_far);
      splineCamera.position.setFrom(movingCam_pos);
      splineCamera.lookAt(movingCam_lookAt);     
-     spotlightFollower.position.setFrom(splineCamera.position);
-     spotlightFollower.lookAt(spotlightFollower_lookAt);
+     PointLight pointlightFollower = new PointLight(0xffffff, intensity: 0.5, distance: 0);     
+//     pointlightFollower.position.setFrom(splineCamera.position);
+     pointlightFollower.position.setFrom(new Vector3(0.0, side/2, 0.0));        
+     pointlightFollower.lookAt(spotlightFollower_lookAt);
      movingObject.add(splineCamera);
-     movingObject.add(spotlightFollower);
-//     parent.add(movingObject); //changed 06.03.2015.
+     movingObject.add(pointlightFollower);
+     
+     //changed 06.03.2015.
+     if(!previewing)
+     {
+          parent.add(movingObject);
+     }
      
      plane = new Mesh(new PlaneGeometry(1000.0, 1000.0), new MeshBasicMaterial(color: 0x00ff00));
      plane.rotation.x = -90.0 * Math.PI / 180.0;
      plane.position.z = -200.0;
-//     parent.add(plane);
+     
+     if(previewing)
+          parent.add(plane);
 
      renderer = new WebGLRenderer(antialias: true);
      renderer.setClearColor(new Color(0xf0f0f0), 1.0); //Alpha = 1.0?)
@@ -403,30 +419,33 @@ update()
           if (strafeTotal >= strafeMax) strafeTotal = strafeMax;
      }
      
-     if(keyboard.isPressed(KeyCode.T))
+     if(previewing)
      {
-          parent.position.x += 2.5;
-     }
-     if(keyboard.isPressed(KeyCode.G))
-     {
-          parent.position.x -= 2.5;
-     }
-     if(keyboard.isPressed(KeyCode.H))
-     {
-          parent.position.z += 2.5;
-     }
-     if(keyboard.isPressed(KeyCode.F))
-     {
-          parent.position.z -= 2.5;
-     }
-     if(keyboard.isPressed(KeyCode.R))
-     {
-          parent.position.y += 2.5;
-     }
-     if(keyboard.isPressed(KeyCode.Z))
-     {
-          parent.position.y -= 2.5;
-     }
+          if(keyboard.isPressed(KeyCode.T))
+          {
+               parent.position.x += 2.5;
+          }
+          if(keyboard.isPressed(KeyCode.G))
+          {
+               parent.position.x -= 2.5;
+          }
+          if(keyboard.isPressed(KeyCode.H))
+          {
+               parent.position.z += 2.5;
+          }
+          if(keyboard.isPressed(KeyCode.F))
+          {
+               parent.position.z -= 2.5;
+          }
+          if(keyboard.isPressed(KeyCode.R))
+          {
+               parent.position.y += 2.5;
+          }
+          if(keyboard.isPressed(KeyCode.Z))
+          {
+               parent.position.y -= 2.5;
+          }  
+     }     
 
      strafeElem.innerHtml = strafeTotal.toString();
 }
@@ -493,7 +512,7 @@ update()
 
 render() 
 {
-     if(toggleRender)
+     if(!previewing)
      {
           if(moving)
           {
@@ -523,8 +542,7 @@ render()
                posObject.add(normalObject.clone());
                movingObject.position.setFrom(posObject);
 
-
-//     print("ScenePos: ${scene.position}, P: ${movingObject.position}");
+//               print("ScenePos: ${scene.position}, P: ${movingObject.position}");
 
 
                //Object lookAt
@@ -546,13 +564,18 @@ render()
      
 //changed 06.03.2015.
 //     camera.lookAt(scene.position);
-     camera.lookAt(lookAtvector);
+     
+     if(!previewing)
+     {
+          camera.lookAt(lookAtvector); //0, 0, 0
+     }
+     else
+     {
+          camera.lookAt(lookAtvector_preview); //0, 20, 0
+     }    
+    
+     renderer.render(scene, animation == true ? splineCamera : camera);
 
      parent.rotation.y += (targetRotation - parent.rotation.y) * 0.05;
-     
-     if(useOrtho)
-          renderer.render(scene, animation == true ? splineCamera : orthoCam);
-     else
-          renderer.render(scene, animation == true ? splineCamera : camera);
 
 }
