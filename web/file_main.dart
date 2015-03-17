@@ -516,7 +516,6 @@ render()
      {
           if(moving)
           {
-               double levitation = 0.0;
 
                //camera animation
                int time = new DateTime.now().millisecondsSinceEpoch;

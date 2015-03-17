@@ -26,14 +26,19 @@ void main() {
 
 
      int time = new DateTime.now().millisecondsSinceEpoch;
-     var looptime = 20 * 1000;
+     var looptime = 5 * 1000;
      var t = (time % looptime) / looptime;
      print(t);
+     
+     print("Milisekunde ${time}");
+     print("Looptime ${looptime}");
+     print("milisekunde / looptime ${(time%looptime)}");
+     print("konacan ${((time%looptime)/looptime)}");
 
      double t1 = 0.23;
      var t11 = ((t1 + 30) / 16) % 1;
-     print(t11);
-
+//     print(t11);
+     
      double tdelta = 1.0 / 30.0;
 
      bool nesto = true;
@@ -46,7 +51,7 @@ void main() {
 
      while (true) {
 //          print("elapsed: ${sw.elapsed.inSeconds} sin: ${computeSine(sw.elapsed.inSeconds)}");
-          print(sw.elapsedTicks / 1000000);
+//          print(sw.elapsedTicks / 1000000);
      }
 
 }

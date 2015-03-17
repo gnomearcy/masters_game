@@ -1,10 +1,12 @@
 import 'package:three/three.dart';
 import 'package:vector_math/vector_math.dart';
 import 'package:three/extras/image_utils.dart' as IMAGEUtils;
+import 'package:three/extras/scene_utils.dart' as SceneUtils;
 import 'dart:html';
 import 'dart:math' as Math;
 import 'dart:core';
 import 'dart:io' as IO;
+import 'utilities/PathParser.dart';
 
 Scene scene;
 PerspectiveCamera camera;
@@ -37,11 +39,7 @@ var windowHalfY = window.innerHeight / 2;
 ButtonElement toggleBtn;
 bool toggle = false;
 
-void main()
-{
-     init();
-     animate(0);
-}
+
 
 MeshBasicMaterial obstableMat = new MeshBasicMaterial(color: 0xff0000, wireframe: false);
 MeshBasicMaterial scoreMat = new MeshBasicMaterial(color:0x00ff00, wireframe: false);
@@ -54,6 +52,28 @@ Math.Random random;
 
 double vertSeg = planeHeight / planeHeight; //1.0
 double horSeg = (planeWidth * 0.8) / 4.0;
+
+//algoritm
+PathParser pp;
+//Path data
+ClosedSplineCurve3 mainCurve;
+Object3D tubeMesh;
+TubeGeometry tube;
+bool closed = false;
+int radiussegments = 4;
+int segments = 100;
+double tuberadius = 2.0;
+Object3D trackMesh;
+Mesh plane;
+Object3D parent;
+double scale = 10.0;
+
+void main()
+{     
+     init();
+     animate(0);
+     addCurves();
+}
 
 void addRandom()
 {
@@ -108,8 +128,137 @@ void addRandom()
      }
 }
 
+void addCurves()
+{
+     String fullCurve = 'obstacle_planning/path_full.obj';
+     String halfCurve = 'obstacle_planning/path_half.obj';
+     
+     SplineCurve3 fullSpline;
+     SplineCurve3 halfSpline;
+     
+     Object3D fullContainer;
+     Object3D halfContainer;
+     
+//     pp = new PathParser();
+//
+//     int broj1;
+//     pp.load(fullCurve).then((object) {
+//
+//          fullSpline = new SplineCurve3(pp.getVertices);
+//          fullContainer = connect(fullSpline);
+//          fullContainer.position.x = -30.0;
+//          parent.add(fullContainer);
+//          int broj1 = pp.getVertices.length;
+//          window.alert(broj1.toString());
+//          pp.resetVertices();
+//
+//
+//     });
+//     
+//     pp = new PathParser();
+//     
+////     pp.resetVertices();
+//     
+//     pp.load(halfCurve).then((object) {
+//
+//          halfSpline = new SplineCurve3(pp.getVertices);
+//          halfContainer = connect(halfSpline);
+//          halfContainer.position.x = 20.0;
+//          parent.add(halfContainer);
+//          int broj1 = pp.getVertices.length;
+//                    window.alert(broj1.toString());
+//
+//     });
+     
+       pp = new PathParser();
+
+       int broj1;
+       pp.load(fullCurve).then((object) {
+
+            fullSpline = new SplineCurve3(pp.getVertices);
+       }).whenComplete(()
+       {
+            window.alert(fullSpline.points.length.toString());
+            fullContainer = connect(fullSpline, 0xff0000);
+            fullContainer.position.x = -30.0;
+            parent.add(fullContainer);
+            
+            pp.resetVertices();
+            
+            pp.load(halfCurve).then((object){
+                 halfSpline = new SplineCurve3(pp.getVertices);
+            }).whenComplete(()
+                      {
+                           window.alert(halfSpline.points.length.toString());
+                           halfContainer = connect(halfSpline, 0x00ff00);
+                           halfContainer.position.x = 20.0;
+                           parent.add(halfContainer);
+                      });
+       });
+            
+//       pp.load(halfCurve).then((object) {
+//
+//                  halfSpline = new SplineCurve3(pp.getVertices);
+//             }).whenComplete(()
+//             {
+//                  window.alert(halfSpline.points.length.toString());
+//                  halfContainer = connect(halfSpline);
+//                  halfContainer.position.x = 20.0;
+//                  parent.add(halfContainer);
+//             });
+       
+       
+       
+//       pp = new PathParser();
+//       
+////     pp.resetVertices();
+//       
+//       pp.load(halfCurve).then((object) {
+//
+//            halfSpline = new SplineCurve3(pp.getVertices);            
+//
+//       });
+}
+
+Object3D connect(SplineCurve3 curve, num hex)
+{
+     List<Vector3> points = curve.points;
+     Geometry lines = new Geometry();
+     Object3D container = new Object3D();
+     
+     for ( Vector3 v in points ) 
+     {
+          v.scale(scale);
+          lines.vertices.add(v);
+          Mesh point = new Mesh(new SphereGeometry(radius), new MeshBasicMaterial(color: hex));
+          point.position.setFrom(v);
+//          parent.add(point);
+          container.add(point);
+     }
+     
+     container.add(new Line(lines, new LineBasicMaterial(color: hex)));
+     
+     return container;
+}
+
+void addTube(SplineCurve3 curve) 
+{
+     
+//     if(tubeMesh != null)
+//     {
+//          parent.remove(tubeMesh);
+//     }
+     
+     print("${curve.toString()}");
+     tube = new TubeGeometry(curve, curve.points.length - 1, tuberadius, radiussegments, closed, false);
+     tubeMesh = SceneUtils.createMultiMaterialObject(tube, [new MeshLambertMaterial(color: 0xff00ff), new MeshBasicMaterial(color: 0x000000, opacity: 0.3, wireframe: true, transparent: true)]);
+     tubeMesh.scale.setFrom(new Vector3(scale, scale, scale));
+     parent.add(tubeMesh);
+}
+
 init()
 {
+
      scene = new Scene();
      container = document.createElement('div');
      document.body.append(container);          
@@ -117,6 +266,10 @@ init()
      camera.position.setFrom(cameraPosition); 
      camera.lookAt(scene.position);
      scene.add(camera);
+     
+     //algoritm
+      parent = new Object3D();
+      scene.add(parent);
      
      //orthocamera
      orthoCamera = new OrthographicCamera(left, right, top, bottom);
@@ -144,44 +297,39 @@ init()
      scene.add(ambientLight);
      
      //obstacles
-     addRandom();
+//     addRandom(); 
      
-     
-     obstacle = new Mesh(new SphereGeometry(radius), obstableMat);
-     obstacle.position.y = radius / 2.0;
-//     (obstacle.material as MeshBasicMaterial).wireframe = false; 
-//     scene.add(obstacle);
-     scoreItem = new Mesh(new SphereGeometry(radius), scoreMat);
-     scoreItem.position.y = radius / 2.0;
      
      String texPath = 'obstacle_planning/crate.png';
      String texPathPlane = 'obstacle_planning/floor.jpg';
      Texture objTex = IMAGEUtils.loadTexture(texPath);
      Texture planeTex = IMAGEUtils.loadTexture(texPathPlane);
-//     planeTex.repeat = new Vector2(2.0, 1.0);
      MeshBasicMaterial planeMat = new MeshBasicMaterial(map: planeTex);
      Mesh plane = new Mesh(new PlaneGeometry(planeWidth, planeHeight), planeMat);
      plane.rotation.x = -90.0 * Math.PI / 180.0;
-     scene.add(plane);
+//     scene.add(plane);
+     parent.add(plane);
      
-     MeshBasicMaterial cubeMat = new MeshBasicMaterial(map: objTex);
-     Mesh cube1 = new Mesh(new CubeGeometry(10.0, 10.0, 10.0), cubeMat);
-     cube1.position.x = -50.0;
-     cube1.position.z = -50.0;
-     cube1.position.y = 5.0;
-     scene.add(cube1);
-     
-     Mesh cube2 = new Mesh(new CubeGeometry(10.0, 10.0, 10.0), cubeMat);
-     cube2.position.x = 50.0;
-     cube2.position.z = 50.0;
-     cube2.position.y = 5.0;
-     scene.add(cube2);     
+//     MeshBasicMaterial cubeMat = new MeshBasicMaterial(map: objTex);
+//         Mesh cube1 = new Mesh(new CubeGeometry(10.0, 10.0, 10.0), cubeMat);
+//         cube1.position.x = -50.0;
+//         cube1.position.z = -50.0;
+//         cube1.position.y = 5.0;
+//         scene.add(cube1);
+//         
+//         Mesh cube2 = new Mesh(new CubeGeometry(10.0, 10.0, 10.0), cubeMat);
+//         cube2.position.x = 50.0;
+//         cube2.position.z = 50.0;
+//         cube2.position.y = 5.0;
+//         scene.add(cube2); 
+         
      //-------------------------
 }
 
 render()
 {
      //WRITE ANIMATION LOGIC HERE
+     parent.rotation.y += (targetRotation - parent.rotation.y) * 0.05;
 }
 
 animate(num time)

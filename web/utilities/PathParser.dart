@@ -54,4 +54,9 @@ class PathParser {
 
           });
      }
+     
+     void resetVertices()
+     {
+          _pathVertices.clear();
+     }
 }
