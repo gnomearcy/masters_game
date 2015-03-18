@@ -552,11 +552,11 @@ render()
                movingObject.rotation = calcEulerFromRotationMatrix(movingObject.matrix);
 
                //Adjust strafe movement
-               Vector3 toMove = binormalObject.clone().normalize();
-               toMove.multiply(new Vector3(strafeTotal, strafeTotal, strafeTotal));
-               posObject.add(toMove);
-               movingObject.position.setFrom(posObject);
-               movingObject.position.y = side / 2;
+//               Vector3 toMove = binormalObject.clone().normalize();
+//               toMove.multiply(new Vector3(strafeTotal, strafeTotal, strafeTotal));
+//               posObject.add(toMove);
+//               movingObject.position.setFrom(posObject);
+//               movingObject.position.y = side / 2;
 
           }
      }
