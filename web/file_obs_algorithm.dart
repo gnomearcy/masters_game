@@ -165,7 +165,7 @@ initObstacles()
      //Reference
      double Lref = 10.0;
      double dtref = 0.01; //referentni pomak za izracun aktualnog pomaka ovisno o duljini krivulje
-     double dist = 0.5;  //threshold iznad kojeg biljezim trenutnu vrijednost "t" 
+     double dist = 3.0;  //threshold iznad kojeg biljezim trenutnu vrijednost "t" 
      
      SplineCurve3 curve = tube.path;    //krivulja u pitanju
      double L = curve.length;           //duljina krivulje
@@ -224,41 +224,9 @@ void addPrepreke(SplineCurve3 k, List ts)
           pos.scale(scale);
           m.position.setFrom(pos);
           scene.add(m);
-     }
-     
-     //uzmi binormalu za svaki t i na njoj napravi obstacle
-     logg("Broj segmenata/tangenti " + tube.tangents.length.toString());     
-     logg("Prvi t: " + ts.first.toString());
-     logg("Prvi t + 2: " + (ts.first + 2).toString());
-     double formula = ((ts.first + 2) / k.length) % 1;
-     logg("formula: " + formula.toString());
-     
-     int segments = tube.tangents.length;
-     double t2 = (ts.first + 2 / k.length) % 1;
-     double a = t2 * segments;
-     int b = a.floor();
-     int c = (b + 1) % segments;
-     
-     Vector3 binormalT = tube.binormals[c] - tube.binormals[b];
-     double s = a - b;
-     binormalT.multiply(new Vector3(s,s,s));
-     binormalT.add(tube.binormals[b]); //ovo je valjda gotova binormala
-//     Vector3 tangentT = -k.getTangentAt(ts);
-     
-     //spoji moj t sa tim nekim obstacle-om na binormali
-     Geometry lines = new Geometry();
-     lines.vertices.add(k.getPoint(ts.first));
-     lines.vertices.add(binormalT);     
-     Mesh lins = new Mesh(lines, new LineBasicMaterial(color: 0x00FFFF));
-     parent.add(lins);
-     
-     //dodaj neki obstacle
-     logg("binormala: " + binormalT.toString());
-     Mesh mm = new Mesh(new SphereGeometry(0.6), new MeshBasicMaterial(color: 0x00ffff));
-     mm.position.setFrom(binormalT);
-//     parent.add(mm);
-     
+     }     
      //za svaki t uzmi point (position) i odredi segment, uzmi binormalu za taj segment, zbroji, nacrtaj
+     int segments = tube.tangents.length;
      for(double t in ts)
      {
           Vector3 pos = k.getPoint(t);
@@ -269,11 +237,18 @@ void addPrepreke(SplineCurve3 k, List ts)
           Vector3 binorm = tube.binormals[kojiSeg.floor()];
           binorm.normalize();
           binorm.scale(strafe);
+          
+          //lijeva strana
           Vector3 noviPos = pos + binorm;
           Mesh mm = new Mesh(new SphereGeometry(0.6), new MeshBasicMaterial(color: 0x00ffff));
           mm.position.setFrom(noviPos);
-          parent.add(mm);
-          
+          parent.add(mm); 
+          //desna strana
+          binorm.negate();
+          noviPos = pos + binorm;
+          Mesh mmm = new Mesh(new SphereGeometry(0.6), new MeshBasicMaterial(color: 0x00ffff));
+          mmm.position.setFrom(noviPos);
+          parent.add(mmm); 
      }
 }
 
@@ -496,7 +471,9 @@ void moveTheObject()
      normalObject.setFrom(binormalObject).crossInto(tangentObject, normalObject);
      posObject.add(normalObject.clone());
      movingObject.position.setFrom(posObject);
-
+     
+     normalObject.y = normalObject.y.abs();    
+     
      //Object lookAt
      Vector3 smjerGledanja = tangentObject.clone().normalize().add(movingObject.position);
      Matrix4 lookAtObjectMatrix = new Matrix4.identity();
