@@ -91,12 +91,12 @@ String fullCurve = 'obstacle_planning/path_full.obj';
 String halfCurve = 'obstacle_planning/path_half.obj';
 bool animation = false;
 
-int loopSeconds = 5;
+int loopSeconds = 30;
 Vector3 binormalObject = new Vector3.zero();
 Vector3 normalObject = new Vector3.zero();
 Vector3 tangentObject = new Vector3.zero();
 
-double strafe = 1.0;
+double strafe = 3.0;
 double strafeDt = strafe / 10.0;
 double strafeMin = -strafe;
 double strafeMax = strafe;
@@ -160,6 +160,130 @@ void addRandom()
      }
 }
 
+initObstacles()
+{     
+     //Reference
+     double Lref = 10.0;
+     double dtref = 0.01; //referentni pomak za izracun aktualnog pomaka ovisno o duljini krivulje
+     double dist = 0.5;  //threshold iznad kojeg biljezim trenutnu vrijednost "t" 
+     
+     SplineCurve3 curve = tube.path;    //krivulja u pitanju
+     double L = curve.length;           //duljina krivulje
+     double dt = (Lref * dtref / L);    //npr. duljina 14.42 ima dt = 0.006933 => 144 iteracije od 0 do 1 za t
+     
+     //Lista "t" vrijednosti za koje su te pozicije medusobno udaljene istu duljinu
+     List result = [];
+     double sum = 0.0; //sumiraj u while petlji, ako prevrsi "dist" resetiraj, spremi zadnji "t" u result
+     
+     double t = 0.0; //starting position
+     
+     Vector3 previous = curve.getPoint(t); //pocetna pozicija
+     logg("Novi dt: " + dt.toString());
+     t += dt;
+     
+     //test udaljenosti
+//     Vector3 a = curve.points.first;
+//     Vector3 b = curve.points[1];
+//     logg("Prvi " + a.toString());
+//     logg("Drugi " + b.toString());
+//     logg("razlika: " + a.absoluteError(b).toString());
+     
+     while(t <= 1.0 + dt) //sve dok ne izadjes iz krivulje van
+     {
+          Vector3 current = curve.getPoint(t);
+          
+          double diff = current.absoluteError(previous);
+          
+          sum = sum + diff;
+          
+          if(sum >= dist)
+          {
+               result.add(t);
+               sum = 0.0;
+          }
+          
+          //zapamti trenutni
+          previous.setFrom(current.clone());
+          t += dt;
+     }
+     int count = result.length;
+     var tt = result.first;
+     Vector3 abab = curve.getPoint(tt);
+     Vector3 baba = curve.getPoint(0.0);
+     logg("test: " + abab.absoluteError(baba).toString() + " tt je: "+tt.toString());    
+     
+     addPrepreke(curve, result);
+}
+
+void addPrepreke(SplineCurve3 k, List ts)
+{
+     for(var t in ts)
+     {
+          Mesh m = new Mesh(new SphereGeometry(radius), new MeshBasicMaterial(color: 0x0000ff));
+          Vector3 pos = k.getPoint(t);
+          pos.scale(scale);
+          m.position.setFrom(pos);
+          scene.add(m);
+     }
+     
+     //uzmi binormalu za svaki t i na njoj napravi obstacle
+     logg("Broj segmenata/tangenti " + tube.tangents.length.toString());     
+     logg("Prvi t: " + ts.first.toString());
+     logg("Prvi t + 2: " + (ts.first + 2).toString());
+     double formula = ((ts.first + 2) / k.length) % 1;
+     logg("formula: " + formula.toString());
+     
+     int segments = tube.tangents.length;
+     double t2 = (ts.first + 2 / k.length) % 1;
+     double a = t2 * segments;
+     int b = a.floor();
+     int c = (b + 1) % segments;
+     
+     Vector3 binormalT = tube.binormals[c] - tube.binormals[b];
+     double s = a - b;
+     binormalT.multiply(new Vector3(s,s,s));
+     binormalT.add(tube.binormals[b]); //ovo je valjda gotova binormala
+//     Vector3 tangentT = -k.getTangentAt(ts);
+     
+     //spoji moj t sa tim nekim obstacle-om na binormali
+     Geometry lines = new Geometry();
+     lines.vertices.add(k.getPoint(ts.first));
+     lines.vertices.add(binormalT);     
+     Mesh lins = new Mesh(lines, new LineBasicMaterial(color: 0x00FFFF));
+     parent.add(lins);
+     
+     //dodaj neki obstacle
+     logg("binormala: " + binormalT.toString());
+     Mesh mm = new Mesh(new SphereGeometry(0.6), new MeshBasicMaterial(color: 0x00ffff));
+     mm.position.setFrom(binormalT);
+//     parent.add(mm);
+     
+     //za svaki t uzmi point (position) i odredi segment, uzmi binormalu za taj segment, zbroji, nacrtaj
+     for(double t in ts)
+     {
+          Vector3 pos = k.getPoint(t);
+          pos.scale(scale);
+          double kojiSeg = t * segments;
+          logg("Za t: " + t.toStringAsFixed(5) + " seg: " + kojiSeg.toString());
+          
+          Vector3 binorm = tube.binormals[kojiSeg.floor()];
+          binorm.normalize();
+          binorm.scale(strafe);
+          Vector3 noviPos = pos + binorm;
+          Mesh mm = new Mesh(new SphereGeometry(0.6), new MeshBasicMaterial(color: 0x00ffff));
+          mm.position.setFrom(noviPos);
+          parent.add(mm);
+          
+     }
+}
+
+double vectorDistance(Vector3 first, Vector3 second)
+{
+     double xSquare = Math.pow((first.x - second.x), 2);
+     double ySquare = Math.pow((first.y - second.y), 2);
+     return Math.sqrt(xSquare + ySquare);
+}
+
 void addCurves()
 {
        pp = new PathParser();
@@ -170,6 +294,7 @@ void addCurves()
             init();
             fullSpline = new SplineCurve3(pp.getVertices);
             addTube(fullSpline);
+            initObstacles();
             
        }).whenComplete(()
        {
@@ -190,8 +315,7 @@ void addCurves()
                       
                       animate(0);
                  });
-       });
-     
+       });     
 }
 
 Object3D connect(SplineCurve3 curve, num hex)
@@ -273,7 +397,6 @@ init()
 //       parent.add(halfContainer);
 //       addTube(fullSpline);
 
-      
      //orthocamera
      orthoCamera = new OrthographicCamera(left, right, top, bottom);
      orthoCamera.position.setFrom(cameraOrthoPosition);
@@ -351,14 +474,11 @@ void moveTheObject()
      try
      {
           posObject = (fullSpline.getPointAt((t + 2 / fullSpline.length) % 1));
-//          logg(posObject.toString());
      }
      catch(e)
      {
           logg(posObject.toString());
      }
-     
-     
 
      //interpolation - moving object
      int segments = tube.tangents.length;
@@ -420,7 +540,7 @@ animate(num time)
 //     moveTheObject();     
 //     renderer.render(scene, camera);
 //     renderer.render(scene, toggle ? camera : orthoCamera);
-     renderer.render(scene, animation == true ? splineCamera : camera);
+     renderer.render(scene, animation == true ? splineCamera : orthoCamera);
 //     parent.rotation.y += (targetRotation - parent.rotation.y) * 0.05;
      window.requestAnimationFrame(animate);
 }
