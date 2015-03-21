@@ -22,6 +22,21 @@ double dtrRatio = Math.PI / 180.0;
 
 List axisAngle = new List(4);
 
+Math.Random random = new Math.Random(new DateTime.now().millisecondsSinceEpoch);
+
+class A
+{
+     int a;
+     
+     A(this.a);
+}
+
+class B
+{
+     int b;
+     B(this.b);
+}
+
 void main() {
 
 
@@ -49,11 +64,112 @@ void main() {
      sw.start();
 
 
-     while (true) {
-//          print("elapsed: ${sw.elapsed.inSeconds} sin: ${computeSine(sw.elapsed.inSeconds)}");
-//          print(sw.elapsedTicks / 1000000);
-     }
+     
+     A a = new A(10);
+     B b = new B(20);
+     
+     List abs = [];
+     abs.add(a);
+     abs.add(b);
+     
+     //testiram generateNextVertPos(int last, int size)
+     int upperBound = 3;
+     int lowerBound = 0;
+     Math.Random r = new Math.Random(new DateTime.now().millisecondsSinceEpoch);
+     print(r.nextInt((upperBound  + 1) - lowerBound) + lowerBound);     
+     int last = 0;
+     int size = 0;     
+     int res = generateNextVertPos(last, size);
+     print(res);
+     
+     List prva = [1,2,3,4,5,6,7,8,9];
+     List druga = prva.sublist(1, 4 + 1);
+     
+     druga[2] = 10;
+     print(prva);
+     
+     print(druga);
+     
+     int prvi = 3;
+     int drugi = 5;
+     
+     print((prvi - drugi));
+     
+     int x = 1;
+     
+     if(x < 2)
+          print("va je");
+     else if(x < 3)
+          print("tri je");
+     else print("neznam");
+     
+     double lower = 0.1;
+     double higher = 0.14; 
+     
+     //random.nextInt((upperBound + 1) - lowerBound) + lowerBound;
+     int xmy = random.nextInt(((higher - lower) * 100).toInt()) + (lower*100).toInt();
+//     print(higher * 100);
+     print(xmy);
+     
+     print(generateRandomDoubleBoundsPercentage(lower,  higher));
+     
+     double percent = 0.6;
+     Vector3 binormal = new Vector3(10.0, 5.0, 2.0);
+     binormal = percent > 0.5 ? binormal.negate() : binormal;
+     print(binormal);
+}
 
+double generateRandomDoubleBoundsPercentage(double lower, double higher)
+{
+     return (random.nextInt(((higher + 0.01 - lower) * 100).toInt()) + (lower*100))/100.0;
+}
+
+int generateNextVertPos(int last, int size)
+{
+    //last moze biti 0/1/2/3
+    //size moze biti 0/1/2/3
+     
+     //ako je size 2 ili 3 vrati random od 0 do 3
+     //ako je size 0 vrati rezultat je u range-u [last-1, last+1]
+     //ako je size 1 vrati rezultat je u range-u [last-2, last+2]
+     
+     if(size > 1)
+          return random.nextInt(4); //0/1/2/3
+     else
+     {
+          int deviate = size + 1;
+          int lowerBound;
+          int upperBound;
+          
+//          if((last - deviate) < 0)
+//          {
+//               lowerBound = 0;
+//          }
+//          if((last - deviate) >= 0)
+//          {
+//               lowerBound = last - deviate;
+//          }
+//          
+//          
+//          if((last + deviate) >= 3)
+//          {
+//               upperBound = 3;
+//          }
+//          if((last + deviate) < 3)
+//          {
+//               upperBound = last + deviate;
+//          }
+          
+          //ekvivalent gornjem kodu
+          upperBound = ((last + deviate) >= 3) ? 3 : last + deviate;
+          lowerBound = ((last - deviate) < 0) ? 0 : last - deviate;
+          
+          print("Lower " + lowerBound.toString());
+          print("Upper " + upperBound.toString());
+          
+          /**Return random number in between inclusive [upperBound] and inclusive [lowerBound]*/
+          return random.nextInt((upperBound + 1) - lowerBound) + lowerBound;
+     }     
 }
 
 double computeSine(int seconds) {

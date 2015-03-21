@@ -541,8 +541,8 @@ render()
                posObject.add(normalObject.clone());
                movingObject.position.setFrom(posObject);
 
-//               print("ScenePos: ${scene.position}, P: ${movingObject.position}");
-
+               //added 19.03.2015.
+               normalObject.y = normalObject.y.abs();   
 
                //Object lookAt
                Vector3 smjerGledanja = tangentObject.clone().normalize().add(movingObject.position);
