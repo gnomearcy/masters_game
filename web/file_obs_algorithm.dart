@@ -57,12 +57,12 @@ PathParser pp;
 Keyboard keyboard;
 //Path data
 ClosedSplineCurve3 mainCurve;
-Object3D tubeMesh;
+//Object3D tubeMesh;
 TubeGeometry tube;
-bool closed = false;
-int radiussegments = 1;
-int segments = 100;
-double tuberadius = 2.0;
+//bool closed = false;
+//int radiussegments = 1;
+//int segments = 100;
+//double tuberadius = 2.0;
 Object3D parent;
 double scale = 10.0;
 DivElement log;
@@ -115,44 +115,44 @@ void main()
 
 void addRandom() 
 {
-     //adds random obstacles
-     DateTime date = new DateTime.now();
-     random = new Math.Random(date.millisecondsSinceEpoch);
-
-     Mesh score;
-
-     double nrOfVertSegs = -planeHeight / 2.0;
-
-     List xPos = [-(horSeg * (3 / 2)), -(horSeg * (1 / 2)), (horSeg * (1 / 2)), (horSeg * (3 / 2))];
-
-     while (nrOfVertSegs < (planeHeight / 2.0)) //manji od 250
-     {
-          //generate obstacle patch
-          int patchSize = random.nextInt(2) + 3; //0,1,2,3,4 desno
-          int horPos = random.nextInt(4); //0,1,2,3 gore dolje 0 ->
-          double newX = xPos[horPos];
-
-          for (int i = 0; i < patchSize; i++) {
-               obs = new Mesh(new SphereGeometry(radius), obstableMat);
-               obs.position.x = newX;
-               obs.position.z = nrOfVertSegs; //-250 na pocetku
-               scene.add(obs);
-
-               nrOfVertSegs += 1.0;
-          }
-          //generate void
-          int voidWidth = random.nextInt(5) + 5; //0,1,2,3,4
-          double voidSeg = 0.5;
-
-          if (voidWidth != 0) {
-               Mesh voidPlane = new Mesh(new PlaneGeometry(planeWidth * 0.8, voidWidth.toDouble()), new MeshBasicMaterial(color: 0x0000ff));
-               voidPlane.rotation.x = -90 * Math.PI / 180.0;
-               voidPlane.position.y = 2.0;
-               voidPlane.position.z = nrOfVertSegs + (voidWidth - 1) * voidSeg;
-               scene.add(voidPlane);
-               nrOfVertSegs += voidWidth.toDouble();
-          }
-     }
+//     //adds random obstacles
+//     DateTime date = new DateTime.now();
+//     random = new Math.Random(date.millisecondsSinceEpoch);
+//
+//     Mesh score;
+//
+//     double nrOfVertSegs = -planeHeight / 2.0;
+//
+//     List xPos = [-(horSeg * (3 / 2)), -(horSeg * (1 / 2)), (horSeg * (1 / 2)), (horSeg * (3 / 2))];
+//
+//     while (nrOfVertSegs < (planeHeight / 2.0)) //manji od 250
+//     {
+//          //generate obstacle patch
+//          int patchSize = random.nextInt(2) + 3; //0,1,2,3,4 desno
+//          int horPos = random.nextInt(4); //0,1,2,3 gore dolje 0 ->
+//          double newX = xPos[horPos];
+//
+//          for (int i = 0; i < patchSize; i++) {
+//               obs = new Mesh(new SphereGeometry(radius), obstableMat);
+//               obs.position.x = newX;
+//               obs.position.z = nrOfVertSegs; //-250 na pocetku
+//               scene.add(obs);
+//
+//               nrOfVertSegs += 1.0;
+//          }
+//          //generate void
+//          int voidWidth = random.nextInt(5) + 5; //0,1,2,3,4
+//          double voidSeg = 0.5;
+//
+//          if (voidWidth != 0) {
+//               Mesh voidPlane = new Mesh(new PlaneGeometry(planeWidth * 0.8, voidWidth.toDouble()), new MeshBasicMaterial(color: 0x0000ff));
+//               voidPlane.rotation.x = -90 * Math.PI / 180.0;
+//               voidPlane.position.y = 2.0;
+//               voidPlane.position.z = nrOfVertSegs + (voidWidth - 1) * voidSeg;
+//               scene.add(voidPlane);
+//               nrOfVertSegs += voidWidth.toDouble();
+//          }
+//     }
 }
 
 initObstacles() 
@@ -162,7 +162,7 @@ initObstacles()
      double dtref = 0.01; //referentni pomak za izracun aktualnog pomaka ovisno o duljini krivulje
      double dist = 0.4; //threshold iznad kojeg biljezim trenutnu vrijednost "t"
 
-     SplineCurve3 curve = tube.path; //krivulja u pitanju
+//     SplineCurve3 curve = tube.path; //krivulja u pitanju
      double L = curve.length; //duljina krivulje
      double dt = (Lref * dtref / L); //npr. duljina 14.42 ima dt = 0.006933 => 144 iteracije od 0 do 1 za t
 
@@ -219,18 +219,20 @@ void addPrepreke(SplineCurve3 k, List ts) {
           //"test" obstacle na rubovima binormala
           Vector3 binorm = getBinormal(t);
           Vector3 pos = k.getPoint(t);
+//          binorm.scale(scale);
+          pos.scale(scale);
           //lijeva strana
           Vector3 noviPos = pos + binorm;
           Mesh mm = new Mesh(new SphereGeometry(0.6), new MeshBasicMaterial(color: 0x00ffff));
           mm.position.setFrom(noviPos);
-//          parent.add(mm);
+          parent.add(mm);
           //desna strana
           Vector3 rightBinorm = new Vector3.copy(binorm);
           rightBinorm.negate();
           noviPos = pos + rightBinorm;
           Mesh mmm = new Mesh(new SphereGeometry(0.6), new MeshBasicMaterial(color: 0x00ffff));
           mmm.position.setFrom(noviPos);
-//          parent.add(mmm);
+          parent.add(mmm);
           //kraj - "test" obstacle na rubovima binormala
 
           //horizontalne tockice
@@ -305,14 +307,16 @@ Vector3 getBinormal(double t)
           Vector3 binorm = tube.binormals[kojiSeg.floor()];
           binorm.normalize();
           binorm.scale(strafe);*/
-     SplineCurve3 curve = tube.path;
-     int segments = tube.tangents.length;
+//     SplineCurve3 curve = tube.path;
+//     int segments = tube.tangents.length;
      
      Vector3 position = curve.getPoint(t);
-     position.scale(scale); //TODO skaliraj curve odmah dok konstruiras ????
-     int segment = (t * segments).floor();
      
-     Vector3 binormal = tube.binormals[segment].clone(); //clone for safety
+     position.scale(scale); //TODO skaliraj curve odmah dok konstruiras ????
+     int segment = (t * segs).floor();
+     
+//     Vector3 binormal = tube.binormals[segment].clone(); //clone for safety
+     Vector3 binormal = binormals[segment].clone();
      binormal.normalize();
      binormal.scale(strafe);
      
@@ -471,19 +475,22 @@ int generateNextVertPos(int last, int size) {
      }
 }
 
-class Void {
+class Void 
+{
      int lastVerticalPosition; //last patch
      int newVerticalPosition; //next patch
      int size; //size in horizontal dimension, size equals ts.length;
      List ts; //sublist of global list of all valid t values
 }
 
-class Patch {
+class Patch 
+{
      int size;
      List ts;
 }
 
-class Obstacle {
+class Obstacle 
+{
      Geometry obsGeo;
      MeshBasicMaterial obsMat;
 }
@@ -550,17 +557,27 @@ Object3D connect(SplineCurve3 curve, num hex) {
      return container;
 }
 
-void addTube(SplineCurve3 curve) {
-     if (tubeMesh != null) {
-          parent.remove(tubeMesh);
-     }
+void addTube(SplineCurve3 c) 
+{
+//     if (tubeMesh != null) 
+//     {
+//          parent.remove(tubeMesh);
+//     }
 
-     print("${curve.toString()}");
-     tube = new TubeGeometry(curve, curve.points.length - 1, tuberadius, radiussegments, closed, false);
-     tubeMesh = SceneUtils.createMultiMaterialObject(tube, [new MeshLambertMaterial(color: 0xff00ff), new MeshBasicMaterial(color: 0x000000, opacity: 0.3, wireframe: true, transparent: true)]);
-     tubeMesh.scale.setFrom(new Vector3(scale, scale, scale));
+     int radiussegments = 1;
+     double tuberadius = 2.0;
+     bool closed = false;
+
+     tube = new TubeGeometry(c, c.points.length - 1, tuberadius, radiussegments, closed, false);
+//     Object3D tubeMesh = SceneUtils.createMultiMaterialObject(tube, [new MeshLambertMaterial(color: 0xff00ff), new MeshBasicMaterial(color: 0x000000, opacity: 0.3, wireframe: true, transparent: true)]);
+//     Mesh tubeMesh = new Mesh(tube);
+//     tubeMesh.scale.setFrom(new Vector3(scale, scale, scale));
 //     tubeMesh.position.x = -30.0;
 //     parent.add(tubeMesh);
+     
+     segs = tube.tangents.length; 
+     binormals = tube.binormals;
+     curve = tube.path;     
 }
 
 void logg(String input) {
@@ -670,7 +687,8 @@ void animateCamera(bool t) {
      }
 }
 
-void moveTheObject() {
+void moveTheObject() 
+{
      int time = new DateTime.now().millisecondsSinceEpoch;
      int looptime = loopSeconds * 1000;
      double t = (time % looptime) / looptime;
@@ -683,17 +701,19 @@ void moveTheObject() {
      }
 
      //interpolation - moving object
-     int segments = tube.tangents.length;
+//     int segments = tube.tangents.length;
      double t2 = (t + 2 / fullSpline.length) % 1;
-     double pickt2 = t2 * segments;
+     double pickt2 = t2 * segs;
      int pick2 = pickt2.floor();
-     int pickNext2 = (pick2 + 1) % segments;
+     int pickNext2 = (pick2 + 1) % segs;
 
      //Object position
-     binormalObject = tube.binormals[pickNext2] - tube.binormals[pick2];
+//     binormalObject = tube.binormals[pickNext2] - tube.binormals[pick2];
+     binormalObject = binormals[pickNext2] - binormals[pick2];
+
      double bScaleObject = pickt2 - pick2;
      binormalObject.multiply(new Vector3(bScaleObject, bScaleObject, bScaleObject));
-     binormalObject.add(tube.binormals[pick2]);
+     binormalObject.add(binormals[pick2]);
      tangentObject = -fullSpline.getTangentAt(t2);
      normalObject.setFrom(binormalObject).crossInto(tangentObject, normalObject);
      posObject.add(normalObject.clone());
