@@ -107,6 +107,7 @@ List scoreItemList = [];
 SplineCurve3 curve;
 List<Vector3> binormals;
 int segs; //nr of tangents;
+List vertPositions = [0, 1, 2, 3];
 
 void main() 
 {
@@ -291,9 +292,8 @@ void addPrepreke()
                currentT += voidSize; //pomakni se udesno
           }
           
-          generatePatchData(newVertPos, globalTs.sublist(currentT, currentT + patchSize));
+          generatePatchData(newVertPos, globalTs.sublist(currentT, currentT + patchSize), patchSize);
           currentT += patchSize;
-
      }
 }
 
@@ -324,25 +324,114 @@ Vector3 getBinormal(double t)
      return binormal;
 }
 
-void generatePatchData(int position, List subTs)
+void generatePatchData(int reserved, List subTs, int patchSize)
 {
+     /*  int rndhorizontal = random.nextInt(h.length); //3 = h.length
+//               int whichPosition = h[rndhorizontal]; //[0,2,3], random da 1, to je 2
+//               
+//               if(whichPosition > reserved)
+//               {
+//                    lastPosition = reserved + 1;
+//                    nextPosition = h.last;
+//               }
+//               else
+//               {
+//                    lastPosition = h.first;
+//                    nextPosition = reserved - 1;
+//               }*/
      
+     //TODO refactor........
+     List h = [0, 1, 2, 3];
+     h.remove(reserved);
+     
+     //Add score items in a horizontal patch at same position on each T
+     for(double t in subTs)
+     {
+          addScoreItem(generateItemPosition(t, reserved, reserved));
+     }
+     
+     if(patchSize == 3)
+     {
+          //1 mozda
+          if(random.nextInt(2) == 0)
+               return;
+          else
+          {
+               int whichT = random.nextInt(3); //3 = subTs.length;
+               Positions p = generateVerticalPositions(reserved);
+               addObstacle(generateItemPosition(subTs[whichT], p._last, p._next));
+          }
+     }
+     
+     if(patchSize == 4)          
+     {
+          //1 sigurno
+          int whichT = random.nextInt(4);          
+          Positions p = generateVerticalPositions(reserved);
+          addObstacle(generateItemPosition(subTs[whichT], p._last, p._next));
+
+     }
+     
+     if(patchSize == 5)
+     {
+          int whichT = random.nextInt(5);          
+          Positions p = generateVerticalPositions(reserved);
+          addObstacle(generateItemPosition(subTs[whichT], p._last, p._next));
+          
+          subTs.removeAt(whichT);
+          
+          //1 mozda
+          if(random.nextInt(2) == 0)
+          {
+               return;
+          }
+          else
+          {
+               int whichT = random.nextInt(4);
+               Positions p = generateVerticalPositions(reserved);
+               addObstacle(generateItemPosition(subTs[whichT], p._last, p._next));
+          }          
+          
+     }
+}
+
+Positions generateVerticalPositions(int reserved)
+{
+     List temp = vertPositions.toList();
+     temp.remove(reserved);
+     
+     int lastPosition;
+     int nextPosition;
+     
+     int rnd = random.nextInt(temp.length); //3 = temp.length
+     int generated = temp[rnd]; //[0,2,3], random da 1, to je 2
+     
+     if(generated > reserved)
+     {
+          lastPosition = reserved + 1;
+          nextPosition = temp.last;
+     }
+     else
+     {
+          lastPosition = temp.first;
+          nextPosition = reserved - 1;
+     }
+     
+     return new Positions(lastPosition, nextPosition);     
+}
+
+
+class Positions
+{
+     int _last;
+     int _next;
+     
+     Positions(this._last, this._next);
 }
 
 void generateVoidData(int lastPosition, int newPosition, List subTs, int voidSize) 
 { 
-     if(voidSize == 0)
-     {
-          return;
-     }
-     
-     if(voidSize == 1)
-     {
-         //generiraj 1 mozda
-         if(random.nextInt(2) == 0)
-              return;
-         else
-         {
+     /*  
            //dobio 1, dohvati binormalu, izracunaj 
             double percent = generateBinormalPercentage(lastPosition, newPosition);
             double binormalScale = generateScaleFromPercentage(percent);
@@ -355,54 +444,79 @@ void generateVoidData(int lastPosition, int newPosition, List subTs, int voidSiz
             position.scale(scale);
             
             Vector3 finalPosition = binormal + position;
-            
-            //instantiate an obstacle at position [finalPosition]
-            
+ 
+     */
+     
+     //TODO refactor...
+     if(voidSize == 0)
+     {
+          return;
+     }
+     
+     if(voidSize == 1)
+     {
+         //1 mozda
+         if(random.nextInt(2) == 0)
+              return;
+         else
+         {
+              addObstacle(generateItemPosition(subTs[0], lastPosition, newPosition));            
          }         
      }
      
      if(voidSize == 2)
      {
-          //jedan obstacle je sigurno, odaberi nakojem T-u dohvacam binormalu
-          int whichT = random.nextInt(2);
-          
-          //dobio 1, dohvati binormalu, izracunaj 
-          double percent = generateBinormalPercentage(lastPosition, newPosition);
-          double binormalScale = generateScaleFromPercentage(percent);
-          
-          Vector3 binormal = getBinormal(subTs[whichT]);
-          binormal = percent > 0.5 ? binormal.negate() : binormal;
-          binormal.scale(binormalScale);
-          
-          Vector3 position = curve.getPoint(subTs[whichT]);
-          position.scale(scale);
-          
-          Vector3 finalPosition = binormal + position;
-          
-          //instantiate an obstacle at position [finalPosition]
+          int whichT = random.nextInt(2);          
+          addObstacle(generateItemPosition(subTs[whichT], lastPosition, newPosition));
      }
      
      if(voidSize == 3)
      {
           //1 sigurno
-        //jedan obstacle je sigurno, odaberi nakojem T-u dohvacam binormalu
         int whichT = random.nextInt(3);
-        
-        //dobio 1, dohvati binormalu, izracunaj 
-        double percent = generateBinormalPercentage(lastPosition, newPosition);
-        double binormalScale = generateScaleFromPercentage(percent);
-        
-        Vector3 binormal = getBinormal(subTs[whichT]);
-        binormal = percent > 0.5 ? binormal.negate() : binormal;
-        binormal.scale(binormalScale);
-        
-        Vector3 position = curve.getPoint(subTs[whichT]);
-        position.scale(scale);
-        
-        Vector3 finalPosition = binormal + position;
-        
-        //instantiate an obstacle at position [finalPosition]
+        addObstacle(generateItemPosition(subTs[whichT], lastPosition, newPosition));
+       
+        //1 mozda
+       if(random.nextInt(2) == 0)
+            return;
+       else
+       {
+            subTs.removeAt(whichT);
+            int rnd = random.nextInt(2);
+            addObstacle(generateItemPosition(subTs[rnd], lastPosition, newPosition));
+       }
      }
+}
+
+void addScoreItem(Vector3 position)
+{
+     
+}
+
+void addObstacle(Vector3 position)
+{
+     
+}
+
+/**[t] - vertical position
+ * [lastPosition] - previous horizontal position
+ * [newPosition] - next horizontal position
+ */
+Vector3 generateItemPosition(double t, int lastPosition, int newPosition)
+{
+      double percent = generateBinormalPercentage(lastPosition, newPosition);
+      double binormalScale = generateScaleFromPercentage(percent);
+      
+      Vector3 binormal = getBinormal(t);
+      binormal = percent > 0.5 ? binormal.negate() : binormal;
+      binormal.scale(binormalScale);
+      
+      Vector3 position = curve.getPoint(t);
+      position.scale(scale);
+      
+      Vector3 finalPosition = binormal + position;
+      
+      return finalPosition;      
 }
 
 double generateScaleFromPercentage(double percent)

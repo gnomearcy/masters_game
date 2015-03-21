@@ -117,6 +117,49 @@ void main() {
      Vector3 binormal = new Vector3(10.0, 5.0, 2.0);
      binormal = percent > 0.5 ? binormal.negate() : binormal;
      print(binormal);
+     
+     List l = [10,20,30];
+     print(l);
+     l.removeAt(1);
+     print(l);
+     
+     int position = 2;
+     List h = [0, 1, 2, 3];
+     h.remove(position);
+     print(h);
+     
+     print(h.length);
+     List<int> lll = new List(5);
+     
+     lll[1] = 2;
+     print(lll);
+     
+     int result = generateVerticalPosition();
+     
+     Positions p = new Positions(10,20);
+     
+     print(p.last);
+     
+     
+}
+List vertPositions = [0, 1, 2, 3];
+
+class Positions
+{
+     int _last;
+     int _next;
+     
+     Positions(this._last, this._next);
+     get last => _last; 
+     get next => _next;
+}
+
+int generateVerticalPosition()
+{
+     List temp = vertPositions.toList();   
+     
+     temp.add(2);
+     print(temp);
 }
 
 double generateRandomDoubleBoundsPercentage(double lower, double higher)
