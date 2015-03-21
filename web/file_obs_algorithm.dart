@@ -167,7 +167,7 @@ initObstacles()
      double dt = (Lref * dtref / L); //npr. duljina 14.42 ima dt = 0.006933 => 144 iteracije od 0 do 1 za t
 
      //Lista "t" vrijednosti za koje su te pozicije medusobno udaljene istu duljinu
-     List result = [];
+//     List result = [];
      double sum = 0.0; //sumiraj u while petlji, ako prevrsi "dist" resetiraj, spremi zadnji "t" u result
 
      double t = 0.0; //starting position
@@ -185,7 +185,7 @@ initObstacles()
           sum = sum + diff;
 
           if (sum >= dist) {
-               result.add(t);
+               globalTs.add(t);
                sum = 0.0;
           }
 
@@ -193,20 +193,21 @@ initObstacles()
           previous.setFrom(current.clone());
           t += dt;
      }
-     int count = result.length;
-     var tt = result.first;
+     int count = globalTs.length;
+     var tt = globalTs.first;
      Vector3 abab = curve.getPoint(tt);
      Vector3 baba = curve.getPoint(0.0);
      logg("test: " + abab.absoluteError(baba).toString() + " tt je: " + tt.toString());
 
-     addPrepreke(curve, result);
+     addPrepreke();
 }
 
-void addPrepreke(SplineCurve3 k, List ts) {
+void addPrepreke() 
+{
      //plavi markeri
-     for (var t in ts) {
+     for (var t in globalTs) {
           Mesh m = new Mesh(new SphereGeometry(radius / 2.0), new MeshBasicMaterial(color: 0x0000ff));
-          Vector3 pos = k.getPoint(t);
+          Vector3 pos = curve.getPoint(t);
           pos.scale(scale);
           m.position.setFrom(pos);
           parent.add(m);
@@ -214,13 +215,13 @@ void addPrepreke(SplineCurve3 k, List ts) {
 
      //za svaki t uzmi point (position) i odredi segment, uzmi binormalu za taj segment, zbroji, nacrtaj
 //     int segments = tube.tangents.length;
-     for (double t in ts) 
+     for (double t in globalTs) 
      {
           //"test" obstacle na rubovima binormala
           Vector3 binorm = getBinormal(t);
-          Vector3 pos = k.getPoint(t);
-//          binorm.scale(scale);
-          pos.scale(scale);
+          Vector3 pos = curve.getPoint(t);
+          pos.scale(scale);          
+          
           //lijeva strana
           Vector3 noviPos = pos + binorm;
           Mesh mm = new Mesh(new SphereGeometry(0.6), new MeshBasicMaterial(color: 0x00ffff));
@@ -269,7 +270,7 @@ void addPrepreke(SplineCurve3 k, List ts) {
      int ignoreFirstN = 0; //ignore first N t-s
      int ignoreLastN = 0; //ignore last N t-s to give time to generate new set of obstacles and score items.
      int currentT = 0 + ignoreFirstN;
-     int totalT = ts.length - ignoreLastN; //pretpostavka da je ts veci od ignoreLastN
+     int totalT = globalTs.length - ignoreLastN; //pretpostavka da je ts veci od ignoreLastN
 
      int lastVertPos = random.nextInt(4); //od 0 do 4-1 -> 0,1,2,3 //npr. 2
      int newVertPos;
@@ -286,11 +287,11 @@ void addPrepreke(SplineCurve3 k, List ts) {
           //imam staru i novu vert poziciju - mogu napraviti prepreke na voidu
           if (voidSize != 0) 
           {
-               generateVoidData(lastVertPos, newVertPos, ts.sublist(currentT, currentT + voidSize), voidSize);
+               generateVoidData(lastVertPos, newVertPos, globalTs.sublist(currentT, currentT + voidSize), voidSize);
                currentT += voidSize; //pomakni se udesno
           }
           
-          generatePatchData(newVertPos, ts.sublist(currentT, currentT + patchSize));
+          generatePatchData(newVertPos, globalTs.sublist(currentT, currentT + patchSize));
           currentT += patchSize;
 
      }
@@ -331,7 +332,10 @@ void generatePatchData(int position, List subTs)
 void generateVoidData(int lastPosition, int newPosition, List subTs, int voidSize) 
 { 
      if(voidSize == 0)
+     {
           return;
+     }
+     
      if(voidSize == 1)
      {
          //generiraj 1 mozda
@@ -341,14 +345,63 @@ void generateVoidData(int lastPosition, int newPosition, List subTs, int voidSiz
          {
            //dobio 1, dohvati binormalu, izracunaj 
             double percent = generateBinormalPercentage(lastPosition, newPosition);
-            double tempScale = generateScaleFromPercentage(percent);
+            double binormalScale = generateScaleFromPercentage(percent);
             
             Vector3 binormal = getBinormal(subTs[0]);
             binormal = percent > 0.5 ? binormal.negate() : binormal;
-            binormal.scale(tempScale);
+            binormal.scale(binormalScale);
             
-         }
-         
+            Vector3 position = curve.getPoint(subTs[0]);
+            position.scale(scale);
+            
+            Vector3 finalPosition = binormal + position;
+            
+            //instantiate an obstacle at position [finalPosition]
+            
+         }         
+     }
+     
+     if(voidSize == 2)
+     {
+          //jedan obstacle je sigurno, odaberi nakojem T-u dohvacam binormalu
+          int whichT = random.nextInt(2);
+          
+          //dobio 1, dohvati binormalu, izracunaj 
+          double percent = generateBinormalPercentage(lastPosition, newPosition);
+          double binormalScale = generateScaleFromPercentage(percent);
+          
+          Vector3 binormal = getBinormal(subTs[whichT]);
+          binormal = percent > 0.5 ? binormal.negate() : binormal;
+          binormal.scale(binormalScale);
+          
+          Vector3 position = curve.getPoint(subTs[whichT]);
+          position.scale(scale);
+          
+          Vector3 finalPosition = binormal + position;
+          
+          //instantiate an obstacle at position [finalPosition]
+     }
+     
+     if(voidSize == 3)
+     {
+          //1 sigurno
+        //jedan obstacle je sigurno, odaberi nakojem T-u dohvacam binormalu
+        int whichT = random.nextInt(3);
+        
+        //dobio 1, dohvati binormalu, izracunaj 
+        double percent = generateBinormalPercentage(lastPosition, newPosition);
+        double binormalScale = generateScaleFromPercentage(percent);
+        
+        Vector3 binormal = getBinormal(subTs[whichT]);
+        binormal = percent > 0.5 ? binormal.negate() : binormal;
+        binormal.scale(binormalScale);
+        
+        Vector3 position = curve.getPoint(subTs[whichT]);
+        position.scale(scale);
+        
+        Vector3 finalPosition = binormal + position;
+        
+        //instantiate an obstacle at position [finalPosition]
      }
 }
 
