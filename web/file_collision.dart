@@ -2,6 +2,8 @@ import 'package:three/three.dart';
 import 'package:vector_math/vector_math.dart';
 import 'dart:html';
 
+import 'utilities/Keyboard.dart';
+
 Scene scene;
 PerspectiveCamera camera;
 CameraHelper cameraHelper;
@@ -21,6 +23,9 @@ var mouseXOnMouseDown = 0;
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
 
+ButtonInputElement btn;
+Mesh toHit;
+Keyboard kb;
 Mesh cube;
 
 void main()
@@ -49,15 +54,71 @@ init()
      renderer.domElement.addEventListener('touchmove', onDocumentTouchMove, false);
      window.addEventListener('resize', onWindowResize, false);
      
+     btn = querySelector('#hit');
+     kb = new Keyboard();
+     
      //ADD OBJECTS TO SCENE HERE
      cube = new Mesh(new CubeGeometry(20.0, 20.0, 20.0), new MeshBasicMaterial(color:0xff0000));
-     scene.add(cube);          
+     scene.add(cube);     
+     
+     toHit = new Mesh(new CubeGeometry(20.0, 20.0, 20.0), new MeshBasicMaterial(color:0x123456));
+     toHit.position.x = 50.0;
+     scene.add(toHit);
+     
+     cube.geometry.computeBoundingBox();
+     String one = cube.geometry.boundingBox.min.toString();
+     String two = cube.geometry.boundingBox.max.toString();
+     
+     btn.value = one + " " + two;
+     
+     cube.geometry.computeBoundingSphere();
+     
+     btn.value = cube.geometry.boundingSphere.radius.toString();
+     
+     double radius = cube.geometry.boundingSphere.radius;
+     
+     Geometry geo = new Geometry();
+     geo.vertices.add(new Vector3.zero());
+     geo.vertices.add(new Vector3(radius, radius,radius));
+     
+     Line m = new Line(geo, new LineBasicMaterial(color: 0xff0000,linewidth: 5));
+     scene.add(m);
+     
+     
+     scene.add(new Mesh(new SphereGeometry(10.0), new MeshBasicMaterial(color: 0x00f00f)));
+     
+     Geometry test = new Geometry();
+     
+     test.vertices.add(new Vector3(10.0, 0.0, 10.0));
+     test.vertices.add(new Vector3(10.0, 0.0, -10.0));
+     test.vertices.add(new Vector3(-10.0, 0.0, 0.0));
+     
+     test.computeBoundingBox();
+     
+     btn.value = test.boundingBox.min.toString() + " " + test.boundingBox.max.toString();
+
+     
+     
+     
+     
+     
      //-------------------------
 }
+
+double factor = 2.0;
 
 render()
 {
      //WRITE ANIMATION LOGIC HERE
+     if(kb.isPressed(KeyCode.W))
+     {
+          cube.position.x += factor;
+     }
+     
+     if(kb.isPressed(KeyCode.A))
+     {
+          cube.position.x -= factor;
+     }
 }
 
 animate(num time)

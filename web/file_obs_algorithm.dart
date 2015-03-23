@@ -38,6 +38,8 @@ var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
 
 ButtonInputElement toggleBtn;
+ButtonInputElement scoreBtn;
+ButtonInputElement healthBtn;
 bool toggle = false;
 
 MeshBasicMaterial obstableMat = new MeshBasicMaterial(color: 0xff0000, wireframe: false);
@@ -108,6 +110,9 @@ SplineCurve3 curve;
 List<Vector3> binormals;
 int segs; //nr of tangents;
 List vertPositions = [0, 1, 2, 3];
+
+int health = 3;
+int score = 0;
 
 void main() 
 {
@@ -915,6 +920,11 @@ init() {
 //     toggleBtn.onClick.listen((e) => toggle = !toggle);
      toggleBtn.onClick.listen((e) => animateCamera(true));
      log = querySelector('#log');
+     scoreBtn = querySelector('#score');
+     healthBtn = querySelector('#health');
+     
+     scoreBtn.value = "Score: " + score.toString();
+     healthBtn.value = "Health: " + health.toString();
 
      //ADD OBJECTS TO SCENE HERE
      //lights
@@ -923,7 +933,6 @@ init() {
 
      //obstacles
 //     addRandom();
-
 
      String texPath = 'obstacle_planning/crate.png';
      String texPathPlane = 'obstacle_planning/floor.jpg';

@@ -13,10 +13,14 @@
     <!-- for this next line to work, your pubspec.yaml file must have a dependency on 'browser' -->
     <script src="packages/browser/dart.js"></script>
     <div style="position: absolute; top: 10px; width: 30%; background:black; border: 2px solid">
-          <div >
+          
                <input type="button" id="toggle" value="Toggle"/>
+               <input type="button" id="score" value="Score: "/>
+               <input type="button" id="health" value="Health: "/>               
+          <div>
+               <div id="log" style="color: white">
+               </div>
           </div>
-         <div id="log" style="color: white"></div>
     </div>
     
   </body>
