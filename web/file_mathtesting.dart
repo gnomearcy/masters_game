@@ -140,9 +140,19 @@ void main() {
      
      print(p.last);
      
+     List nekaLista1 = [1,2,3,4,5];
+     zasto(nekaLista1.toList());
+     print(nekaLista1);
+     
      
 }
 List vertPositions = [0, 1, 2, 3];
+
+void zasto(List l)
+{
+     l.remove(1);     
+     print(l);
+}
 
 class Positions
 {

@@ -15,7 +15,7 @@ CameraHelper cameraHelper;
 WebGLRenderer renderer;
 Element container;
 
-Vector3 cameraPosition = new Vector3(50.0, 100.0, 0.0);
+Vector3 cameraPosition = new Vector3(0.0, 100.0, 0.0);
 double cameraFov = 75.0;
 double cameraNear = 1.0;
 double cameraFar = 1000.0;
@@ -174,7 +174,7 @@ initObstacles()
      double t = 0.0; //starting position
 
      Vector3 previous = curve.getPoint(t); //pocetna pozicija
-     logg("Novi dt: " + dt.toString());
+//     logg("Novi dt: " + dt.toString());
      t += dt;
 
      while (t <= 1.0 + dt) //sve dok ne izadjes iz krivulje van
@@ -198,7 +198,7 @@ initObstacles()
      var tt = globalTs.first;
      Vector3 abab = curve.getPoint(tt);
      Vector3 baba = curve.getPoint(0.0);
-     logg("test: " + abab.absoluteError(baba).toString() + " tt je: " + tt.toString());
+//     logg("test: " + abab.absoluteError(baba).toString() + " tt je: " + tt.toString());
 
      addPrepreke();
 }
@@ -206,12 +206,13 @@ initObstacles()
 void addPrepreke() 
 {
      //plavi markeri
-     for (var t in globalTs) {
+     for (var t in globalTs) 
+     {
           Mesh m = new Mesh(new SphereGeometry(radius / 2.0), new MeshBasicMaterial(color: 0x0000ff));
           Vector3 pos = curve.getPoint(t);
           pos.scale(scale);
           m.position.setFrom(pos);
-          parent.add(m);
+//          parent.add(m);
      }
 
      //za svaki t uzmi point (position) i odredi segment, uzmi binormalu za taj segment, zbroji, nacrtaj
@@ -227,14 +228,14 @@ void addPrepreke()
           Vector3 noviPos = pos + binorm;
           Mesh mm = new Mesh(new SphereGeometry(0.6), new MeshBasicMaterial(color: 0x00ffff));
           mm.position.setFrom(noviPos);
-          parent.add(mm);
+//          parent.add(mm);
           //desna strana
           Vector3 rightBinorm = new Vector3.copy(binorm);
           rightBinorm.negate();
           noviPos = pos + rightBinorm;
           Mesh mmm = new Mesh(new SphereGeometry(0.6), new MeshBasicMaterial(color: 0x00ffff));
           mmm.position.setFrom(noviPos);
-          parent.add(mmm);
+//          parent.add(mmm);
           //kraj - "test" obstacle na rubovima binormala
 
           //horizontalne tockice
@@ -243,9 +244,11 @@ void addPrepreke()
           Mesh right1 = new Mesh(new SphereGeometry(radius / 2.0), new MeshBasicMaterial(color: 0x00ff00));
           Mesh right2 = new Mesh(new SphereGeometry(radius / 2.0), new MeshBasicMaterial(color: 0x00ff00));
 
+          double nearScaleLeft = 0.28;
+          double nearScaleRight = 0.26666666666;
           Vector3 left1v = binorm.clone().scale(0.8);
-          Vector3 left2v = binorm.clone().scale(0.4);
-          Vector3 right1v = rightBinorm.clone().scale(0.4);
+          Vector3 left2v = binorm.clone().scale(nearScaleLeft);
+          Vector3 right1v = rightBinorm.clone().scale(nearScaleRight);
           Vector3 right2v = rightBinorm.clone().scale(0.8);
 
           Vector3 left1pos = pos + left1v;
@@ -273,30 +276,61 @@ void addPrepreke()
      int currentT = 0 + ignoreFirstN;
      int totalT = globalTs.length - ignoreLastN; //pretpostavka da je ts veci od ignoreLastN
 
-     int lastVertPos = random.nextInt(4); //od 0 do 4-1 -> 0,1,2,3 //npr. 2
-     int newVertPos;
+     int previousVertPos = random.nextInt(4); //od 0 do 4-1 -> 0,1,2,3 //npr. 2
+     int nextVertPos;
+     
+     logg("Total Ts - " + totalT.toString());
+     logg("Current T - " + currentT.toString());     
+     logg("Prvi previous: " + previousVertPos.toString());
 
+     int voids = 1;
+     int patches = 1;
      //TODO provjera da currentT + voidSize + (eventualno) patchSize < totalT, ako je, ne radi nista
      //totalT ce biti oko 600-700, dakle provjera voidsize + patchsize (max -> 8) parcijalno vece od totalT nema smisla, samo breakaj
      while (currentT < totalT) 
      {
           //generiram void size i patch size
           voidSize = random.nextInt(4); //0,1,2,3
-          patchSize = random.nextInt(3) + 3; //3,4,5
-          newVertPos = generateNextVertPos(lastVertPos, voidSize);
-
-          //imam staru i novu vert poziciju - mogu napraviti prepreke na voidu
+          logg("Void " + voids.toString() + " size - " + voidSize.toString());
+          voids++;
+          
+          if(currentT + voidSize > totalT)
+          {
+               break;
+          }
+          
+          nextVertPos = generateNextVerticalIndex(previousVertPos, voidSize);
+          logg("Next vert - " + nextVertPos.toString());
+          
           if (voidSize != 0) 
           {
-               generateVoidData(lastVertPos, newVertPos, globalTs.sublist(currentT, currentT + voidSize), voidSize);
+               generateVoidData(previousVertPos, nextVertPos, globalTs.sublist(currentT, currentT + voidSize), voidSize);
                currentT += voidSize; //pomakni se udesno
           }
           
-          generatePatchData(newVertPos, globalTs.sublist(currentT, currentT + patchSize), patchSize);
+          patchSize = random.nextInt(3) + 3; //3,4,5
+          logg("Patch " + patches.toString() + " size - " + patchSize.toString());
+          patches++;
+          
+          //if both the
+          if(currentT + patchSize > totalT)
+          {
+               break;
+          }         
+          
+          generatePatchData(nextVertPos, globalTs.sublist(currentT, currentT + patchSize), patchSize);
           currentT += patchSize;
+          
+          previousVertPos = nextVertPos; //get ready for the next void + patch field generation.
      }
 }
 
+/**
+ * Used in [generateItemPosition] to retrieve value of a 
+ * binormal vector on a curve.
+ * [t] - value in range [0.0, 1.0] where 0.0 represents the start
+ * of the curve and 1.0 the end.
+ */
 Vector3 getBinormal(double t)
 {
      /*//"test" obstacle na rubovima binormala
@@ -311,9 +345,9 @@ Vector3 getBinormal(double t)
 //     SplineCurve3 curve = tube.path;
 //     int segments = tube.tangents.length;
      
-     Vector3 position = curve.getPoint(t);
+//     Vector3 position = curve.getPoint(t);
      
-     position.scale(scale); //TODO skaliraj curve odmah dok konstruiras ????
+//     position.scale(scale); //TODO skaliraj curve odmah dok konstruiras ????
      int segment = (t * segs).floor();
      
 //     Vector3 binormal = tube.binormals[segment].clone(); //clone for safety
@@ -324,6 +358,14 @@ Vector3 getBinormal(double t)
      return binormal;
 }
 
+/**
+ * Generates score and obstacle item positions for the patch field.
+ * [reserved] is used in calculating positions for score items and to flag
+ * the reserved position for obstacle items.
+ * [subTs] array of valid "t" values for the horizontal position.
+ * [patchSize] value to switch on for different number of obstacles.
+ * [subTs.length] is equal to [patchSize].
+ */
 void generatePatchData(int reserved, List subTs, int patchSize)
 {
      /*  int rndhorizontal = random.nextInt(h.length); //3 = h.length
@@ -341,8 +383,6 @@ void generatePatchData(int reserved, List subTs, int patchSize)
 //               }*/
      
      //TODO refactor........
-     List h = [0, 1, 2, 3];
-     h.remove(reserved);
      
      //Add score items in a horizontal patch at same position on each T
      for(double t in subTs)
@@ -390,11 +430,15 @@ void generatePatchData(int reserved, List subTs, int patchSize)
                int whichT = random.nextInt(4);
                Positions p = generateVerticalPositions(reserved);
                addObstacle(generateItemPosition(subTs[whichT], p._last, p._next));
-          }          
-          
+          }                 
      }
 }
 
+/**
+ * Used to add obstacles to patch field.
+ * [reserved] value represents the vertical position at
+ * which the obstacles can not live for the current patch field.
+ */
 Positions generateVerticalPositions(int reserved)
 {
      List temp = vertPositions.toList();
@@ -429,7 +473,14 @@ class Positions
      Positions(this._last, this._next);
 }
 
-void generateVoidData(int lastPosition, int newPosition, List subTs, int voidSize) 
+/**
+ * Depending on the [voidSize], instantiate new obstacle items.
+ * Obstacle horizontal position is determined from [subTs] elements.
+ * Obstacle vertical position is calculated from the vertical alignment
+ * of score items of the trailing and following patch field, namely
+ * [previous] and [next].
+ */
+void generateVoidData(int previous, int next, List subTs, int voidSize) 
 { 
      /*  
            //dobio 1, dohvati binormalu, izracunaj 
@@ -457,55 +508,83 @@ void generateVoidData(int lastPosition, int newPosition, List subTs, int voidSiz
      {
          //1 mozda
          if(random.nextInt(2) == 0)
+         {
+              logg("VDG - voidSize 1 -> returning!!!");
               return;
+         }
          else
          {
-              addObstacle(generateItemPosition(subTs[0], lastPosition, newPosition));            
+              logg("VDG - voidSize 1 -> t = 0");
+              addObstacle(generateItemPosition(subTs[0], previous, next));  
          }         
      }
      
      if(voidSize == 2)
      {
-          int whichT = random.nextInt(2);          
-          addObstacle(generateItemPosition(subTs[whichT], lastPosition, newPosition));
+          int whichT = random.nextInt(2); 
+          logg("VDG - voidSize 2 -> t = " + whichT.toString());
+
+          addObstacle(generateItemPosition(subTs[whichT], previous, next));
+
      }
      
      if(voidSize == 3)
      {
           //1 sigurno
         int whichT = random.nextInt(3);
-        addObstacle(generateItemPosition(subTs[whichT], lastPosition, newPosition));
+        logg("VDG - voidSize 3 -> t = " + whichT.toString());
+        addObstacle(generateItemPosition(subTs[whichT], previous, next));
+        
+          
        
         //1 mozda
        if(random.nextInt(2) == 0)
+       {
+            logg("VDG - voidSize 3 -> returning!!!!");
             return;
+       }
        else
        {
             subTs.removeAt(whichT);
             int rnd = random.nextInt(2);
-            addObstacle(generateItemPosition(subTs[rnd], lastPosition, newPosition));
+            logg("VDG - voidSize 3 -> t = " + rnd.toString());
+//            addObstacle(generateItemPosition(subTs[rnd], previous, next));
+            
+            //Change - any other extra obstacle should be free 
+            addObstacle(generateItemPosition(subTs[rnd], vertPositions.first, vertPositions.last));
+
        }
      }
 }
 
 void addScoreItem(Vector3 position)
 {
-     
+     //placeholder score item 
+     double a = 0.5;
+     Mesh scoreItemMesh = new Mesh(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0x09BCED));
+     scoreItemMesh.position.setFrom(position);
+     parent.add(scoreItemMesh);     
 }
 
 void addObstacle(Vector3 position)
 {
-     
+     double a = 0.5;
+     Mesh obstacleMesh = new Mesh(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0xEB07DB));
+     obstacleMesh.position.setFrom(position);
+     parent.add(obstacleMesh);     
 }
 
-/**[t] - vertical position
- * [lastPosition] - previous horizontal position
- * [newPosition] - next horizontal position
+/**
+ * Computes the final position of an score or obstacle item.
+ * [t] - vertical position
+ * [previous] - previous horizontal position
+ * [next] - next horizontal position
  */
-Vector3 generateItemPosition(double t, int lastPosition, int newPosition)
+Vector3 generateItemPosition(double t, int previous, int next)
 {
-      double percent = generateBinormalPercentage(lastPosition, newPosition);
-      double binormalScale = generateScaleFromPercentage(percent);
+      double percent = generateVerticalPercentage(previous, next);
+      double binormalScale = percent <= 0.5 ? (1 - percent * 2.0) : (2.0 * (percent - 0.5));
+      logg("For previous/next -> " + previous.toString() + "-" + next.toString() + ": percent: " + percent.toString());
       
       Vector3 binormal = getBinormal(t);
       binormal = percent > 0.5 ? binormal.negate() : binormal;
@@ -519,6 +598,13 @@ Vector3 generateItemPosition(double t, int lastPosition, int newPosition)
       return finalPosition;      
 }
 
+
+/**
+ * Interval 0%----------50%---------100% where 0% is 1.0, 50% is 0.0, and 100% is -1.0.
+ * Given a [percent] value in interval [0.0, 1.0]
+ * returns the scale factor by which to multiply the binormal vector.
+ * The returned value depends on the position of the [percent] in the above graphical interval.
+ */
 double generateScaleFromPercentage(double percent)
 {
 //     double result;
@@ -533,11 +619,20 @@ double generateScaleFromPercentage(double percent)
 //     }
 //     
 //     return result;
-     
-     return percent <= 0.5 ? (1 - percent * 2.0) : (2.0 * (percent - 0.5));
+     return null;     
 }
 
-double generateBinormalPercentage(int first, int second)
+/**
+ * The graph:
+ * 0 ----------------------- ^ - 0%
+ * 1 ----------------------- |
+ * 2 ----------------------- |
+ * 3 ----------------------- v - 100%
+ * 
+ * Numbers [0-3] represent all possible vertical indices for an item.
+ * Given two such numbers, calculate the possible range (in %) for the items' vertical position.  
+ */
+double generateVerticalPercentage(int first, int second)
 {
      //TODO not tested for other values, TODO extract to public interface for tweaking
      double max = 0.9;
@@ -591,12 +686,21 @@ double generateRandomDoubleBoundsPercentage(double lower, double higher)
      return random.nextInt(((higher + 0.01 - lower) * 100).toInt()) + (lower*100);
 }
 
+/**Returns an int number expressed in interval [0, 100]
+ * [lower] is a number in range [0, 100];
+ * [higher] is a number in range [0, 100];
+ */
 int generateRandomIntBounds(int lower, int higher)
 {
      return random.nextInt((higher + 1) - lower) + lower;
 }
 
-int generateNextVertPos(int last, int size) {
+/**
+ * Given the [previous] vertical index of a patch field score items
+ * and the [voidSize] of the following void field, calculate the new
+ * vertical index for the following patch field score items.
+ */
+int generateNextVerticalIndex(int previous, int voidSize) {
      //last moze biti 0/1/2/3
      //size moze biti 0/1/2/3
 
@@ -604,9 +708,9 @@ int generateNextVertPos(int last, int size) {
      //ako je size 0 vrati rezultat je u range-u [last-1, last+1]
      //ako je size 1 vrati rezultat je u range-u [last-2, last+2]
 
-     if (size > 1) return random.nextInt(4); //0/1/2/3
+     if (voidSize > 1) return random.nextInt(4); //0/1/2/3
      else {
-          int deviate = size + 1;
+          int deviate = voidSize + 1;
           int lowerBound;
           int upperBound;
 
@@ -630,11 +734,11 @@ int generateNextVertPos(int last, int size) {
 //          }
 
           //ekvivalent gornjem kodu
-          upperBound = ((last + deviate) >= 3) ? 3 : last + deviate;
-          lowerBound = ((last - deviate) < 0) ? 0 : last - deviate;
+          upperBound = ((previous + deviate) >= 3) ? 3 : previous + deviate;
+          lowerBound = ((previous - deviate) < 0) ? 0 : previous - deviate;
 
-          print("Lower " + lowerBound.toString());
-          print("Upper " + upperBound.toString());
+//          print("Lower " + lowerBound.toString());
+//          print("Upper " + upperBound.toString());
 
           /**Return random number in between inclusive [upperBound] and inclusive [lowerBound]*/
 //          return random.nextInt((upperBound + 1) - lowerBound) + lowerBound;
@@ -705,7 +809,8 @@ void addCurves()
      });
 }
 
-Object3D connect(SplineCurve3 curve, num hex) {
+Object3D connect(SplineCurve3 curve, num hex) 
+{
      List<Vector3> points = curve.points;
      Geometry lines = new Geometry();
      Object3D container = new Object3D();
@@ -903,6 +1008,8 @@ void moveTheObject()
      movingObject.position.y = side / 2;
 }
 
+double factor = 1.5;
+
 update() {
      if (keyboard.isPressed(KeyCode.D)) {
           strafeTotal -= strafeDt;
@@ -913,6 +1020,25 @@ update() {
           strafeTotal += strafeDt;
           if (strafeTotal >= strafeMax) strafeTotal = strafeMax;
      }
+     if (keyboard.isPressed(KeyCode.H)) {
+               parent.position.z += factor;
+          }
+     if (keyboard.isPressed(KeyCode.F)) {
+               parent.position.z -= factor;
+
+          }
+     if (keyboard.isPressed(KeyCode.G)) {
+               parent.position.x -= factor;
+          }
+     if (keyboard.isPressed(KeyCode.T)) {
+               parent.position.x += factor;
+          }
+     if (keyboard.isPressed(KeyCode.R)) {
+               camera.position.y += factor;
+          }
+     if (keyboard.isPressed(KeyCode.Z)) {
+               camera.position.y -= factor;
+          }
 }
 
 render() {
@@ -928,7 +1054,7 @@ animate(num time) {
 //     moveTheObject();
 //     renderer.render(scene, camera);
 //     renderer.render(scene, toggle ? camera : orthoCamera);
-     renderer.render(scene, animation == true ? splineCamera : orthoCamera);
+     renderer.render(scene, animation == true ? splineCamera : camera);
 //     parent.rotation.y += (targetRotation - parent.rotation.y) * 0.05;
      window.requestAnimationFrame(animate);
 }
