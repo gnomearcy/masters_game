@@ -802,7 +802,8 @@ void addCurves()
 
           pp.resetVertices();
 
-          pp.load(halfCurve).then((object) {
+          pp.load(halfCurve).then((object) 
+          {
                halfSpline = new SplineCurve3(pp.getVertices);
           }).whenComplete(() {
                halfContainer = connect(halfSpline, 0x00ff00);
