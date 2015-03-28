@@ -13,7 +13,7 @@ CameraHelper cameraHelper;
 WebGLRenderer renderer;
 Element container;
 
-Vector3 cameraPosition = new Vector3(50.0, 50.0, 50.0);
+Vector3 cameraPosition = new Vector3(0.0, 100.0, 0.0);
 double cameraFov = 75.0;
 double cameraNear = 1.0;
 double cameraFar = 1000.0;
@@ -49,15 +49,17 @@ Geometry testGeo2;
 Mesh meshCustom1;
 Mesh meshCustom2;
 
-String customPath = 'obj_shaders_testing/cube_obj_custom.obj';
-String customLayout = 'obj_shaders_testing/cube_obj_custom_layout.png';
+String customPath = 'obj_shaders_testing/score_cell_obj_smooth_flipped.obj';
+String customLayout = 'obj_shaders_testing/score_cell_layout1test2.jpg';
 
 Mesh firstMesh;
 Mesh secondMesh;
 
 List<Vector3> directions;
+MojParser mp;
 
-void main() {
+void main() 
+{
   directions = new List<Vector3>();
   directions.add(new Vector3(0.0, 0.0, 1.0));
   directions.add(new Vector3(0.0, 0.0, -1.0));
@@ -69,29 +71,53 @@ void main() {
   directions.add(new Vector3(0.0, 0.0, 1.0));
 
   nowYouCanHitMe = true;
-  init();
-  animate(0);
+  
+  mp = new MojParser();
+//  init();
+//  animate(0);
+  
+  printCustom();
+}
 
-  //apply global
-  Matrix4 m = new Matrix4.identity();
-  m.storage[12] = 50.0;
+Geometry instantiateGeo()
+{
+     Geometry geo = new Geometry();
+     
+     mp.faces.forEach((e) {
+          geo.faces.add(e.clone());
+     });
 
-  Vector3 v =
-      new Vector3(-4.530324935913086, -1.0669759511947632, 2.3987278938293457);
+     mp.vertices.forEach((e) {
+          geo.vertices.add(e.clone());
+     });
 
-  print("MAAAAAAtrica: " + m.toString());
-  print("VEEEEEEEEktor: " + v.toString());
+     mp.normals.forEach((e) {
+          geo.normals.add((e as Vector3).clone());
+     });
 
-  v.applyProjection(m);
-  print("ASDASD: " + v.toString());
+     mp.faceUvs.forEach((e) {
+          geo.faceUvs.add(e);
+     });
+
+     mp.faceVertexUvs.forEach((faceVertexUvs) {
+
+          faceVertexUvs.forEach((faceVertexUv) {
+               geo.faceVertexUvs[0].add(faceVertexUv);
+          });
+     });
+     
+     geo.faces.forEach((e) {
+      (e as Face3).normal = (e as Face3).vertexNormals.first;
+    });
+     
+     return geo;
 }
 
 init() {
   scene = new Scene();
   container = document.createElement('div');
   document.body.append(container);
-  camera =
-      new PerspectiveCamera(cameraFov, cameraAspect, cameraNear, cameraFar);
+  camera = new PerspectiveCamera(cameraFov, cameraAspect, cameraNear, cameraFar);
   camera.position.setFrom(cameraPosition);
   camera.lookAt(scene.position);
   scene.add(camera);
@@ -119,125 +145,89 @@ init() {
   double side = 5.0;
   double r = 5.0;
   //ADD OBJECTS TO SCENE HERE
-  cube = new Mesh(new CubeGeometry(side, side, side, 5, 5, 5),
-      new MeshBasicMaterial(color: 0x00ff00));
-  cube =
-      new Mesh(new SphereGeometry(r), new MeshBasicMaterial(color: 0x00ff00));
+  cube = new Mesh(new CubeGeometry(side, side, side, 5, 5, 5), new MeshBasicMaterial(color: 0x00ff00));
+  cube = new Mesh(new SphereGeometry(r), new MeshBasicMaterial(color: 0x00ff00));
   cube.rotation.y = 30.0 * Math.PI / 180.0;
 //     scene.add(cube);
 
   lineParent = new Object3D();
   scene.add(lineParent);
 
-//     toHit = new Mesh(new CubeGeometry(side,side,side), new MeshBasicMaterial(color:0x123456));
-//     toHit = new Mesh(new SphereGeometry(r), new MeshBasicMaterial(color: 0x123456));
-//     toHit.position.x = 30.0;
-//     scene.add(toHit);
-//     hitobjects.add(toHit);
-
   //Add two hand made meshes to the scene and try to remove the second one by intersecting from the first one
 
 //     secondMesh = new Mesh(new CubeGeometry(side, side, side), new MeshBasicMaterial(color: 0xff0000));
-  secondMesh =
-      new Mesh(new SphereGeometry(r), new MeshBasicMaterial(color: 0xff0000));
-//     secondMesh.position.x = 50.0;
-//     Matrix4 m = new Matrix4.identity();
-//     m.storage[12] = 50.0;
-
-//     m.translate(x)
-//     secondMesh.position.x = 50.0; //visual moving to 50.0 on x
-  secondMesh.matrixWorld.translate(50.0);
-  secondMesh.geometry.applyMatrix(secondMesh.matrixWorld);
-  secondMesh.position.applyProjection(secondMesh.matrixWorld);
-//     scene.add(secondMesh);
-
-  print(secondMesh.position);
-
-  addLines();
-//     Vector3 position = secondMesh.position.clone();
-//
-//     for(int i = 0; i < secondMesh.geometry.vertices.length; i++)
-//     {
-//          var local = secondMesh.geometry.vertices[i].clone();
-//          var global = local.applyProjection(secondMesh.matrix);
-//          var direction = global.sub(position);
-//          var ray = new Ray(position, direction.clone());
-//          var result = ray.intersectObjects(hitobjects);
-//
-//          if(result.length > 0)
-//          {
-//               window.alert("IMAM GA");
-//          }
-//
-//     }
-
-  Vector3 local = secondMesh.geometry.vertices[0];
-  print("Local " + local.toString());
-  print("Pozicija: " + secondMesh.position.toString());
-  Matrix4 localMatrix = secondMesh.matrix;
-  print("Matrica: " + localMatrix.toString());
-
-  Vector3 global = local.clone();
-  print("Global: " + global.toString());
-
-  //mesh to be removed with the other mesh
-//     firstMesh = new Mesh(new CubeGeometry(side, side, side), new MeshBasicMaterial(color: 0xfff100));
-  firstMesh =
-      new Mesh(new SphereGeometry(r), new MeshBasicMaterial(color: 0xfff100));
-//     firstMesh.position.z = 20.0;
-  firstMesh.matrixWorld.translate(0.0, 0.0, 20.0);
-  firstMesh.geometry.applyMatrix(firstMesh.matrixWorld);
-  scene.add(firstMesh);
-  hitobjects.add(firstMesh);
-
-  /*Vector3 pos = secondMesh.position.clone();
-     int v = 0;
-     
-//     print("Position " + pos.toString());
-     for(v; v < secondMesh.geometry.vertices.length; v++)
-     {
-//          print("${v} ----------------------------");
-
-          var local = secondMesh.geometry.vertices[v].clone();
-//          print("Local " + local.toString());
-          
-          var global = local.applyProjection(secondMesh.matrix);
-          var direction = global.sub(secondMesh.position);
-          var ray = new Ray(pos, direction.clone().normalize());
-          var collisionResults = ray.intersectObjects(hitobjects);
-          
-          if(collisionResults.length > 0 && collisionResults[0].distance < direction.length)
-          {
-               if(nowYouCanHitMe)
-               {
-                    btn.value = "HIT!";
-                    logg("Kaj je ovo: " + collisionResults[0].object.runtimeType.toString());
-//                    print("Distance: " + collisionResults[0].distance.toString());
-//                    print("Direction length " + direction.length.toString());                             
-                    
-//                    scene.remove(collisionResults[0].object);
-//                    hitobjects.remove(collisionResults[0].object); 
-               }                    
-          }          
-          else
-          {
-               btn.value = "---";
-          }
-     }  */
-//     printCustom();
+////     secondMesh = new Mesh(new SphereGeometry(r), new MeshBasicMaterial(color: 0xff0000));
+//    secondMesh.position.x = 50.0;
+//    secondMesh.updateMatrixWorld();
+//    scene.add(secondMesh);    
+//    
+//  Vector3 local = secondMesh.geometry.vertices[0];
+//  print("Local " + local.toString());
+//  print("Pozicija: " + secondMesh.position.toString());
+//  Matrix4 worldMatrix = secondMesh.matrixWorld;
+//  print("Matrica (world): " + worldMatrix.toString());
+//  
+////     firstMesh = new Mesh(new CubeGeometry(side, side, side), new MeshBasicMaterial(color: 0xff129A));
+//  firstMesh = new Mesh(new SphereGeometry(r), new MeshBasicMaterial(color: 0xfff100));
+//  firstMesh.position.z = 20.0;
+//  firstMesh.updateMatrixWorld();
+////  firstMesh.matrixWorld.setTranslation(firstMesh.position);
+//  scene.add(firstMesh);
+//  hitobjects.addObject(firstMesh);
+  
+  
+//  printCustom();
+//  addLines();
+  
+//  scene.updateMatrixWorld(force: true); 
 }
+
+updateKeyboard() 
+{
+  //WRITE ANIMATION LOGIC HERE
+  if (kb.isPressed(KeyCode.S)) {
+    secondMesh.position.x += factor;
+  }
+
+  if (kb.isPressed(KeyCode.W)) {
+    secondMesh.position.x -= factor;
+  }
+
+  if (kb.isPressed(KeyCode.A)) {
+      secondMesh.position.z += factor;
+  }
+
+  if (kb.isPressed(KeyCode.D)) {
+       secondMesh.position.z -= factor;
+  }
+
+  if (kb.isPressed(KeyCode.Q)) {
+    secondMesh.position.y += factor;
+  }
+
+  if (kb.isPressed(KeyCode.E)) {
+    secondMesh.position.y -= factor;
+  }
+  
+//  secondMesh.updateMatrixWorld();
+}
+
 Object3D lineParent;
+
 void addLines() {
   //Add lines
   scene.remove(lineParent);
   Geometry g1;
   lineParent = new Object3D();
 
-  for (int i = 0; i < secondMesh.geometry.vertices.length; i++) {
+  for (int i = 0; i < secondMesh.geometry.vertices.length; i++) 
+  {
     g1 = new Geometry();
     g1.vertices.add(new Vector3.zero());
+//    g1.vertices.add(secondMesh.position);
     var local = secondMesh.geometry.vertices[i].clone();
 //    print("LOkalni " + i.toString() + local.toString());
+    local.applyProjection(secondMesh.matrixWorld);
     g1.vertices.add(local);
 
     Line l = new Line(g1, new LineBasicMaterial(color: 0xff0000));
@@ -247,108 +237,26 @@ void addLines() {
   scene.add(lineParent);
 }
 
-void update() {
-//     Vector3 position = secondMesh.position.clone();
-////          position.applyProjection(secondMesh.matrixWorld);
-//
-//
-//        for(int i = 0; i < directions.length; i++)
-//        {
-////        var local = secondMesh.geometry.vertices[i].clone();
-////        var global = local.applyProjection(secondMesh.matrixWorld);
-////        var direction = global.sub(position);
-////        var ray = new Ray(position, direction.clone());
-////        var result = ray.intersectObjects(hitobjects);
-////
-////        var a = position + directions[i];
-//
-//             var ray = new Ray(position, directions[i]);
-//             var result = ray.intersectObjects(hitobjects);
-//
-//             if(result.length > 0)
-//             {
-//                  window.alert("IMAM GA");
-//             }
-//        }
-//     Vector3 pos = cube.position.clone();
-//
-//     int v = 0;
-//     for(v; v < cube.geometry.vertices.length; v++)
-//     {
-//          var local = cube.geometry.vertices[v].clone();
-//          var global = local.applyProjection(cube.matrix);
-//          var direction = global.sub(cube.position);
-//          var ray = new Ray(pos, direction.clone().normalize());
-//          var collisionResults = ray.intersectObjects(hitobjects);
-//
-//          if(collisionResults.length > 0 && collisionResults[0].distance < direction.length)
-////          if(collisionResults.length > 0 )
-//          {
-//               btn.value = "HIT!";
-////               hitobjects.remove(collisionResults[0].object);
-////               scene.remove(collisionResults[0].object);
-//          }
-//          else btn.value = "---";
-//     }
+void update() 
+{
+    Vector3 position = secondMesh.position.clone();
 
-//     if(nowYouCanHitMe == true)
-//     {
-//          logg("trueee");
-//     }
-//     else logg("falseee");
+    for(int i = 0; i < secondMesh.geometry.vertices.length; i++)
+    {
+         var local = secondMesh.geometry.vertices[i].clone();
+         var global = local.applyProjection(secondMesh.matrixWorld);
+         var direction = global.sub(position);
+         var ray = new Ray(position, direction.clone());
+         var result = ray.intersectObjects(hitobjects);
 
-//     Vector3 pos = secondMesh.position.clone();
-////     pos.applyProjection(secondMesh.matrixWorld);
-//     int v = 0;
-//
-////     print("Position " + pos.toString());
-//     for(v; v < secondMesh.geometry.vertices.length; v++)
-//     {
-////          print("${v} ----------------------------");
-//
-//          var local = secondMesh.geometry.vertices[v].clone();
-////          print("Local " + local.toString());
-//
-//          var global = local.applyProjection(secondMesh.matrix);
-//          var direction = global.sub(secondMesh.position);
-//          var ray = new Ray(pos, direction.clone().normalize());
-//          var collisionResults = ray.intersectObjects(hitobjects);
-//
-//          if(collisionResults.length > 0 && collisionResults[0].distance < direction.length)
-//          {
-//               if(nowYouCanHitMe)
-//               {
-//                    btn.value = "HIT!";
-//                    logg("Kaj je ovo: " + collisionResults[0].object.runtimeType.toString());
-////                    print("Distance: " + collisionResults[0].distance.toString());
-////                    print("Direction length " + direction.length.toString());
-//
-//                    scene.remove(collisionResults[0].object);
-//                    hitobjects.remove(collisionResults[0].object);
-//               }
-//          }
-//          else
-//          {
-//               btn.value = "---";
-//          }
-//     }
-//
-
-//     Vector3 position = secondMesh.position.clone();
-//
-//    for(int i = 0; i < secondMesh.geometry.vertices.length; i++)
-//    {
-//         var local = secondMesh.geometry.vertices[i].clone();
-//         var global = local.applyProjection(secondMesh.matrixWorld);
-//         var direction = global.sub(position);
-//         var ray = new Ray(position, direction.clone());
-//         var result = ray.intersectObjects(hitobjects);
-//
+         if(result.length > 0 && result[0].distance < direction.length)
 //         if(result.length > 0)
-//         {
-//              window.alert("IMAM GA");
-//         }
-//    }
+         {    
+              window.alert("IMAM GA");
+              scene.remove(result[0].object);
+              hitobjects.remove(result[0].object);
+         }
+    }
 
 }
 
@@ -356,16 +264,18 @@ bool nowYouCanHitMe = false;
 
 printCustom() {
 
-//     MojParser mp = new MojParser();
-//     Texture tex = ImageUTILS.loadTexture(customLayout);
-//
-//     mp.load(customPath).then((object)
-//     {
-//          MeshBasicMaterial matBasic = new MeshBasicMaterial(color: 0xff0000);
-//          MeshLambertMaterial matLambert = new MeshLambertMaterial(color: 0xff0000);
-//          MeshBasicMaterial matBasicTex = new MeshBasicMaterial(map: tex);
-//          MeshLambertMaterial matLambertTex = new MeshLambertMaterial(map: tex);
-//
+     Texture tex = ImageUTILS.loadTexture(customLayout);
+
+     mp.load(customPath).then((object)
+     {
+          init();
+          
+          MeshBasicMaterial matBasic = new MeshBasicMaterial(color: 0xff0000);
+          MeshLambertMaterial matLambert = new MeshLambertMaterial(color: 0xff0000);
+          MeshBasicMaterial matBasicTex = new MeshBasicMaterial(map: tex);
+          MeshLambertMaterial matLambertTex = new MeshLambertMaterial(map: tex);
+
+//          testGeo = new Geometry();
 //          testGeo.vertices = mp.vertices;
 //          testGeo.faceUvs = mp.faceUvs;
 //          testGeo.normals = mp.normals;
@@ -375,32 +285,20 @@ printCustom() {
 //          testGeo.faces.forEach((e) {
 //               (e as Face3).normal = (e as Face3).vertexNormals.first;
 //          });
-//
-//          meshCustom1 = new Mesh(testGeo);
-////          meshCustom1.scale.scale(10.0);
-//          meshCustom1.material = matBasicTex;
-//          meshCustom1.position.z = 20.0;
-//          scene.add(meshCustom1);
-//          hitobjects.add(meshCustom1);
-//
-////          testGeo.vertices.forEach((e)
-////                    {
-////                        testGeo2.vertices.add((e as Vector3).clone());
-////                    });
-////
-////          testGeo.faceUvs.forEach((e)
-////                    {
-////                        testGeo2.faceUvs.add((e as Face).clone());
-////                    });
-////
-////          testGeo.vertices.forEach((e)
-////                    {
-////                        testGeo2.vertices.add((e as Vector3).clone());
-////                    });
-//
-//
+
+//          firstMesh = new Mesh(testGeo);
+//          firstMesh = new Mesh(instantiateGeo());
+//          firstMesh.scale.scale(3.0);
+//          firstMesh.material = matBasicTex;
+//          firstMesh.position.z = 20.0;
+//          firstMesh.updateMatrixWorld();
+//          hitobjects.add(firstMesh);
+//          scene.add(firstMesh);
+          
+
+//          testGeo2 = new Geometry();
 //          testGeo.faces.forEach((e) {
-//                         testGeo2.faces.add(e.clone());
+//                testGeo2.faces.add(e.clone());
 //          });
 //
 //          testGeo.vertices.forEach((e) {
@@ -421,136 +319,101 @@ printCustom() {
 //                    testGeo2.faceVertexUvs[0].add(faceVertexUv);
 //               });
 //          });
+
+
+//          secondMesh = new Mesh(testGeo2);
+          secondMesh = new Mesh(instantiateGeo());
+          secondMesh.position.x = 50.0;
+          secondMesh.scale.scale(3.0);
+          secondMesh.material = matBasicTex;
+          secondMesh.updateMatrixWorld();
+          scene.add(secondMesh);
+          
+          generateRandom(matBasicTex);
+          
+          animate(0);
+          
+         });
+
+//  MojParser mp = new MojParser();
+//  Texture tex = ImageUTILS.loadTexture(customLayout);
+//  MeshBasicMaterial matBasicTex = new MeshBasicMaterial(map: tex);
 //
-//
-//          meshCustom2 = new Mesh(testGeo2);
-////          meshCustom2.scale.scale(10.0);
-//          meshCustom2.position.x = 50.0;
-//          meshCustom2.material = matBasicTex;
-//          scene.add(meshCustom2);
-//
-//          //Info printing
-//          logg("Vertices: " + meshCustom2.geometry.vertices.length.toString());
-//          logg("Faces: " + meshCustom2.geometry.faces.length.toString());
-//          logg("Normals: " + meshCustom2.geometry.normals.length.toString());
-//          logg("Face UVs: " + meshCustom2.geometry.faceUvs.length.toString());
-//          logg("Position: " + meshCustom2.position.toString());
-//          logg("Matrix: " + meshCustom2.matrix.toString());
-//          logg("MatrixWorld: " + meshCustom2.matrixWorld.toString());
-//
-//          scene.children.forEach((e) {
-//                 logg(e.runtimeType.toString());
-//              });
-//
-//              logg("broj djece " + scene.children.length.toString());
-//
-//
-//
-////          //GLOW NA CUSTOM GEOMETRIJU
-////          uniformsCustom = new Map<String, Uniform>();
-////          Uniform c = new Uniform.float(0.0);
-////          Uniform p = new Uniform.float(1.0);
-////          Uniform glowColor = new Uniform.color(0x00ff0f);
-////          Uniform viewVector = new Uniform.vector3(camera.position.x, camera.position.y, camera.position.z);
-////
-////          uniformsCustom["c"] = c;
-////          uniformsCustom["p"] = p;
-////          uniformsCustom["glowColor"] = glowColor;
-////          uniformsCustom["viewVector"] = viewVector;
-////
-////          shaderCustom = new ShaderMaterial(uniforms: uniformsCustom, vertexShader: glowVertex, fragmentShader: glowFragment, side: FrontSide, blending: AdditiveBlending, transparent: true);
-////
-////          meshCustom2 = new Mesh(testGeo2);
-////          meshCustom2.scale.x = 43.0;
-////          meshCustom2.scale.y = 39.5;
-////          meshCustom2.scale.z = 50.0;
-////          meshCustom2.material = shaderCustom;
-////          print("${meshCustom2.position}");
-////          planeContainer.add(meshCustom2);
+//  mp.load(customPath).then((obj) 
+//  {
+//     init();
+//     
+//     mp.vertices.forEach((e) 
+//     {
+//          print(e);
 //     });
+//     
+//    //load first mesh
+//    testGeo = new Geometry();
+//    testGeo.vertices = mp.vertices;
+//    testGeo.faceUvs = mp.faceUvs;
+//    testGeo.normals = mp.normals;
+//    testGeo.faces = mp.faces;
+//    testGeo.faceVertexUvs = mp.faceVertexUvs;
+//
+//    testGeo.faces.forEach((e) {
+//      (e as Face3).normal = (e as Face3).vertexNormals.first;
+//    });
+//
+//    firstMesh = new Mesh(testGeo);
+//    firstMesh.material = matBasicTex;
+//    firstMesh.position.z = 20.0;
+//    firstMesh.updateMatrixWorld();
+//    scene.add(firstMesh);
+//    hitobjects.add(firstMesh);    
+//    
+//    animate(0);
+//  });
 
-  MojParser mp = new MojParser();
-  Texture tex = ImageUTILS.loadTexture(customLayout);
-  MeshBasicMaterial matBasicTex = new MeshBasicMaterial(map: tex);
-
-  mp.load(customPath).then((obj) {
-    mp.vertices.forEach((e) {
-      print(e);
-    });
-    //load first mesh
-    testGeo = new Geometry();
-    testGeo.vertices = mp.vertices;
-    testGeo.faceUvs = mp.faceUvs;
-    testGeo.normals = mp.normals;
-    testGeo.faces = mp.faces;
-    testGeo.faceVertexUvs = mp.faceVertexUvs;
-
-    testGeo.faces.forEach((e) {
-      (e as Face3).normal = (e as Face3).vertexNormals.first;
-    });
-
-    meshCustom1 = new Mesh(testGeo);
-//          meshCustom1.scale.scale(10.0);
-    meshCustom1.material = matBasicTex;
-    meshCustom1.position.z = 20.0;
-    scene.add(meshCustom1);
-//          hitobjects.add(meshCustom1);
-
-    logg("broj djece " + scene.children.length.toString());
-
-//         logg("zovem animate!!");
-//         nowYouCanHitMe = true;
-//         animate(0);
-
-  }).then((obj) {
-    //load second mesh
-    testGeo2 = new Geometry();
-
-    testGeo.faces.forEach((e) {
-      testGeo2.faces.add(e.clone());
-    });
-
-    testGeo.vertices.forEach((e) {
-      testGeo2.vertices.add(e.clone());
-    });
-
-    testGeo.normals.forEach((e) {
-      testGeo2.normals.add((e as Vector3).clone());
-    });
-
-    testGeo.faceUvs.forEach((e) {
-      testGeo2.faceUvs.add((e as UV).clone());
-    });
-
-    testGeo.faceVertexUvs.forEach((faceVertexUvs) {
-      faceVertexUvs.forEach((faceVertexUv) {
-//                    logg(faceVertexUv.runtimeType.toString()); //JSArray when compiled to JS
-        print(faceVertexUv.runtimeType.toString());
-        print(faceVertexUv[0].runtimeType.toString());
-        testGeo2.faceVertexUvs[0].add(faceVertexUv); //
-      });
-    });
-
-    testGeo2.faces.forEach((e) {
-      (e as Face3).normal = (e as Face3).vertexNormals.first;
-    });
-
-    meshCustom2 = new Mesh(testGeo2);
-//          meshCustom2.scale.scale(10.0);
-    meshCustom2.position.x = 50.0;
-    meshCustom2.material = matBasicTex;
-    scene.add(meshCustom2);
-  }).whenComplete(() {
-    hitobjects.add(meshCustom1);
-    Object3D mmm = hitobjects[0];
-    print(mmm.geometry.vertices.length);
-    print(mmm.position);
-
-    logg("zovem animate!!");
-    logg("velicina: " + hitobjects.length.toString());
-    nowYouCanHitMe = true;
-    animate(0);
-  });
+//  }).then((obj) {
+//    //load second mesh
+//    testGeo2 = new Geometry();
+//
+//    testGeo.faces.forEach((e) {
+//      testGeo2.faces.add(e.clone());
+//    });
+//
+//    testGeo.vertices.forEach((e) {
+//      testGeo2.vertices.add(e.clone());
+//    });
+//
+//    testGeo.normals.forEach((e) {
+//      testGeo2.normals.add((e as Vector3).clone());
+//    });
+//
+//    testGeo.faceUvs.forEach((e) {
+//      testGeo2.faceUvs.add((e as UV).clone());
+//    });
+//
+//    testGeo.faceVertexUvs.forEach((faceVertexUvs) {
+//      faceVertexUvs.forEach((faceVertexUv) {
+////                    logg(faceVertexUv.runtimeType.toString()); //JSArray when compiled to JS
+//        print(faceVertexUv.runtimeType.toString());
+//        print(faceVertexUv[0].runtimeType.toString());
+//        testGeo2.faceVertexUvs[0].add(faceVertexUv); 
+//      });
+//    });
+//
+//    testGeo2.faces.forEach((e) {
+//      (e as Face3).normal = (e as Face3).vertexNormals.first;
+//    });
+//
+//    secondMesh = new Mesh(testGeo2);
+////          meshCustom2.scale.scale(10.0);
+//    secondMesh.position.x = 50.0;
+//    secondMesh.material = matBasicTex;
+//    secondMesh.updateMatrixWorld();
+////    scene.add(secondMesh);
+//    
+//  }).whenComplete(() 
+//  {
+//    animate(0);
+//  });
 
 //          MojParser mp = new MojParser();
 //
@@ -606,7 +469,8 @@ printCustom() {
 //          });
 }
 
-void logg(String input) {
+void logg(String input) 
+{
   logcounter++;
   String content = log.innerHtml.toString();
   String toAdd = '<br>' + logcounter.toString() + ". " + input;
@@ -729,27 +593,29 @@ bool showOnce = true;
 //
 //}
 
-void generateRandom() {
+void generateRandom(MeshBasicMaterial mat) {
   int nr = 10;
 
   Math.Random rnd = new Math.Random(new DateTime.now().millisecondsSinceEpoch);
   Vector3 pos;
   Mesh obs;
-  double side = 5.0;
-  double scale = 70.0;
+  double posscale = 70.0;
+  double objscale = 2.0;
 
-  for (int i = 0; i < nr; i++) {
+  for (int i = 0; i < nr; i++) 
+  {
     int degree = rnd.nextInt(360);
 
     double xpos = Math.cos(degree);
     double zpos = Math.sin(degree);
 
     pos = new Vector3(xpos, 0.0, zpos);
-    pos.scale(scale);
+    pos.scale(posscale);
 
-    obs = new Mesh(new CubeGeometry(side, side, side),
-        new MeshBasicMaterial(color: 0xFF3456));
+    obs = new Mesh(instantiateGeo(), mat);
     obs.position.setFrom(pos);
+    obs.scale.scale(objscale);
+    obs.updateMatrixWorld();
     hitobjects.add(obs);
     scene.add(obs);
   }
@@ -757,88 +623,11 @@ void generateRandom() {
 
 double factor = 0.4;
 
-render() {
-  //WRITE ANIMATION LOGIC HERE
-  if (kb.isPressed(KeyCode.S)) {
-//          secondMesh.position.x += factor;
-    var pos = secondMesh.position;
-    pos.x += factor;
-//          secondMesh.translateX(factor);
-    secondMesh.matrixWorld.translate(pos.x, pos.y, pos.z);
-    secondMesh.geometry.applyMatrix(secondMesh.matrixWorld);
-    addLines();
-  }
-
-  if (kb.isPressed(KeyCode.W)) {
-////          secondMesh.position.x -= factor;
-//          secondMesh.translateX(-factor);
-//
-//          addLines();
-    var pos = secondMesh.position;
-    pos.x -= factor;
-//          secondMesh.translateX(factor);
-    secondMesh.matrixWorld.translate(pos.x, pos.y, pos.z);
-    secondMesh.geometry.applyMatrix(secondMesh.matrixWorld);
-    addLines();
-  }
-
-  if (kb.isPressed(KeyCode.A)) {
-////          secondMesh.position.z += factor;
-//          secondMesh.translateZ(factor);
-//
-//          addLines();
-    var pos = secondMesh.position;
-    pos.z += factor;
-//          secondMesh.translateX(factor);
-    secondMesh.matrixWorld.translate(pos.x, pos.y, pos.z);
-    secondMesh.geometry.applyMatrix(secondMesh.matrixWorld);
-    addLines();
-  }
-
-  if (kb.isPressed(KeyCode.D)) {
-////          secondMesh.position.z -= factor;
-//          secondMesh.translateZ(-factor);
-//
-//          addLines();
-    var pos = secondMesh.position;
-    pos.z -= factor;
-//          secondMesh.translateX(factor);
-    secondMesh.matrixWorld.translate(pos.x, pos.y, pos.z);
-    secondMesh.geometry.applyMatrix(secondMesh.matrixWorld);
-    addLines();
-  }
-
-  if (kb.isPressed(KeyCode.Q)) {
-////          secondMesh.position.y += factor;
-//          secondMesh.translateY(factor);
-//
-//          addLines();
-    var pos = secondMesh.position;
-    pos.y += factor;
-//          secondMesh.translateX(factor);
-    secondMesh.matrixWorld.translate(pos.x, pos.y, pos.z);
-    secondMesh.geometry.applyMatrix(secondMesh.matrixWorld);
-    addLines();
-  }
-
-  if (kb.isPressed(KeyCode.E)) {
-////          secondMesh.position.y -= factor;
-//          secondMesh.translateY(-factor);
-//
-//          addLines();
-    var pos = secondMesh.position;
-    pos.y -= factor;
-//          secondMesh.translateX(factor);
-    secondMesh.matrixWorld.translate(pos.x, pos.y, pos.z);
-    secondMesh.geometry.applyMatrix(secondMesh.matrixWorld);
-    addLines();
-  }
-}
-
-animate(num time) {
-  update();
-  render();
+animate(num time) 
+{
   renderer.render(scene, camera);
+  updateKeyboard();
+  update();
   window.requestAnimationFrame(animate);
 }
 

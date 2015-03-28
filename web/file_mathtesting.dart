@@ -144,6 +144,14 @@ void main() {
      zasto(nekaLista1.toList());
      print(nekaLista1);
      
+     num blabla = 10;
+     
+     for(int i = 0; i < 20; i++)
+     {
+          if(i == 10) continue;
+          print("BUREK " + i.toString());
+     }
+     
      
 }
 List vertPositions = [0, 1, 2, 3];
