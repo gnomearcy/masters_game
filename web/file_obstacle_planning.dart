@@ -4,7 +4,6 @@ import 'package:three/extras/image_utils.dart' as IMAGEUtils;
 import 'dart:html';
 import 'dart:math' as Math;
 import 'dart:core';
-import 'dart:io' as IO;
 
 Scene scene;
 PerspectiveCamera camera;

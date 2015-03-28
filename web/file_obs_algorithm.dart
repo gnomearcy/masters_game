@@ -1,11 +1,11 @@
 import 'package:three/three.dart';
-import 'package:vector_math/vector_math.dart';
+import 'package:vector_math/vector_math.dart' hide Ray;
 import 'package:three/extras/image_utils.dart' as IMAGEUtils;
 import 'package:three/extras/scene_utils.dart' as SceneUtils;
 import 'dart:html';
 import 'dart:math' as Math;
 import 'dart:core';
-import 'dart:io' as IO;
+//import 'dart:io' as IO;
 import 'utilities/PathParser.dart';
 import 'utilities/Keyboard.dart';
 
@@ -97,7 +97,7 @@ Vector3 normalObject = new Vector3.zero();
 Vector3 tangentObject = new Vector3.zero();
 
 double strafe = 3.0;
-double strafeDt = strafe / 10.0;
+double strafeDt = strafe / 60.0;
 double strafeMin = -strafe;
 double strafeMax = strafe;
 double strafeTotal = 0.0;
@@ -114,51 +114,22 @@ List vertPositions = [0, 1, 2, 3];
 int health = 3;
 int score = 0;
 
+List hitobjects = [];
+
+
+class Obstacle extends Mesh
+{
+     Obstacle(Geometry geometry, [Material material]) : super(geometry, material);
+}
+
+class ScoreItem extends Mesh
+{
+     ScoreItem(Geometry geometry, [Material material]) : super(geometry, material);
+}
+
 void main() 
 {
      addCurves();
-}
-
-void addRandom() 
-{
-//     //adds random obstacles
-//     DateTime date = new DateTime.now();
-//     random = new Math.Random(date.millisecondsSinceEpoch);
-//
-//     Mesh score;
-//
-//     double nrOfVertSegs = -planeHeight / 2.0;
-//
-//     List xPos = [-(horSeg * (3 / 2)), -(horSeg * (1 / 2)), (horSeg * (1 / 2)), (horSeg * (3 / 2))];
-//
-//     while (nrOfVertSegs < (planeHeight / 2.0)) //manji od 250
-//     {
-//          //generate obstacle patch
-//          int patchSize = random.nextInt(2) + 3; //0,1,2,3,4 desno
-//          int horPos = random.nextInt(4); //0,1,2,3 gore dolje 0 ->
-//          double newX = xPos[horPos];
-//
-//          for (int i = 0; i < patchSize; i++) {
-//               obs = new Mesh(new SphereGeometry(radius), obstableMat);
-//               obs.position.x = newX;
-//               obs.position.z = nrOfVertSegs; //-250 na pocetku
-//               scene.add(obs);
-//
-//               nrOfVertSegs += 1.0;
-//          }
-//          //generate void
-//          int voidWidth = random.nextInt(5) + 5; //0,1,2,3,4
-//          double voidSeg = 0.5;
-//
-//          if (voidWidth != 0) {
-//               Mesh voidPlane = new Mesh(new PlaneGeometry(planeWidth * 0.8, voidWidth.toDouble()), new MeshBasicMaterial(color: 0x0000ff));
-//               voidPlane.rotation.x = -90 * Math.PI / 180.0;
-//               voidPlane.position.y = 2.0;
-//               voidPlane.position.z = nrOfVertSegs + (voidWidth - 1) * voidSeg;
-//               scene.add(voidPlane);
-//               nrOfVertSegs += voidWidth.toDouble();
-//          }
-//     }
 }
 
 initObstacles() 
@@ -566,17 +537,21 @@ void addScoreItem(Vector3 position)
 {
      //placeholder score item 
      double a = 0.5;
-     Mesh scoreItemMesh = new Mesh(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0x09BCED));
+//     Mesh scoreItemMesh = new Mesh(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0x09BCED));
+     ScoreItem scoreItemMesh = new ScoreItem(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0x09BCED));
      scoreItemMesh.position.setFrom(position);
-     parent.add(scoreItemMesh);     
+     parent.add(scoreItemMesh);
+     hitobjects.add(scoreItemMesh);
 }
 
 void addObstacle(Vector3 position)
 {
      double a = 0.5;
-     Mesh obstacleMesh = new Mesh(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0xEB07DB));
+//     Mesh obstacleMesh = new Mesh(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0xEB07DB));
+     Obstacle obstacleMesh = new Obstacle(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0xEB07DB));
      obstacleMesh.position.setFrom(position);
-     parent.add(obstacleMesh);     
+     parent.add(obstacleMesh);
+     hitobjects.add(obstacleMesh);
 }
 
 /**
@@ -751,6 +726,44 @@ int generateNextVerticalIndex(int previous, int voidSize) {
      }
 }
 
+//renamed from update() in file_collision.dart file
+void checkCollision() 
+{
+    Vector3 position = movingObject.position.clone();
+
+    for(int i = 0; i < movingObject.geometry.vertices.length; i++)
+    {
+         var local = movingObject.geometry.vertices[i].clone();
+         var global = local.applyProjection(movingObject.matrixWorld);
+         var direction = global.sub(position);
+         var ray = new Ray(position, direction.clone());
+         var result = ray.intersectObjects(hitobjects);
+
+         if(result.length > 0 && result[0].distance < direction.length)
+//         if(result.length > 0)
+         {    
+//              window.alert("IMAM GA");
+              parent.remove(result[0].object);
+              hitobjects.remove(result[0].object);
+              print(result[0].object.runtimeType);
+              if(result[0].object is ScoreItem)
+              {
+                   score++;
+                   scoreBtn.value = "Score: " + score.toString();
+                   print("pogodio sam score item");
+              }
+              if(result[0].object is Obstacle)
+              {
+                   health--;
+                   healthBtn.value = "Health: " + health.toString();
+                   print("pogodio sam obstacle");
+              }
+         }
+    }
+
+}
+
+
 class Void 
 {
      int lastVerticalPosition; //last patch
@@ -765,16 +778,16 @@ class Patch
      List ts;
 }
 
-class Obstacle 
-{
-     Geometry obsGeo;
-     MeshBasicMaterial obsMat;
-}
-
-class ScoreItem {
-     Geometry scGeo;
-     MeshBasicMaterial scMat;
-}
+//class Obstacle 
+//{
+//     Geometry obsGeo;
+//     MeshBasicMaterial obsMat;
+//}
+//
+//class ScoreItem {
+//     Geometry scGeo;
+//     MeshBasicMaterial scMat;
+//}
 
 
 double vectorDistance(Vector3 first, Vector3 second) {
@@ -1051,16 +1064,18 @@ update() {
           }
 }
 
-render() {
+render() 
+{
      //WRITE ANIMATION LOGIC HERE
      moveTheObject();
      parent.rotation.y += (targetRotation - parent.rotation.y) * 0.05;
-
 }
 
 animate(num time) {
      update();
      render();
+     checkCollision();
+     
 //     moveTheObject();
 //     renderer.render(scene, camera);
 //     renderer.render(scene, toggle ? camera : orthoCamera);

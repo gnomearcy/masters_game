@@ -23,6 +23,7 @@ var windowHalfY = window.innerHeight / 2;
 
 Mesh cube;
 
+
 void main()
 {
      init();

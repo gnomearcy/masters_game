@@ -57,18 +57,22 @@ Mesh secondMesh;
 
 List<Vector3> directions;
 MojParser mp;
+double factor = 0.4;
+bool nowYouCanHitMe = false;
+
+
 
 void main() 
 {
-  directions = new List<Vector3>();
-  directions.add(new Vector3(0.0, 0.0, 1.0));
-  directions.add(new Vector3(0.0, 0.0, -1.0));
-  directions.add(new Vector3(1.0, 0.0, -1.0));
-  directions.add(new Vector3(1.0, 0.0, 0.0));
-  directions.add(new Vector3(1.0, 0.0, 1.0));
-  directions.add(new Vector3(-1.0, 0.0, 1.0));
-  directions.add(new Vector3(-1.0, 0.0, -1.0));
-  directions.add(new Vector3(0.0, 0.0, 1.0));
+//  directions = new List<Vector3>();
+//  directions.add(new Vector3(0.0, 0.0, 1.0));
+//  directions.add(new Vector3(0.0, 0.0, -1.0));
+//  directions.add(new Vector3(1.0, 0.0, -1.0));
+//  directions.add(new Vector3(1.0, 0.0, 0.0));
+//  directions.add(new Vector3(1.0, 0.0, 1.0));
+//  directions.add(new Vector3(-1.0, 0.0, 1.0));
+//  directions.add(new Vector3(-1.0, 0.0, -1.0));
+//  directions.add(new Vector3(0.0, 0.0, 1.0));
 
   nowYouCanHitMe = true;
   
@@ -76,7 +80,7 @@ void main()
 //  init();
 //  animate(0);
   
-  printCustom();
+//  printCustom();
 }
 
 Geometry instantiateGeo()
@@ -108,7 +112,7 @@ Geometry instantiateGeo()
      
      geo.faces.forEach((e) {
       (e as Face3).normal = (e as Face3).vertexNormals.first;
-    });
+     });
      
      return geo;
 }
@@ -260,7 +264,6 @@ void update()
 
 }
 
-bool nowYouCanHitMe = false;
 
 printCustom() {
 
@@ -270,58 +273,8 @@ printCustom() {
      {
           init();
           
-          MeshBasicMaterial matBasic = new MeshBasicMaterial(color: 0xff0000);
-          MeshLambertMaterial matLambert = new MeshLambertMaterial(color: 0xff0000);
           MeshBasicMaterial matBasicTex = new MeshBasicMaterial(map: tex);
-          MeshLambertMaterial matLambertTex = new MeshLambertMaterial(map: tex);
 
-//          testGeo = new Geometry();
-//          testGeo.vertices = mp.vertices;
-//          testGeo.faceUvs = mp.faceUvs;
-//          testGeo.normals = mp.normals;
-//          testGeo.faces = mp.faces;
-//          testGeo.faceVertexUvs = mp.faceVertexUvs;
-//
-//          testGeo.faces.forEach((e) {
-//               (e as Face3).normal = (e as Face3).vertexNormals.first;
-//          });
-
-//          firstMesh = new Mesh(testGeo);
-//          firstMesh = new Mesh(instantiateGeo());
-//          firstMesh.scale.scale(3.0);
-//          firstMesh.material = matBasicTex;
-//          firstMesh.position.z = 20.0;
-//          firstMesh.updateMatrixWorld();
-//          hitobjects.add(firstMesh);
-//          scene.add(firstMesh);
-          
-
-//          testGeo2 = new Geometry();
-//          testGeo.faces.forEach((e) {
-//                testGeo2.faces.add(e.clone());
-//          });
-//
-//          testGeo.vertices.forEach((e) {
-//               testGeo2.vertices.add(e.clone());
-//          });
-//
-//          testGeo.normals.forEach((e) {
-//               testGeo2.normals.add((e as Vector3).clone());
-//          });
-//
-//          testGeo.faceUvs.forEach((e) {
-//               testGeo2.faceUvs.add((e as UV).clone());
-//          });
-//
-//          testGeo.faceVertexUvs.forEach((faceVertexUvs) {
-//
-//               faceVertexUvs.forEach((faceVertexUv) {
-//                    testGeo2.faceVertexUvs[0].add(faceVertexUv);
-//               });
-//          });
-
-
-//          secondMesh = new Mesh(testGeo2);
           secondMesh = new Mesh(instantiateGeo());
           secondMesh.position.x = 50.0;
           secondMesh.scale.scale(3.0);
@@ -334,139 +287,6 @@ printCustom() {
           animate(0);
           
          });
-
-//  MojParser mp = new MojParser();
-//  Texture tex = ImageUTILS.loadTexture(customLayout);
-//  MeshBasicMaterial matBasicTex = new MeshBasicMaterial(map: tex);
-//
-//  mp.load(customPath).then((obj) 
-//  {
-//     init();
-//     
-//     mp.vertices.forEach((e) 
-//     {
-//          print(e);
-//     });
-//     
-//    //load first mesh
-//    testGeo = new Geometry();
-//    testGeo.vertices = mp.vertices;
-//    testGeo.faceUvs = mp.faceUvs;
-//    testGeo.normals = mp.normals;
-//    testGeo.faces = mp.faces;
-//    testGeo.faceVertexUvs = mp.faceVertexUvs;
-//
-//    testGeo.faces.forEach((e) {
-//      (e as Face3).normal = (e as Face3).vertexNormals.first;
-//    });
-//
-//    firstMesh = new Mesh(testGeo);
-//    firstMesh.material = matBasicTex;
-//    firstMesh.position.z = 20.0;
-//    firstMesh.updateMatrixWorld();
-//    scene.add(firstMesh);
-//    hitobjects.add(firstMesh);    
-//    
-//    animate(0);
-//  });
-
-//  }).then((obj) {
-//    //load second mesh
-//    testGeo2 = new Geometry();
-//
-//    testGeo.faces.forEach((e) {
-//      testGeo2.faces.add(e.clone());
-//    });
-//
-//    testGeo.vertices.forEach((e) {
-//      testGeo2.vertices.add(e.clone());
-//    });
-//
-//    testGeo.normals.forEach((e) {
-//      testGeo2.normals.add((e as Vector3).clone());
-//    });
-//
-//    testGeo.faceUvs.forEach((e) {
-//      testGeo2.faceUvs.add((e as UV).clone());
-//    });
-//
-//    testGeo.faceVertexUvs.forEach((faceVertexUvs) {
-//      faceVertexUvs.forEach((faceVertexUv) {
-////                    logg(faceVertexUv.runtimeType.toString()); //JSArray when compiled to JS
-//        print(faceVertexUv.runtimeType.toString());
-//        print(faceVertexUv[0].runtimeType.toString());
-//        testGeo2.faceVertexUvs[0].add(faceVertexUv); 
-//      });
-//    });
-//
-//    testGeo2.faces.forEach((e) {
-//      (e as Face3).normal = (e as Face3).vertexNormals.first;
-//    });
-//
-//    secondMesh = new Mesh(testGeo2);
-////          meshCustom2.scale.scale(10.0);
-//    secondMesh.position.x = 50.0;
-//    secondMesh.material = matBasicTex;
-//    secondMesh.updateMatrixWorld();
-////    scene.add(secondMesh);
-//    
-//  }).whenComplete(() 
-//  {
-//    animate(0);
-//  });
-
-//          MojParser mp = new MojParser();
-//
-//          Texture tex = ImageUTILS.loadTexture(customLayout);
-//
-//          mp.load(customPath).whenComplete(()
-//          {
-//               MeshBasicMaterial matBasicTex = new MeshBasicMaterial(map: tex);
-////
-////               //Logiraj parsirane podatke - provjera da su vidljivi ovdje
-////               logg("Vertices: " + mp.vertices.length.toString());
-////               logg("Faces: " + mp.faces.length.toString());
-////               logg("Normals: " + mp.normals.length.toString());
-////               logg("Face UVs: " + mp.faceUvs.length.toString());
-////
-////               //Kloniraj njegove podatke
-////               Geometry geo = new Geometry();
-////
-////               mp.faces.forEach((e) {
-////                    geo.faces.add(e.clone()); //todo valjda je tri?
-////               });
-////
-////               mp.vertices.forEach((e) {
-////                    geo.vertices.add((e as Vector3).clone());
-////               });
-////
-////               mp.normals.forEach((e) {
-////                    geo.normals.add((e as Vector3).clone());
-////               });
-////
-////               mp.faceUvs.forEach((e) {
-////                    geo.faceUvs.add((e as UV).clone());
-////               });
-////
-////               mp.faceVertexUvs.forEach((faceVertexUvs) {
-////
-////                    faceVertexUvs.forEach((faceVertexUv) {
-////                         geo.faceVertexUvs[0].add(faceVertexUv);
-////                    });
-////               });
-////
-////               //Azuriranje normala?
-////               geo.faces.forEach((e) {
-////                    (e as Face3).normal = (e as Face3).vertexNormals.first;
-////               });
-////
-////               Mesh m = new Mesh(geo, matBasicTex);
-//////               Mesh m = new Mesh(geo);
-//////               m.material = matBasicTex;
-////               m.position.y = 20.0;
-////               scene.add(m);
-//
-//          });
 }
 
 void logg(String input) 
@@ -477,123 +297,8 @@ void logg(String input)
   log.innerHtml = content + toAdd;
 }
 
-bool showOnce = true;
-
-//void update()
-//{
-// /*// collision detection:
-//// determines if any of the rays from the cube's origin to each vertex
-//// intersects any face of a mesh in the array of target meshes
-//// for increased collision accuracy, add more vertices to the cube;
-//// for example, new THREE.CubeGeometry( 64, 64, 64, 8, 8, 8, wireMaterial )
-//// HOWEVER: when the origin of the ray is within the target mesh, collisions do not occur
-//var originPoint = MovingCube.position.clone();
-//clearText();
-//for (var vertexIndex = 0; vertexIndex < MovingCube.geometry.vertices.length; vertexIndex++)
-//{
-//var localVertex = MovingCube.geometry.vertices[vertexIndex].clone();
-//var globalVertex = localVertex.applyMatrix4( MovingCube.matrix );
-//var directionVector = globalVertex.sub( MovingCube.position );
-//var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-//var collisionResults = ray.intersectObjects( collidableMeshList );
-//if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() )
-//appendText(" Hit ");
-//} */
-//
-////     Vector3 pos = cube.position.clone();
-////
-////     int v = 0;
-////     for(v; v < cube.geometry.vertices.length; v++)
-////     {
-////          var local = cube.geometry.vertices[v].clone();
-////          var global = local.applyProjection(cube.matrix);
-////          var direction = global.sub(cube.position);
-////          var ray = new Ray(pos, direction.clone().normalize());
-////          var collisionResults = ray.intersectObjects(hitobjects);
-////
-////          if(collisionResults.length > 0 && collisionResults[0].distance < direction.length)
-//////          if(collisionResults.length > 0 )
-////          {
-////               btn.value = "HIT!";
-//////               hitobjects.remove(collisionResults[0].object);
-//////               scene.remove(collisionResults[0].object);
-////          }
-////          else btn.value = "---";
-////     }
-//
-//     Vector3 pos = meshCustom2.position.clone();
-////     if(nowYouCanHitMe == true)
-////     {
-////          logg("trueee");
-////     }
-////     else logg("falseee");
-//
-//     int v = 0;
-//
-//
-//
-//     if(showOnce)
-//     {
-//          print("Position " + pos.toString());
-//          for(v; v < meshCustom2.geometry.vertices.length; v++)
-//          {
-//               print("${v} ----------------------------");
-//
-//               var local = meshCustom2.geometry.vertices[v].clone();
-//               print("Local " + local.toString());
-//
-////               meshCustom2.matrix.storage[12] = pos.x;
-////               meshCustom2.matrix.storage[13] = pos.y;
-////               meshCustom2.matrix.storage[14] = pos.z;
-//
-//               var global = local.applyProjection(meshCustom2.matrix);
-//               var direction = global.sub(meshCustom2.position);
-//               var ray = new Ray(pos, direction.clone().normalize());
-//               var collisionResults = ray.intersectObjects(hitobjects);
-//
-//               print("Global " + global.toString());
-//               print("Matrix " + meshCustom2.matrix.toString());
-//               print("Direction " + direction.toString());
-//
-//               print("Broj: " + collisionResults.length.toString());
-//               if(collisionResults.length > 0 && collisionResults[0].distance < direction.length)
-////               if(collisionResults.length > 0 && collisionResults[0].distance < local.length)
-//
-////          if(collisionResults.length > 0)
-//               {
-//                    if(nowYouCanHitMe)
-//                    {
-//                         btn.value = "HIT!";
-//                         logg("Kaj je ovo: " + collisionResults[0].object.runtimeType.toString());
-//                         print("Distance: " + collisionResults[0].distance.toString());
-//                         print("Direction length " + direction.length.toString());
-////                    Mesh m = collisionResults[0].object;
-////                    logg(">>>>>>>>>><<<<<<<<<<<<<<");
-////                    logg("Vertices: " + m.geometry.vertices.length.toString());
-////                    logg("Faces: " + m.geometry.faces.length.toString());
-////                    logg("Normals: " + m.geometry.normals.length.toString());
-////                    logg("Face UVs: " + m.geometry.faceUvs.length.toString());
-////                    logg("Position: " + m.position.toString());
-////                    logg("Matrix: " + m.matrix.toString());
-////                    logg("MatrixWorld: " + m.matrixWorld.toString());
-//
-//                         scene.remove(collisionResults[0].object);
-//                         hitobjects.remove(collisionResults[0].object);
-//                    }
-//               }
-//               else
-//               {
-////                    showOnce = !showOnce;
-//                    btn.value = "---";
-//               }
-//          }
-//
-//          showOnce = false;
-//     }
-//
-//}
-
-void generateRandom(MeshBasicMaterial mat) {
+void generateRandom(MeshBasicMaterial mat) 
+{
   int nr = 10;
 
   Math.Random rnd = new Math.Random(new DateTime.now().millisecondsSinceEpoch);
@@ -621,7 +326,6 @@ void generateRandom(MeshBasicMaterial mat) {
   }
 }
 
-double factor = 0.4;
 
 animate(num time) 
 {
