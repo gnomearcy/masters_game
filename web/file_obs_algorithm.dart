@@ -8,6 +8,7 @@ import 'dart:core';
 //import 'dart:io' as IO;
 import 'utilities/PathParser.dart';
 import 'utilities/Keyboard.dart';
+import 'utilities/TimeManager.dart';
 
 Scene scene;
 PerspectiveCamera camera;
@@ -40,6 +41,7 @@ var windowHalfY = window.innerHeight / 2;
 ButtonInputElement toggleBtn;
 ButtonInputElement scoreBtn;
 ButtonInputElement healthBtn;
+ButtonInputElement startStopBtn;
 bool toggle = false;
 
 MeshBasicMaterial obstableMat = new MeshBasicMaterial(color: 0xff0000, wireframe: false);
@@ -115,7 +117,10 @@ int health = 3;
 int score = 0;
 
 List hitobjects = [];
+String start = "Start";
+String stop = "Stop";
 
+TimeManager timeManager;
 
 class Obstacle extends Mesh
 {
@@ -936,6 +941,9 @@ init() {
      log = querySelector('#log');
      scoreBtn = querySelector('#score');
      healthBtn = querySelector('#health');
+     startStopBtn = querySelector('#startstop');
+     startStopBtn.value = stop;
+     startStopBtn.onClick.listen((MouseEvent e) {timeManager.toggle();});
      
      scoreBtn.value = "Score: " + score.toString();
      healthBtn.value = "Health: " + health.toString();
@@ -974,7 +982,6 @@ init() {
      //-------------------------
 }
 
-
 void animateCamera(bool t) {
      if (t) {
           animation = !animation;
@@ -984,9 +991,21 @@ void animateCamera(bool t) {
 
 void moveTheObject() 
 {
-     int time = new DateTime.now().millisecondsSinceEpoch;
-     int looptime = loopSeconds * 1000;
-     double t = (time % looptime) / looptime;
+     //use new TimeManager class
+//     if(!timeManager.isRunning)
+//     {
+//          timeManager.start();
+//     }
+     if(timeManager == null)
+     {
+          print("Initializing a new TimeManager object");
+          timeManager = new TimeManager(loopSeconds, true);
+     }
+     
+     double t = timeManager.getCurrentTime();
+//     int time = new DateTime.now().millisecondsSinceEpoch;
+//     int looptime = loopSeconds * 1000;
+//     double t = (time % looptime) / looptime;
      Vector3 posObject;
 
      try {

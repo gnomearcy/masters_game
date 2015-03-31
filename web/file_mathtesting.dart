@@ -152,8 +152,18 @@ void main() {
           print("BUREK " + i.toString());
      }
      
+     Duration duration = new Duration(seconds: 3);
+     Timer timer = new Timer(duration, timerCallback);
      
+     Stopwatch swsw = new Stopwatch();
+     swsw.start();
 }
+
+timerCallback()
+{
+     print("jedandvatri");
+}
+
 List vertPositions = [0, 1, 2, 3];
 
 void zasto(List l)
