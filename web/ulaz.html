@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+     <script>
+     $(document).ready(function(){
+         $("p").click(function(){
+             $(this).hide();
+         });
+     });
+     
+     var height = $(window).height();
+     alert(height);
+     </script>
+    <title>ulaz</title>
+  </head>
+ 
+  <body>      
+    <input type="button" value="Start the game!" onclick="otvori()">
+    <p>tekst1</p>
+    <script>
+    function otvori()
+    {
+         var height = $(window).height();
+         var width = $(window).width();
+         var screenHeight = screen.height;
+         var screenWidth = screen.width;
+         
+         alert(screenHeight);
+
+         window.open("file_canvas.html","bfs","fullscreen=yes,width=width,height=height")
+    }
+    </script>
+  </body>
+</html>

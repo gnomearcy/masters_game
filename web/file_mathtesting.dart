@@ -1,6 +1,7 @@
 import 'package:vector_math/vector_math.dart';
 import 'dart:math' as Math;
 import 'dart:async';
+import 'dart:html';
 
 
 double key_x = 0.0;
@@ -157,6 +158,14 @@ void main() {
      
      Stopwatch swsw = new Stopwatch();
      swsw.start();
+     
+     int d = 50 * 1000;
+     int elapsed = 23 * 1000;
+     
+     print((elapsed%d)/d);
+     
+     document.body.style.border = "0px";
+     
 }
 
 timerCallback()

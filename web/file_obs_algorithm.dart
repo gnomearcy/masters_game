@@ -883,7 +883,8 @@ void logg(String input) {
      logCounter++;
 }
 
-init() {
+init() 
+{
      scene = new Scene();
      container = document.createElement('div');
      document.body.append(container);
@@ -898,6 +899,7 @@ init() {
 
      keyboard = new Keyboard();
      random = new Math.Random(new DateTime.now().millisecondsSinceEpoch);
+//     timeManager = new TimeManager(loopSeconds);
 
      //Moving object - initialisation
      Texture tex = IMAGEUtils.loadTexture(objectTexture);
@@ -947,6 +949,7 @@ init() {
      
      scoreBtn.value = "Score: " + score.toString();
      healthBtn.value = "Health: " + health.toString();
+     
 
      //ADD OBJECTS TO SCENE HERE
      //lights
@@ -980,6 +983,23 @@ init() {
 //         scene.add(cube2);
 
      //-------------------------
+}
+
+void createCanvas()
+{
+     CanvasElement canvas = document.createElement('canvas');
+     canvas.style.position = "absolute";
+     canvas.style.width = window.innerWidth.toString();
+     canvas.style.height = window.innerHeight.toString();
+     canvas.id = "mycanvas";
+     
+     document.body.append(canvas);
+     
+     CanvasElement c = document.getElementById("mycanvas");
+     var ctx = c.getContext("2d");
+     ctx.moveTo(0,0);
+     ctx.lineTo(500, 500);
+     ctx.stroke();
 }
 
 void animateCamera(bool t) {
@@ -1103,7 +1123,8 @@ animate(num time) {
      window.requestAnimationFrame(animate);
 }
 
-onWindowResize(Event e) {
+onWindowResize(Event e) 
+{
      windowHalfX = window.innerWidth / 2;
      windowHalfY = window.innerHeight / 2;
 
