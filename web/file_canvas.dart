@@ -154,6 +154,7 @@ void createCanvas() {
   canvas.style.width = window.innerWidth.toString();
   canvas.style.height = window.innerHeight.toString();
   canvas.id = "mycanvas";
+  
 
   document.body.append(canvas);
 
