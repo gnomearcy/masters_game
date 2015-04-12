@@ -109,7 +109,7 @@ init()
                            ..minWidth = "100%";
   
   renderer.domElement.id = "rendererDOm";
-  window.onLoad.listen((event){ onLoad(event);});
+//  window.onLoad.listen((event){ onLoad(event);});
   
   print("Prozor W " + window.innerWidth.toString());
   print("Prozor H " + window.innerHeight.toString());

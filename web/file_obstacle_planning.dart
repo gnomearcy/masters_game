@@ -143,8 +143,7 @@ init()
      scene.add(ambientLight);
      
      //obstacles
-     addRandom();
-     
+     addRandom();     
      
      obstacle = new Mesh(new SphereGeometry(radius), obstableMat);
      obstacle.position.y = radius / 2.0;

@@ -134,38 +134,6 @@ void main() {
      
      lll[1] = 2;
      print(lll);
-     
-     int result = generateVerticalPosition();
-     
-     Positions p = new Positions(10,20);
-     
-     print(p.last);
-     
-     List nekaLista1 = [1,2,3,4,5];
-     zasto(nekaLista1.toList());
-     print(nekaLista1);
-     
-     num blabla = 10;
-     
-     for(int i = 0; i < 20; i++)
-     {
-          if(i == 10) continue;
-          print("BUREK " + i.toString());
-     }
-     
-     Duration duration = new Duration(seconds: 3);
-     Timer timer = new Timer(duration, timerCallback);
-     
-     Stopwatch swsw = new Stopwatch();
-     swsw.start();
-     
-     int d = 50 * 1000;
-     int elapsed = 23 * 1000;
-     
-     print((elapsed%d)/d);
-     
-     document.body.style.border = "0px";
-     
 }
 
 timerCallback()
@@ -175,11 +143,6 @@ timerCallback()
 
 List vertPositions = [0, 1, 2, 3];
 
-void zasto(List l)
-{
-     l.remove(1);     
-     print(l);
-}
 
 class Positions
 {

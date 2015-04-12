@@ -179,7 +179,7 @@ void setScale()
      parent.scale.setFrom(new Vector3(scale, scale, scale));      
 }
 
-void loadPath() 
+void loadTrack() 
 {
      Texture tex = ImageUTILS.loadTexture(trackTexture);
      Material mat = new MeshPhongMaterial(map: tex);
@@ -353,7 +353,7 @@ init()
      //TESTIRAM PATH
      if (loadiraj) 
      {
-          loadPath(); 
+          loadTrack(); 
      }     
 
      //changed 06.03.2015.

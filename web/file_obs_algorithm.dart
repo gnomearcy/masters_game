@@ -62,7 +62,7 @@ Keyboard keyboard;
 //Path data
 ClosedSplineCurve3 mainCurve;
 //Object3D tubeMesh;
-TubeGeometry tube;
+//TubeGeometry tube;
 //bool closed = false;
 //int radiussegments = 1;
 //int segments = 100;
@@ -106,8 +106,6 @@ double strafeTotal = 0.0;
 
 //algoritam finished results
 List globalTs = [];
-List obstacleList = [];
-List scoreItemList = [];
 SplineCurve3 curve;
 List<Vector3> binormals;
 int segs; //nr of tangents;
@@ -768,21 +766,6 @@ void checkCollision()
 
 }
 
-
-class Void 
-{
-     int lastVerticalPosition; //last patch
-     int newVerticalPosition; //next patch
-     int size; //size in horizontal dimension, size equals ts.length;
-     List ts; //sublist of global list of all valid t values
-}
-
-class Patch 
-{
-     int size;
-     List ts;
-}
-
 //class Obstacle 
 //{
 //     Geometry obsGeo;
@@ -793,13 +776,6 @@ class Patch
 //     Geometry scGeo;
 //     MeshBasicMaterial scMat;
 //}
-
-
-double vectorDistance(Vector3 first, Vector3 second) {
-     double xSquare = Math.pow((first.x - second.x), 2);
-     double ySquare = Math.pow((first.y - second.y), 2);
-     return Math.sqrt(xSquare + ySquare);
-}
 
 void addCurves() 
 {
@@ -864,7 +840,7 @@ void addTube(SplineCurve3 c)
      double tuberadius = 2.0;
      bool closed = false;
 
-     tube = new TubeGeometry(c, c.points.length - 1, tuberadius, radiussegments, closed, false);
+     TubeGeometry tube = new TubeGeometry(c, c.points.length - 1, tuberadius, radiussegments, closed, false);
 //     Object3D tubeMesh = SceneUtils.createMultiMaterialObject(tube, [new MeshLambertMaterial(color: 0xff00ff), new MeshBasicMaterial(color: 0x000000, opacity: 0.3, wireframe: true, transparent: true)]);
 //     Mesh tubeMesh = new Mesh(tube);
 //     tubeMesh.scale.setFrom(new Vector3(scale, scale, scale));
@@ -983,23 +959,6 @@ init()
 //         scene.add(cube2);
 
      //-------------------------
-}
-
-void createCanvas()
-{
-     CanvasElement canvas = document.createElement('canvas');
-     canvas.style.position = "absolute";
-     canvas.style.width = window.innerWidth.toString();
-     canvas.style.height = window.innerHeight.toString();
-     canvas.id = "mycanvas";
-     
-     document.body.append(canvas);
-     
-     CanvasElement c = document.getElementById("mycanvas");
-     var ctx = c.getContext("2d");
-     ctx.moveTo(0,0);
-     ctx.lineTo(500, 500);
-     ctx.stroke();
 }
 
 void animateCamera(bool t) {

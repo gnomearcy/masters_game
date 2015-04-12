@@ -80,7 +80,7 @@ void main()
 //  init();
 //  animate(0);
   
-//  printCustom();
+  printCustom();
 }
 
 Geometry instantiateGeo()
@@ -265,8 +265,8 @@ void update()
 }
 
 
-printCustom() {
-
+printCustom() 
+{
      Texture tex = ImageUTILS.loadTexture(customLayout);
 
      mp.load(customPath).then((object)
@@ -394,7 +394,8 @@ onDocumentTouchMove(TouchEvent e) {
   }
 }
 
-void makeAxes() {
+void makeAxes() 
+{
   Geometry geometrija1 = new Geometry();
   geometrija1.vertices.add(new Vector3(0.0, 0.0, 0.0));
   geometrija1.vertices.add(new Vector3(800.0, 0.0, 0.0)); //x
