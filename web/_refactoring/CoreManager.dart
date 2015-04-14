@@ -24,14 +24,17 @@ class CoreManager
      
      Random random;
      
-     List globalTs = [];
-     List hitobjects = []; //collision array
+     List globalTs = [];      //valid t values for scoreitem/obstacle horizontal position
+     List hitobjects = [];    //collision array
      
      CoreManager();
      
-     Path path;
+     Path path;               //holds curve, number of segments and binormals for vertical offset
      Object3D parent;
-     double strafe;     
+     double strafe;           //maximum vertical offset from middle (binormal multiplier)
+     
+     double a = 0.125;
+     double b = 0.125;
      
      //generate a set of hit objects
      //we need a parent to add the object to
@@ -84,16 +87,16 @@ class CoreManager
 //          logg("Current T - " + currentT.toString());     
 //          logg("Prvi previous: " + previousVertPos.toString());
 
-        int voids = 1;
-        int patches = 1;
-        //TODO provjera da currentT + voidSize + (eventualno) patchSize < totalT, ako je, ne radi nista
+//        int voids = 1;
+//        int patches = 1;
+//        TODO provjera da currentT + voidSize + (eventualno) patchSize < totalT, ako je, ne radi nista
         //totalT ce biti oko 600-700, dakle provjera voidsize + patchsize (max -> 8) parcijalno vece od totalT nema smisla, samo breakaj
         while (currentT < totalT) 
         {
              //generiram void size i patch size
              voidSize = random.nextInt(4); //0,1,2,3
 //               logg("Void " + voids.toString() + " size - " + voidSize.toString());
-             voids++;
+//             voids++;
              
              if(currentT + voidSize > totalT)
              {
@@ -111,7 +114,7 @@ class CoreManager
              
              patchSize = random.nextInt(3) + 3; //3,4,5
 //               logg("Patch " + patches.toString() + " size - " + patchSize.toString());
-             patches++;
+//             patches++;
              
              //if both the
              if(currentT + patchSize > totalT)
@@ -361,7 +364,6 @@ class CoreManager
      void addScoreItem(Vector3 position)
      {
           //placeholder score item 
-          double a = 0.5;
 //     Mesh scoreItemMesh = new Mesh(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0x09BCED));
           ScoreItem scoreItemMesh = new ScoreItem(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0x09BCED));
           scoreItemMesh.position.setFrom(position);
@@ -371,7 +373,6 @@ class CoreManager
 
      void addObstacle(Vector3 position)
      {
-          double a = 0.5;
 //     Mesh obstacleMesh = new Mesh(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0xEB07DB));
           Obstacle obstacleMesh = new Obstacle(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0xEB07DB));
           obstacleMesh.position.setFrom(position);

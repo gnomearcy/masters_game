@@ -850,6 +850,9 @@ void addTube(SplineCurve3 c)
      segs = tube.tangents.length; 
      binormals = tube.binormals;
      curve = tube.path;     
+     
+     print(segs);
+     print(binormals.length);
 }
 
 void logg(String input) {
@@ -1069,7 +1072,8 @@ render()
      parent.rotation.y += (targetRotation - parent.rotation.y) * 0.05;
 }
 
-animate(num time) {
+animate(num time) 
+{
      update();
      render();
      checkCollision();

@@ -15,13 +15,13 @@ import 'dart:html';
 
 class ObjectManager
 {
-     final path_obj = "refactoring_objs/testiram_cijelu_traku_krivulja9.obj";
+     final path_obj = "refactoring_objs/testiram_cijelu_traku_krivulja11.obj";
      final ship_obj = "";
-     final track_obj = "refactoring_objs/testiram_cijelu_traku_traka9.obj";
+     final track_obj = "refactoring_objs/testiram_cijelu_traku_traka11.obj";
      final obstacle_obj = "";
      final scoreItem_obj = "";
      
-     final ship_texture = "";
+     final ship_texture = "refactoring_objs/crate.png";
      final track_texture = "refactoring_objs/combined_layout_test1_export.jpg";
      final obstacle_texture = "";
      final scoreItem_texture = "";
@@ -37,98 +37,16 @@ class ObjectManager
      Parser parser;
      List resources;
      
+     double side = 0.4;
+     PerspectiveCamera splineCamera;
+     
      ObjectManager() 
      {
           parser = new Parser();
           resources = [];
           resources.add(path_obj);
           resources.add(track_obj);
-     }
-          
-//     Future someFunction()
-//     {
-//          return Future.wait(resources.map((literal) => HttpRequest.request(literal, responseType: "String")))
-//          .then((List<HttpRequest> responses) //sada tu imam obj fileove kao string
-//          {
-////               print("dobio sam http requestove " + responses.length.toString());
-//               List<Object> rs = new List<Object>();
-//               for(HttpRequest r in responses)
-//               {
-//                    rs.add(r.response);
-//               }
-//               
-//               Future.wait(rs.map((response) => parser.parse(response)))
-//               .then((List<Geometry> geometries)
-//               {
-//                 print(geometries.length);   
-//                 print(geometries.elementAt(0).vertices.length);
-//                 
-//                 //kreiraj tube
-//                 var curve = new SplineCurve3(geometries.elementAt(0).vertices);
-//                 TubeGeometry tube = new TubeGeometry(curve, curve.points.length - 1, 1.0, 1, false, false);
-//                 path = new Path(tube.binormals, tube.tangents.length, tube.path);
-//                 
-//                 //kreiraj track
-////                 Texture tex = ImageUTILS.loadTexture(track_texture);
-////                 MeshPhongMaterial track_material = new MeshPhongMaterial(map: tex);
-////                 track = new Mesh(geometries.elementAt(1), track_material);
-//                 
-//                 nekibroj = geometries[0].verticesCount;
-//               });
-//          });
-//     }
-     
-     Future init() => 
-               
-//           parser.load(track_obj)
-//           .then((object)
-//           {
-//                Texture tex = ImageUTILS.loadTexture(track_texture);
-//                MeshPhongMaterial track_material = new MeshPhongMaterial(map: tex);
-//                track = new Mesh(object, track_material);
-//           })
-//           .whenComplete(()
-//                {
-//                parser.load(path_obj)
-//                .then((object)
-//                {                
-//                     var curve = new SplineCurve3(object.vertices);
-//                     TubeGeometry tube = new TubeGeometry(curve, curve.points.length - 1, 1.0, 1, false, false);
-//                     
-//                     path = new Path(tube.binormals, tube.tangents.length, tube.path);
-//                     //curve, segments, radius, radiussegments, closed, debug
-//     //                     path = new Mesh(new TubeGeometry(curve, curve.points.length - 1, 1.0, 1, false, false));  
-//                });
-//           });
-               
-          parser.load(path_obj)
-                    .then((object)
-                    {
-                         var curve = new SplineCurve3(object.vertices);
-                         TubeGeometry tube = new TubeGeometry(curve, curve.points.length - 1, 1.0, 1, false, false);
-                         path = new Path(tube.binormals, tube.tangents.length, tube.path);
-//                         curve, segments, radius, radiussegments, closed, debug
-         //                     path = new Mesh(new TubeGeometry(curve, curve.points.length - 1, 1.0, 1, false, false)); 
-                    });
-//                    .whenComplete(()
-//                    {
-//                    parser.load(track_obj)
-//                    .then((object)
-//                    {
-//                         Texture tex = ImageUTILS.loadTexture(track_texture);
-//                         MeshPhongMaterial track_material = new MeshPhongMaterial(map: tex);
-//                         track = new Mesh(object, track_material);
-//                    });
-//                    });
-//                    .whenComplete(()
-//                         {
-//                         parser.load(track_obj)
-//                         .then((object)
-//                         {      
-//                              
-//                               
-//                         });
-//                    });
+     }       
      
      handleGeometries(Object3D parent, List<Geometry> geometries)
      {
@@ -141,7 +59,28 @@ class ObjectManager
           Texture tex = ImageUTILS.loadTexture(track_texture);
           MeshPhongMaterial track_material = new MeshPhongMaterial(map: tex);
           track = new Mesh(geometries[1], track_material);
-//          parent.add(track);
+          parent.add(track);
+          
+          //movingObject
+          double movingCam_fov = 75.0;
+          double movingCam_near = 0.1;
+          double movingCam_far = 5000.0;
+          Vector3 movingCam_pos = new Vector3(0.0, side, side * 6.0); //parented to moving object
+          Vector3 movingCam_lookAt = new Vector3.zero();
+          Vector3 spotlightFollower_lookAt = new Vector3.zero();
+          
+          Texture t = ImageUTILS.loadTexture(ship_texture);
+          ship = new Mesh(new CubeGeometry(side, side, side), new MeshBasicMaterial(map: t));
+          
+          splineCamera = new PerspectiveCamera(movingCam_fov, window.innerWidth / window.innerHeight, movingCam_near, movingCam_far);
+          splineCamera.position.setFrom(movingCam_pos);
+          splineCamera.lookAt(movingCam_lookAt);
+          PointLight pointlightFollower = new PointLight(0xffffff, intensity: 0.5, distance: 0);
+          pointlightFollower.position.setFrom(new Vector3(0.0, side / 2, 0.0));
+          pointlightFollower.lookAt(spotlightFollower_lookAt);
+          ship.add(splineCamera);
+          ship.add(pointlightFollower);
+          parent.add(ship);
      }
      
      //next two functions are used by coremanager to get a new copy of items

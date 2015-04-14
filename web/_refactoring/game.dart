@@ -1,13 +1,16 @@
 library Game;
 
 import 'package:three/three.dart' hide Path;
-import 'package:vector_math/vector_math.dart';
+import 'package:vector_math/vector_math.dart' hide Ray;
 import 'package:three/extras/image_utils.dart' as ImageUTILS;
 import 'dart:html';
 import 'dart:async';
 import 'ObjectManager.dart';
 import 'Parser.dart';
 import 'CoreManager.dart';
+import 'Keyboard.dart';
+import 'TimeManager.dart';
+import 'package:stats/stats.dart';
 
 Scene scene;
 PerspectiveCamera camera;
@@ -34,13 +37,33 @@ CoreManager coreManager;
 ObjectManager objectManager;
 Parser parser;
 Path path;
+Keyboard keyboard;
+TimeManager timeManager;
+Stats stats;
 
 //Gameplay
-double strafe = 3.0;
+double strafe = 1.3;
 double strafeDt = strafe / 60.0;
 double strafeMin = -strafe;
 double strafeMax = strafe;
 double strafeTotal = 0.0;
+int loopSeconds = 50;
+
+Vector3 binormalObject = new Vector3.zero();
+Vector3 normalObject = new Vector3.zero();
+Vector3 tangentObject = new Vector3.zero();
+
+ButtonInputElement toggleBtn;
+ButtonInputElement scoreBtn;
+ButtonInputElement healthBtn;
+ButtonInputElement startStopBtn;
+bool toggle = false;
+String start = "Start";
+String stop = "Stop";
+bool animation = false;
+
+int score = 0;
+int health = 3;
 
 void main()
 {    
@@ -52,6 +75,7 @@ void main()
                .then((List<HttpRequest> responses) 
                {
                     List<Object> rs = new List<Object>();
+                    
                     for(HttpRequest r in responses)
                     {
                          rs.add(r.response);
@@ -60,14 +84,12 @@ void main()
                     Future.wait(rs.map((response) => parser.parse(response)))
                     .then((List<Geometry> geometries)
                     {                      
-                      objectManager.handleGeometries(scene, geometries);
-                      path = objectManager.path;
-//                      var curve = new SplineCurve3(geometries.elementAt(0).vertices);
-//                      TubeGeometry tube = new TubeGeometry(curve, curve.points.length - 1, 1.0, 1, false, false);
-//                      path = new Path(tube.binormals, tube.tangents.length, tube.path);
-                      coreManager.generate(scene, path, strafe);
-                      animate(0);
+                      objectManager.handleGeometries(scene, geometries); //imam ship, path, track, scoreitem, obstacle
+                      path = objectManager.path;   //drzi referencu na krivulju, njezine binormale i segmente (sluzi za pomicanje broda)
                       
+                      coreManager.generate(scene, path, strafe); //generiraj prepreke i iteme za bodove, ubaci ih u scenu
+                      
+                      animate(0);                      
                     });
                });
      
@@ -83,6 +105,14 @@ initObjects()
      objectManager = new ObjectManager();
      coreManager = new CoreManager();
      parser = new Parser();
+     keyboard = new Keyboard();
+     stats = new Stats();
+     
+     stats.container.style..position = "absolute"
+                         ..left = "0px"
+                         ..top = "50px"
+                         ..zIndex = "10";
+     document.body.append(stats.container);
      
      scene = new Scene();
 //     container = document.querySelector('#renderer_wrapper');
@@ -110,78 +140,18 @@ initObjects()
      cube = new Mesh(new CubeGeometry(20.0, 20.0, 20.0), new MeshBasicMaterial(color:0xff0000));
 //     scene.add(cube);
      
-//     loadWithParser();
-//     loadWithManager();
-//     loadWithLoader();
+      toggleBtn = querySelector('#toggle');
+//     toggleBtn.onClick.listen((e) => toggle = !toggle);
+      toggleBtn.onClick.listen((e) => animateCamera(true));
+      scoreBtn = querySelector('#score');
+      healthBtn = querySelector('#health');
+      startStopBtn = querySelector('#startstop');
+      startStopBtn.value = stop;
+      startStopBtn.onClick.listen((MouseEvent e) {timeManager.toggle();});
+      
+      scoreBtn.value = "Score: " + score.toString();
+      healthBtn.value = "Health: " + health.toString();
      
-}
-
-void loadWithParser()
-{
-//     mojParser.MojParser mp = new mojParser.MojParser();
-
-     String trackpath = 'testiram_jedan_segment_6.obj';
-     String track_texture = "combined_layout_test1_export.jpg";
-     
-     Texture tex = ImageUTILS.loadTexture(track_texture);
-     MeshPhongMaterial track_material = new MeshPhongMaterial(map: tex);
-     
-     mp.load(trackpath).then((object)
-     {
-           Mesh track = new Mesh(object, track_material);
-           track.scale.scale(20.0);
-           scene.add(track);          
-     });
-}
-
-void loadWithManager()
-{
-//     objManager = new ObjectManager();
-//     objManager.init()
-//     .then((value)
-//     {
-////          scene.add(objManager.track);
-////          print(objManager.track.geometry.vertices.length);
-////          print(objManager.path.geometry.vertices.length);   
-////          objManager.path.toString();
-//          print(objManager.path == null ? "da" : "ne");
-//          print(objManager.track == null ? "da" : "ne");
-//     });
-     
-//     objManager.someFunction();
-//     print(objManager.path == null ? "da" : "ne");
-//     print(objManager.track == null ? "da" : "ne");
-//     
-//     print(objManager.pathGeo.vertices.length);
-     
-}
-
-void loadWithLoader()
-{
-     Object3D track;
-
-     String trackpath = 'testiram_jedan_segment_6.obj';
-     String track_texture = "combined_layout_test1_export.jpg";
-     
-     Texture tex = ImageUTILS.loadTexture(track_texture);
-     Material mat = new MeshPhongMaterial(map: tex);
-
-     var loader = new OBJLoader();
-
-     loader.load(trackpath).then((object) 
-               {
-
-          object.children.forEach((e) {
-               if (e is Mesh) {
-                    (e as Mesh).material = mat;
-               }
-          });
-          
-          //Cache locally
-          track = object;   
-          track.scale.scale(30.0);
-          scene.add(track);
-     });
 }
 
 void addLights()
@@ -195,16 +165,116 @@ void addLights()
      scene.add(spotLightCenter);
 }
 
+void animateCamera(bool t) {
+     if (t) {
+          animation = !animation;
+          toggleBtn.value = "Camera Spline Animation View: " + (animation == true ? "ON" : "OFF");
+     }
+}
+
+update() 
+{
+     if (keyboard.isPressed(KeyCode.D)) {
+          strafeTotal -= strafeDt;
+          if (strafeTotal <= strafeMin) strafeTotal = strafeMin;
+     }
+
+     if (keyboard.isPressed(KeyCode.A)) {
+          strafeTotal += strafeDt;
+          if (strafeTotal >= strafeMax) strafeTotal = strafeMax;
+     }
+}
+
 render()
 {
-     //WRITE ANIMATION LOGIC HERE
+     if(timeManager == null)
+     {
+          print("Initializing a new TimeManager object");
+          timeManager = new TimeManager(loopSeconds, true);
+     }
+     
+     double t = timeManager.getCurrentTime();
+     Vector3 posObject = (path.curve.getPointAt((t + 2 / path.curve.length) % 1));
+     
+     double t2 = (t + 2 / path.curve.length) % 1;
+     double pickt2 = t2 * path.segments;
+     int pick2 = pickt2.floor();
+     int pickNext2 = (pick2 + 1) % path.segments;
+
+     //Object position
+     binormalObject = path.binormals[pickNext2] - path.binormals[pick2];
+
+     double bScaleObject = pickt2 - pick2;
+     binormalObject.multiply(new Vector3(bScaleObject, bScaleObject, bScaleObject));
+     binormalObject.add(path.binormals[pick2]);
+     tangentObject = -path.curve.getTangentAt(t2);
+     normalObject.setFrom(binormalObject).crossInto(tangentObject, normalObject);
+     posObject.add(normalObject.clone());
+     objectManager.ship.position.setFrom(posObject);
+
+     normalObject.y = normalObject.y.abs();
+
+     //Object lookAt
+     Vector3 smjerGledanja = tangentObject.clone().normalize().add(objectManager.ship.position);
+     Matrix4 lookAtObjectMatrix = new Matrix4.identity();
+     lookAtObjectMatrix = makeLookAt(lookAtObjectMatrix, smjerGledanja, objectManager.ship.position, normalObject);
+     objectManager.ship.matrix = lookAtObjectMatrix;
+     objectManager.ship.rotation = calcEulerFromRotationMatrix(objectManager.ship.matrix);
+
+     //Adjust strafe movement
+     Vector3 toMove = binormalObject.clone().normalize();
+     toMove.multiply(new Vector3(strafeTotal, strafeTotal, strafeTotal));
+     posObject.add(toMove);
+     objectManager.ship.position.setFrom(posObject);
+     objectManager.ship.position.y = objectManager.side / 2;
+}
+
+checkCollision() 
+{
+    Vector3 position = objectManager.ship.position.clone();
+
+    for(int i = 0; i < objectManager.ship.geometry.vertices.length; i++)
+    {
+         var local = objectManager.ship.geometry.vertices[i].clone();
+         var global = local.applyProjection(objectManager.ship.matrixWorld);
+         var direction = global.sub(position);
+         var ray = new Ray(position, direction.clone());
+         var result = ray.intersectObjects(coreManager.hitobjects);
+
+         if(result.length > 0 && result[0].distance < direction.length)
+//         if(result.length > 0)
+         {    
+//              window.alert("IMAM GA");
+              scene.remove(result[0].object);
+              coreManager.hitobjects.remove(result[0].object);
+              print(result[0].object.runtimeType);
+              if(result[0].object is ScoreItem)
+              {
+                   score++;
+                   scoreBtn.value = "Score: " + score.toString();
+                   print("pogodio sam score item");
+              }
+              if(result[0].object is Obstacle)
+              {
+                   health--;
+                   healthBtn.value = "Health: " + health.toString();
+                   print("pogodio sam obstacle");
+              }
+         }
+    }
+
 }
 
 animate(num time)
 {
+     stats.begin();
+     update();
+     render();
+     checkCollision();
+     stats.end();
+//     renderer.render(scene, camera);
+     renderer.render(scene, animation == true ? objectManager.splineCamera : camera);
      window.requestAnimationFrame(animate);
-     render();    
-     renderer.render(scene, camera);
 }
 
 onWindowResize(Event e) {
