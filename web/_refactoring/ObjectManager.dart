@@ -15,9 +15,9 @@ import 'dart:html';
 
 class ObjectManager
 {
-     final path_obj = "refactoring_objs/testiram_cijelu_traku_krivulja9.obj";
+     final path_obj = "refactoring_objs/testiram_cijelu_traku_krivulja11.obj";
      final ship_obj = "";
-     final track_obj = "refactoring_objs/testiram_cijelu_traku_traka9.obj";
+     final track_obj = "refactoring_objs/testiram_cijelu_traku_traka11.obj";
      final obstacle_obj = "";
      final scoreItem_obj = "";
      

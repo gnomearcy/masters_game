@@ -366,7 +366,7 @@ init()
      splineCamera = new PerspectiveCamera(movingCam_fov, window.innerWidth / window.innerHeight, movingCam_near, movingCam_far);
      splineCamera.position.setFrom(movingCam_pos);
      splineCamera.lookAt(movingCam_lookAt);     
-     PointLight pointlightFollower = new PointLight(0xffffff, intensity: 0.5, distance: 0);     
+     PointLight pointlightFollower = new PointLight(0xffffff, intensity: 0.5, distance: 0.0);     
 //     pointlightFollower.position.setFrom(splineCamera.position);
      pointlightFollower.position.setFrom(new Vector3(0.0, side/2, 0.0));        
      pointlightFollower.lookAt(spotlightFollower_lookAt);

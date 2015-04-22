@@ -183,7 +183,7 @@ update()
           if (strafeTotal >= strafeMax) strafeTotal = strafeMax;
      }
 }
-
+int i = 1;
 render()
 {
      if(timeManager == null)
@@ -193,41 +193,107 @@ render()
      }
      
      double t = timeManager.getCurrentTime();
-     Vector3 posObject = (path.curve.getPointAt((t + 2 / path.curve.length) % 1));
+     double someT = ((t + 2 / path.curve.length) % 1);
+     Vector3 posObject = (path.curve.getPointAt(someT));
      
 //     objectManager.ship.position.setFrom(posObject);
      
-     double t2 = (t + 2 / path.curve.length) % 1;
-     double pickt2 = t2 * path.segments;
-     int pick2 = pickt2.floor();
-     int pickNext2 = (pick2 + 1) % path.segments;
-
-     //Object position
-     binormalObject = path.binormals[pickNext2] - path.binormals[pick2];
-
+//     double t2 = (t + 2 / path.curve.length) % 1;
+//     double pickt2 = t2 * path.segments;
+     double pickt2 = someT * path.segments; //unfloored
+     int pick2 = (someT * path.segments).floor(); //floored
      double bScaleObject = pickt2 - pick2;
-     binormalObject.multiply(new Vector3(bScaleObject, bScaleObject, bScaleObject));
-     binormalObject.add(path.binormals[pick2]);
-     tangentObject = -path.curve.getTangentAt(t2);
-     normalObject.setFrom(binormalObject).crossInto(tangentObject, normalObject);
-     posObject.add(normalObject.clone());
-     objectManager.ship.position.setFrom(posObject);
+//     int pick2 = pickt2.floor(); //trenutni segment
+     int pickNext2 = (pick2 + 1) % path.segments; //sljedeci segment
 
-     normalObject.y = normalObject.y.abs();
+     
+     //object position rewritten
+     binormalObject = path.binormals[pickNext2] - path.binormals[pick2];
+     if(i == 1)
+     {
+       print("pickNext2: " + pickNext2.toString());
+       print("pickt2: " + pickt2.toString());
+       print("pick2: " + pick2.toString());
+       print("bScaleObject: " + bScaleObject.toString());
+       print("Binormal pickNext2: " + path.binormals[pickNext2].toString());
+       print("Binormal pick2: " + path.binormals[pick2].toString());
+       print("Binormal object: " + binormalObject.toString());
+       
+       i++;
+     }
+
+//     print("Binormal object: " + path.binormals[pickNext2].toString());
+
+//      double bScaleObject = pickt2 - pick2;
+      binormalObject.multiply(new Vector3(bScaleObject, bScaleObject, bScaleObject));
+      binormalObject.add(path.binormals[pick2]);
+      //binormala uvijek gleda prema gore, Y prostor
+      //tangeta je u X Z prostoru
+      tangentObject = -path.curve.getTangentAt(someT); //tangenta iz trenutnog segmenta
+      normalObject.setFrom(binormalObject).crossInto(tangentObject, normalObject);
+      //normala se postavi u Y prostor, crosa na tangentu, i dođe u XZ prostor
+      //normala je okomita na tangentu
+      posObject.add(normalObject.clone()); //nepotrebno
+      objectManager.ship.position.setFrom(posObject);
+  
+      normalObject.y = normalObject.y.abs();
+     //Object position
+//     binormalObject = path.binormals[pickNext2] - path.binormals[pick2];
+//
+//     double bScaleObject = pickt2 - pick2;
+//     binormalObject.multiply(new Vector3(bScaleObject, bScaleObject, bScaleObject));
+//     binormalObject.add(path.binormals[pick2]);
+//     tangentObject = -path.curve.getTangentAt(t2);
+//     normalObject.setFrom(binormalObject).crossInto(tangentObject, normalObject);
+//     posObject.add(normalObject.clone());
+//     objectManager.ship.position.setFrom(posObject);
+//
+//     normalObject.y = normalObject.y.abs();
 
 //     //Object lookAt
-//     Vector3 smjerGledanja = tangentObject.clone().normalize().add(objectManager.ship.position);
-//     Matrix4 lookAtObjectMatrix = new Matrix4.identity();
-//     lookAtObjectMatrix = makeLookAt(lookAtObjectMatrix, smjerGledanja, objectManager.ship.position, normalObject);
-//     objectManager.ship.matrix = lookAtObjectMatrix;
+     Vector3 smjerGledanja = tangentObject.clone().normalize().add(objectManager.ship.position);
+     Matrix4 lookAtObjectMatrix = new Matrix4.identity();
+     lookAtObjectMatrix = makeLookAt(lookAtObjectMatrix, smjerGledanja, objectManager.ship.position, normalObject);
+     objectManager.ship.matrix = lookAtObjectMatrix;
      objectManager.ship.rotation = calcEulerFromRotationMatrix(objectManager.ship.matrix);
 //
 //     //Adjust strafe movement
      Vector3 toMove = binormalObject.clone().normalize();
      toMove.multiply(new Vector3(strafeTotal, strafeTotal, strafeTotal));
+     print(toMove.toString());
      posObject.add(toMove);
      objectManager.ship.position.setFrom(posObject);
      objectManager.ship.position.y = objectManager.side / 2;     
+}
+
+render2()
+{
+      if(timeManager == null)
+       {
+            print("Initializing a new TimeManager object");
+            timeManager = new TimeManager(loopSeconds, true);
+       }
+       
+       double t = timeManager.getCurrentTime();
+       //center
+       Vector3 posObject = (path.curve.getPointAt(t));
+       //eye
+       tangentObject = path.curve.getTangentAt(t);
+       Vector3 eye = -tangentObject.clone().normalize().add(posObject);
+       //up
+       normalObject = new Vector3(0.0, 1.0, 0.0);
+       
+       //lookatmatrix
+       Matrix4 lookAtM = new Matrix4.identity();
+       lookAtM = makeLookAt(lookAtM, eye, posObject, normalObject);
+       objectManager.ship.rotation = calcEulerFromRotationMatrix(lookAtM);
+       
+       //adjust strafe
+       Vector3 side = new Vector3.zero();
+       side = normalObject.clone().normalize().crossInto(tangentObject, side);
+       side.multiply(new Vector3(strafeTotal, 0.0, strafeTotal));
+       objectManager.ship.position.setFrom(posObject.add(side));
+
 }
 
 checkCollision() 
@@ -270,7 +336,7 @@ animate(num time)
 {
      stats.begin();
      update();
-     render();
+     render2();
      scene.rotation.y += (targetRotation - scene.rotation.y) * 0.05;
 
      checkCollision();
