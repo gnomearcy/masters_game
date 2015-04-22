@@ -36,22 +36,25 @@ Mesh cube;
 CoreManager coreManager;
 ObjectManager objectManager;
 Parser parser;
-Path path;
+//Path path;
 Keyboard keyboard;
 TimeManager timeManager;
 Stats stats;
 
 //Gameplay
-double strafe = 1.3;
+double strafe = 0.6;
 double strafeDt = strafe / 60.0;
 double strafeMin = -strafe;
 double strafeMax = strafe;
 double strafeTotal = 0.0;
-int loopSeconds = 50;
+int loopSeconds = 150;
 
 Vector3 binormalObject = new Vector3.zero();
-Vector3 normalObject = new Vector3.zero();
+Vector3 normalObject = new Vector3(0.0, 1.0, 0.0);  //up
 Vector3 tangentObject = new Vector3.zero();
+Vector3 positionObject = new Vector3.zero();        //center
+Matrix4 lookAtMatrix = new Matrix4.identity();    
+double t;       //current time
 
 ButtonInputElement toggleBtn;
 ButtonInputElement scoreBtn;
@@ -85,9 +88,9 @@ void main()
                     .then((List<Geometry> geometries)
                     {                      
                       objectManager.handleGeometries(scene, geometries); //imam ship, path, track, scoreitem, obstacle
-                      path = objectManager.path;   //drzi referencu na krivulju, njezine binormale i segmente (sluzi za pomicanje broda)
+//                      path = objectManager.path;   //drzi referencu na krivulju, njezine binormale i segmente (sluzi za pomicanje broda)
                       
-                      coreManager.generate(scene, path, strafe); //generiraj prepreke i iteme za bodove, ubaci ih u scenu
+                      coreManager.generate(scene, objectManager, strafe); //generiraj prepreke i iteme za bodove, ubaci ih u scenu
                       
                       animate(0);                      
                     });
@@ -115,7 +118,8 @@ initObjects()
      
      scene = new Scene();
 //     container = document.querySelector('#renderer_wrapper');
-     
+     BoundingBox b = new BoundingBox();
+     b.obj
      camera = new PerspectiveCamera(cameraFov, cameraAspect, cameraNear, cameraFar);
      camera.position.setFrom(cameraPosition); 
      camera.lookAt(scene.position);
@@ -183,90 +187,8 @@ update()
           if (strafeTotal >= strafeMax) strafeTotal = strafeMax;
      }
 }
-int i = 1;
+
 render()
-{
-     if(timeManager == null)
-     {
-          print("Initializing a new TimeManager object");
-          timeManager = new TimeManager(loopSeconds, true);
-     }
-     
-     double t = timeManager.getCurrentTime();
-     double someT = ((t + 2 / path.curve.length) % 1);
-     Vector3 posObject = (path.curve.getPointAt(someT));
-     
-//     objectManager.ship.position.setFrom(posObject);
-     
-//     double t2 = (t + 2 / path.curve.length) % 1;
-//     double pickt2 = t2 * path.segments;
-     double pickt2 = someT * path.segments; //unfloored
-     int pick2 = (someT * path.segments).floor(); //floored
-     double bScaleObject = pickt2 - pick2;
-//     int pick2 = pickt2.floor(); //trenutni segment
-     int pickNext2 = (pick2 + 1) % path.segments; //sljedeci segment
-
-     
-     //object position rewritten
-     binormalObject = path.binormals[pickNext2] - path.binormals[pick2];
-     if(i == 1)
-     {
-       print("pickNext2: " + pickNext2.toString());
-       print("pickt2: " + pickt2.toString());
-       print("pick2: " + pick2.toString());
-       print("bScaleObject: " + bScaleObject.toString());
-       print("Binormal pickNext2: " + path.binormals[pickNext2].toString());
-       print("Binormal pick2: " + path.binormals[pick2].toString());
-       print("Binormal object: " + binormalObject.toString());
-       
-       i++;
-     }
-
-//     print("Binormal object: " + path.binormals[pickNext2].toString());
-
-//      double bScaleObject = pickt2 - pick2;
-      binormalObject.multiply(new Vector3(bScaleObject, bScaleObject, bScaleObject));
-      binormalObject.add(path.binormals[pick2]);
-      //binormala uvijek gleda prema gore, Y prostor
-      //tangeta je u X Z prostoru
-      tangentObject = -path.curve.getTangentAt(someT); //tangenta iz trenutnog segmenta
-      normalObject.setFrom(binormalObject).crossInto(tangentObject, normalObject);
-      //normala se postavi u Y prostor, crosa na tangentu, i dođe u XZ prostor
-      //normala je okomita na tangentu
-      posObject.add(normalObject.clone()); //nepotrebno
-      objectManager.ship.position.setFrom(posObject);
-  
-      normalObject.y = normalObject.y.abs();
-     //Object position
-//     binormalObject = path.binormals[pickNext2] - path.binormals[pick2];
-//
-//     double bScaleObject = pickt2 - pick2;
-//     binormalObject.multiply(new Vector3(bScaleObject, bScaleObject, bScaleObject));
-//     binormalObject.add(path.binormals[pick2]);
-//     tangentObject = -path.curve.getTangentAt(t2);
-//     normalObject.setFrom(binormalObject).crossInto(tangentObject, normalObject);
-//     posObject.add(normalObject.clone());
-//     objectManager.ship.position.setFrom(posObject);
-//
-//     normalObject.y = normalObject.y.abs();
-
-//     //Object lookAt
-     Vector3 smjerGledanja = tangentObject.clone().normalize().add(objectManager.ship.position);
-     Matrix4 lookAtObjectMatrix = new Matrix4.identity();
-     lookAtObjectMatrix = makeLookAt(lookAtObjectMatrix, smjerGledanja, objectManager.ship.position, normalObject);
-     objectManager.ship.matrix = lookAtObjectMatrix;
-     objectManager.ship.rotation = calcEulerFromRotationMatrix(objectManager.ship.matrix);
-//
-//     //Adjust strafe movement
-     Vector3 toMove = binormalObject.clone().normalize();
-     toMove.multiply(new Vector3(strafeTotal, strafeTotal, strafeTotal));
-     print(toMove.toString());
-     posObject.add(toMove);
-     objectManager.ship.position.setFrom(posObject);
-     objectManager.ship.position.y = objectManager.side / 2;     
-}
-
-render2()
 {
       if(timeManager == null)
        {
@@ -274,69 +196,92 @@ render2()
             timeManager = new TimeManager(loopSeconds, true);
        }
        
-       double t = timeManager.getCurrentTime();
+       t = timeManager.getCurrentTime();
        //center
-       Vector3 posObject = (path.curve.getPointAt(t));
+       positionObject = objectManager.path.getPointAt(t);
        //eye
-       tangentObject = path.curve.getTangentAt(t);
-       Vector3 eye = -tangentObject.clone().normalize().add(posObject);
-       //up
-       normalObject = new Vector3(0.0, 1.0, 0.0);
+       tangentObject = -objectManager.path.getTangentAt(t);
+       Vector3 eye = tangentObject.clone().normalize().add(positionObject);
        
        //lookatmatrix
-       Matrix4 lookAtM = new Matrix4.identity();
-       lookAtM = makeLookAt(lookAtM, eye, posObject, normalObject);
-       objectManager.ship.rotation = calcEulerFromRotationMatrix(lookAtM);
+       lookAtMatrix = makeLookAt(lookAtMatrix, eye, positionObject, normalObject);
+       objectManager.ship.rotation = calcEulerFromRotationMatrix(lookAtMatrix);
        
        //adjust strafe
-       Vector3 side = new Vector3.zero();
-       side = normalObject.clone().normalize().crossInto(tangentObject, side);
-       side.multiply(new Vector3(strafeTotal, 0.0, strafeTotal));
-       objectManager.ship.position.setFrom(posObject.add(side));
-
+       binormalObject = new Vector3.zero();
+       binormalObject = normalObject.clone().normalize().crossInto(-tangentObject, binormalObject);
+       binormalObject.multiply(new Vector3(strafeTotal, 0.0, strafeTotal));
+       objectManager.ship.position.setFrom(positionObject.add(binormalObject));
+       objectManager.ship.geometry.computeBoundingBox();
+       objectManager.ship.updateMatrixWorld();
 }
 
 checkCollision() 
 {
-    Vector3 position = objectManager.ship.position.clone();
-
-    for(int i = 0; i < objectManager.ship.geometry.vertices.length; i++)
+//    Vector3 position = objectManager.ship.position.clone();
+//
+//    for(int i = 0; i < objectManager.ship.geometry.vertices.length; i++)
+//    {
+//         var local = objectManager.ship.geometry.vertices[i].clone();
+//         var global = local.applyProjection(objectManager.ship.matrixWorld);
+//         var direction = global.sub(position);
+//         var ray = new Ray(position, direction.clone());
+//         var result = ray.intersectObjects(coreManager.hitobjects);
+//
+//         if(result.length > 0 && result[0].distance < direction.length)
+////         if(result.length > 0)
+//         {    
+////              window.alert("IMAM GA");
+//              scene.remove(result[0].object);
+//              coreManager.hitobjects.remove(result[0].object);
+//              print(result[0].object.runtimeType);
+//              if(result[0].object is ScoreItem)
+//              {
+//                   score++;
+//                   scoreBtn.value = "Score: " + score.toString();
+//                   print("pogodio sam score item");
+//              }
+//              if(result[0].object is Obstacle)
+//              {
+//                   health--;
+//                   healthBtn.value = "Health: " + health.toString();
+//                   print("pogodio sam obstacle");
+//              }
+//         }
+//    }
+  
+    Mesh hitObject;
+    
+    for(int i = 0; i < objectManager.hitObjects.length; i++)
     {
-         var local = objectManager.ship.geometry.vertices[i].clone();
-         var global = local.applyProjection(objectManager.ship.matrixWorld);
-         var direction = global.sub(position);
-         var ray = new Ray(position, direction.clone());
-         var result = ray.intersectObjects(coreManager.hitobjects);
-
-         if(result.length > 0 && result[0].distance < direction.length)
-//         if(result.length > 0)
-         {    
-//              window.alert("IMAM GA");
-              scene.remove(result[0].object);
-              coreManager.hitobjects.remove(result[0].object);
-              print(result[0].object.runtimeType);
-              if(result[0].object is ScoreItem)
-              {
-                   score++;
-                   scoreBtn.value = "Score: " + score.toString();
-                   print("pogodio sam score item");
-              }
-              if(result[0].object is Obstacle)
-              {
-                   health--;
-                   healthBtn.value = "Health: " + health.toString();
-                   print("pogodio sam obstacle");
-              }
-         }
+        hitObject = objectManager.hitObjects[i];
+        
+        if(hitObject.geometry.boundingBox.isIntersectionBox(objectManager.ship.geometry.boundingBox))
+        {
+            if(hitObject is ScoreItem)
+            {
+                score++;
+                scoreBtn.value = "Score: " + score.toString();
+                print("pogodio sam score item");
+            }
+            if(hitObject is Obstacle)
+            {
+                 health--;
+                 healthBtn.value = "Health: " + health.toString();
+                 print("pogodio sam obstacle");
+            }
+            
+            scene.remove(hitObject);
+            objectManager.hitObjects.remove(hitObject);
+        }
     }
-
 }
 
 animate(num time)
 {
      stats.begin();
      update();
-     render2();
+     render();
      scene.rotation.y += (targetRotation - scene.rotation.y) * 0.05;
 
      checkCollision();

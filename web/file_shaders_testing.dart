@@ -92,7 +92,8 @@ init() {
 
 }
 
-printCustom() {
+printCustom() 
+{
      usingCustom = true;
 
      MojParser mp = new MojParser();

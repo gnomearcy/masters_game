@@ -28,7 +28,8 @@ class ObjectManager
      
      int nekibroj;
      
-     Path path;
+//     Path path;
+     Curve3D path;
      Object3D ship;
      Object3D track;
      Object3D obstacle;
@@ -36,6 +37,7 @@ class ObjectManager
      
      Parser parser;
      List resources;
+     List hitObjects = [];    //collision array
      
      double side = 0.4;
      PerspectiveCamera splineCamera;
@@ -53,7 +55,8 @@ class ObjectManager
           //geometries[0] => path;
           var curve = new ClosedSplineCurve3(geometries[0].vertices);
           TubeGeometry tube = new TubeGeometry(curve, curve.points.length - 1, 1.0, 1, false, false);
-          path = new Path(tube.binormals, tube.tangents.length, tube.path);
+//          path = new Path(tube.binormals, tube.tangents.length, tube.path);
+          path = tube.path;
           
           //geometries[1] => track          
           Texture tex = ImageUTILS.loadTexture(track_texture);
@@ -71,6 +74,7 @@ class ObjectManager
           
           Texture t = ImageUTILS.loadTexture(ship_texture);
           ship = new Mesh(new CubeGeometry(side, side, side), new MeshBasicMaterial(map: t));
+          ship.geometry.computeBoundingBox();
           
           splineCamera = new PerspectiveCamera(movingCam_fov, window.innerWidth / window.innerHeight, movingCam_near, movingCam_far);
           splineCamera.position.setFrom(movingCam_pos);
@@ -99,14 +103,14 @@ class ObjectManager
      }
 }
 
-class Path
-{
-     List<Vector3> binormals;
-     int segments;
-     ClosedSplineCurve3 curve;
-     
-     Path(this.binormals, this.segments, this.curve);
-}
+//class Path
+//{
+//     List<Vector3> binormals;
+//     int segments;
+//     ClosedSplineCurve3 curve;
+//     
+//     Path(this.binormals, this.segments, this.curve);
+//}
 
 class Obstacle extends Mesh
 {

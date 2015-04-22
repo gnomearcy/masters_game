@@ -60,20 +60,8 @@ MojParser mp;
 double factor = 0.4;
 bool nowYouCanHitMe = false;
 
-
-
 void main() 
 {
-//  directions = new List<Vector3>();
-//  directions.add(new Vector3(0.0, 0.0, 1.0));
-//  directions.add(new Vector3(0.0, 0.0, -1.0));
-//  directions.add(new Vector3(1.0, 0.0, -1.0));
-//  directions.add(new Vector3(1.0, 0.0, 0.0));
-//  directions.add(new Vector3(1.0, 0.0, 1.0));
-//  directions.add(new Vector3(-1.0, 0.0, 1.0));
-//  directions.add(new Vector3(-1.0, 0.0, -1.0));
-//  directions.add(new Vector3(0.0, 0.0, 1.0));
-
   nowYouCanHitMe = true;
   
   mp = new MojParser();
@@ -241,27 +229,35 @@ void addLines() {
   scene.add(lineParent);
 }
 
-void update() 
+void update()
 {
-    Vector3 position = secondMesh.position.clone();
-
-    for(int i = 0; i < secondMesh.geometry.vertices.length; i++)
+//    Vector3 position = secondMesh.position.clone();
+//
+//    for(int i = 0; i < secondMesh.geometry.vertices.length; i++)
+//    {
+//         var local = secondMesh.geometry.vertices[i].clone();
+//         var global = local.applyProjection(secondMesh.matrixWorld);
+//         var direction = global.sub(position);
+//         var ray = new Ray(position, direction.clone());
+//         var result = ray.intersectObjects(hitobjects);
+//
+//         if(result.length > 0 && result[0].distance < direction.length)
+////         if(result.length > 0)
+//         {    
+//              window.alert("IMAM GA");
+//              scene.remove(result[0].object);
+//              hitobjects.remove(result[0].object);
+//         }
+//    }
+  
+  for(int i = 0; i < hitobjects.length; i++)
+  {
+    Mesh hit = hitobjects[i];
+    if(hit.geometry.boundingBox.isIntersectionBox(secondMesh.geometry.boundingBox))
     {
-         var local = secondMesh.geometry.vertices[i].clone();
-         var global = local.applyProjection(secondMesh.matrixWorld);
-         var direction = global.sub(position);
-         var ray = new Ray(position, direction.clone());
-         var result = ray.intersectObjects(hitobjects);
-
-         if(result.length > 0 && result[0].distance < direction.length)
-//         if(result.length > 0)
-         {    
-              window.alert("IMAM GA");
-              scene.remove(result[0].object);
-              hitobjects.remove(result[0].object);
-         }
+      window.alert("hej");
     }
-
+  }
 }
 
 
@@ -279,7 +275,9 @@ printCustom()
           secondMesh.position.x = 50.0;
           secondMesh.scale.scale(3.0);
           secondMesh.material = matBasicTex;
+          secondMesh.geometry.computeBoundingBox();
           secondMesh.updateMatrixWorld();
+          
           scene.add(secondMesh);
           
           generateRandom(matBasicTex);
@@ -320,6 +318,7 @@ void generateRandom(MeshBasicMaterial mat)
     obs = new Mesh(instantiateGeo(), mat);
     obs.position.setFrom(pos);
     obs.scale.scale(objscale);
+    obs.geometry.computeBoundingBox();
     obs.updateMatrixWorld();
     hitobjects.add(obs);
     scene.add(obs);

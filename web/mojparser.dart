@@ -19,20 +19,20 @@ class MojParser
 //     List<Vector3> _normals;
 
      //Output Geometry
-//     Geometry geometry;
+     Geometry geometry;
      
-//     var vertices        = new List();
-//     var normals         = new List();
-//     var faceUvs         = new List();
-//     var faces           = new List();
-//     var faceVertexUvs   = new List<List>();
-     var vertices;
-     var normals;
-     var faceUvs;
-     var faces;
-     var faceVertexUvs;
+     var vertices        = new List();
+     var normals         = new List();
+     var faceUvs         = new List();
+     var faces           = new List();
+     var faceVertexUvs   = new List<List>();
+//     var vertices;
+//     var normals;
+//     var faceUvs;
+//     var faces;
+//     var faceVertexUvs;
 
-     MojParser();
+     MojParser() : geometry = new Geometry();
 //               : _pathVertices = new List<Vector3>(),
 //                 _colors = new List<Vector3>(),
 //                 _uVs = new List<Vector2>(),
@@ -128,15 +128,13 @@ class MojParser
     }
   }
 
-  Future<Geometry> parse(String text) 
-  {
-    Geometry geo = new Geometry();
-    
-    vertices        = new List();
-    normals         = new List();
-    faceUvs         = new List();
-    faces           = new List();
-    faceVertexUvs   = new List<List>();
+  parse(String text) 
+  {    
+//    vertices        = new List();
+//    normals         = new List();
+//    faceUvs         = new List();
+//    faces           = new List();
+//    faceVertexUvs   = new List<List>();
     
     var face_offset = 0;
 
@@ -167,14 +165,14 @@ class MojParser
 
           // ["f 1 2 3", "1", "2", "3", undefined]
           _handle_face_line(
-               geo, face_offset, normals, faceUvs,
+               geometry, face_offset, normals, faceUvs,
               [result[1], result[2], result[3], result[4]]
           );
         } else if ((result = face_pattern2.firstMatch(line)) != null) {
 
           // ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
           _handle_face_line(
-              geo, face_offset, normals, faceUvs,
+              geometry, face_offset, normals, faceUvs,
               [result[2], result[5], result[8], result[11]], //faces
               [result[3], result[6], result[9], result[12]] //uv
           );
@@ -182,7 +180,7 @@ class MojParser
 
           // ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
           _handle_face_line(
-              geo, face_offset, normals, faceUvs,
+              geometry, face_offset, normals, faceUvs,
               [result[2], result[6], result[10], result[14]], //faces
               [result[3], result[7], result[11], result[15]], //uv
               [result[4], result[8], result[12], result[16]] //normal
@@ -191,7 +189,7 @@ class MojParser
 
           // ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
           _handle_face_line(
-               geo, face_offset, normals, faceUvs,
+               geometry, face_offset, normals, faceUvs,
                [result[2], result[5], result[8], result[11]], //faces
                [], //uv
                [result[3], result[6], result[9], result[12]] //normal
@@ -201,31 +199,31 @@ class MojParser
     });
     
     //old code
-//    faces = geo.faces;
-//    faceVertexUvs = geo.faceVertexUvs;   
+    faces = geometry.faces;
+    faceVertexUvs = geometry.faceVertexUvs;   
     
-//    print(vertices.length);
-//    print(normals.length);
-//    print(faceUvs.length);
-//    print(faceVertexUvs[0][0].length);
-//    print(faces.length);
-    
-    //dodijeli geometriji
-    geo.vertices = vertices;
-    geo.normals = normals;
-    geo.faceUvs = faceUvs;
-    //nuliraj
-    vertices = null;
-    normals = null;
-    faceUvs = null;
-    
-    //vrati rezultat
-//    return geo;
-    
-    //wrap the geometry object into Future
-    var completer = new Completer();    
-    completer.complete(geo);    
-    return completer.future;
+////    print(vertices.length);
+////    print(normals.length);
+////    print(faceUvs.length);
+////    print(faceVertexUvs[0][0].length);
+////    print(faces.length);
+//    
+//    //dodijeli geometriji
+//    geo.vertices = vertices;
+//    geo.normals = normals;
+//    geo.faceUvs = faceUvs;
+//    //nuliraj
+////    vertices = null;
+////    normals = null;
+////    faceUvs = null;
+//    
+//    //vrati rezultat
+////    return geo;
+//    
+//    //wrap the geometry object into Future
+//    var completer = new Completer();    
+//    completer.complete(geo);    
+//    return completer.future;
     
   }
 }

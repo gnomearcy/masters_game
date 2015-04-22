@@ -10,11 +10,11 @@ import 'ObjectManager.dart';
 class CoreManager
 {
      //Fine tuning interface
-     double Lref = 10.0;
+     double Lref = 20.0;
      //referentni pomak za izracun aktualnog pomaka ovisno o duljini krivulje
-     double dtref = 0.01;
+     double dtref = 0.03;
      //threshold iznad kojeg biljezim trenutnu vrijednost "t"
-     double dist = 0.4;
+     double dist = 0.8;
      
      List vertPositions = [0, 1, 2, 3];
      
@@ -25,38 +25,40 @@ class CoreManager
      Random random;
      
      List globalTs = [];      //valid t values for scoreitem/obstacle horizontal position
-     List hitobjects = [];    //collision array
      
      CoreManager();
      
-     Path path;               //holds curve, number of segments and binormals for vertical offset
+//     Path path;               //holds curve, number of segments and binormals for vertical offset
+//     Curve3D path;
      Object3D parent;
      double strafe;           //maximum vertical offset from middle (binormal multiplier)
      
      double a = 0.125;
      double b = 0.125;
      
+     ObjectManager objM;
+     
      //generate a set of hit objects
      //we need a parent to add the object to
-     generate(Object3D pp, Path p, double s)
+     generate(Object3D pp, ObjectManager m, double s)
      {
-          path = p;
+          objM = m;
           parent = pp;
           strafe = s;
           
           random = new Random(new DateTime.now().millisecondsSinceEpoch);
-          double L = path.curve.length; 
+          double L = objM.path.length; 
           double dt = (Lref * dtref / L);
 
           double sum = 0.0; 
           double t = 0.0;
           t += dt;
 
-          Vector3 previous = path.curve.getPoint(t);           
+          Vector3 previous = objM.path.getPoint(t);           
 
           while (t <= 1.0 + dt)
           {
-               Vector3 current = path.curve.getPoint(t);
+               Vector3 current = objM.path.getPoint(t);
 
                double diff = current.absoluteError(previous);
 
@@ -154,18 +156,26 @@ class CoreManager
 //     Vector3 position = curve.getPoint(t);
           
 //     position.scale(scale); //TODO skaliraj curve odmah dok konstruiras ????
-          int segment = (t * path.segments).floor();
+//          int segment = (t * path.segments).floor();
           
 //     Vector3 binormal = tube.binormals[segment].clone(); //clone for safety
           
           //Safety measure to prevent index out of bounds exception
           //binormal in prelast and last segments don't differ that much.
-          if(segment == path.segments) 
-              segment -= 1;
+//          if(segment == path.segments) 
+//              segment -= 1;
           
-          Vector3 binormal = path.binormals[segment].clone();
-          binormal.normalize();
-          binormal.scale(strafe);
+//          Vector3 binormal = path.binormals[segment].clone();
+//          binormal.normalize();
+//          binormal.scale(strafe);
+          
+//          return binormal;
+          
+          Vector3 tangent = objM.path.getTangentAt(t);
+          Vector3 normal = new Vector3(0.0, 1.0, 0.0);
+          Vector3 binormal = new Vector3.zero();
+          binormal = normal.clone().crossInto(tangent, binormal);
+          binormal.normalize().scale(strafe);
           
           return binormal;
      }
@@ -375,17 +385,21 @@ class CoreManager
 //     Mesh scoreItemMesh = new Mesh(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0x09BCED));
           ScoreItem scoreItemMesh = new ScoreItem(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0x09BCED));
           scoreItemMesh.position.setFrom(position);
+          scoreItemMesh.updateMatrixWorld();
+          scoreItemMesh.geometry.computeBoundingBox();
           parent.add(scoreItemMesh);
-          hitobjects.add(scoreItemMesh);
+          objM.hitObjects.add(scoreItemMesh);
      }
 
      void addObstacle(Vector3 position)
      {
 //     Mesh obstacleMesh = new Mesh(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0xEB07DB));
           Obstacle obstacleMesh = new Obstacle(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0xEB07DB));
-          obstacleMesh.position.setFrom(position);          
+          obstacleMesh.position.setFrom(position);  
+          obstacleMesh.updateMatrixWorld();
+          obstacleMesh.geometry.computeBoundingBox();
           parent.add(obstacleMesh);
-          hitobjects.add(obstacleMesh);
+          objM.hitObjects.add(obstacleMesh);
      }
 
      /**
@@ -404,15 +418,14 @@ class CoreManager
            binormal = percent > 0.5 ? binormal.negate() : binormal;
            binormal.scale(binormalScale);
            
-           Vector3 position = path.curve.getPoint(t);
+           Vector3 position = objM.path.getPoint(t);
 //           position.scale(scale);
            
            Vector3 finalPosition = binormal + position;
            
            return finalPosition;      
      }
-
-
+     
      /**
       * Interval 0%----------50%---------100% where 0% is 1.0, 50% is 0.0, and 100% is -1.0.
       * Given a [percent] value in interval [0.0, 1.0]
