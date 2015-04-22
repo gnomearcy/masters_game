@@ -91,8 +91,7 @@ void main()
                       
                       animate(0);                      
                     });
-               });
-     
+               });     
 }
 
 /**
@@ -196,6 +195,8 @@ render()
      double t = timeManager.getCurrentTime();
      Vector3 posObject = (path.curve.getPointAt((t + 2 / path.curve.length) % 1));
      
+//     objectManager.ship.position.setFrom(posObject);
+     
      double t2 = (t + 2 / path.curve.length) % 1;
      double pickt2 = t2 * path.segments;
      int pick2 = pickt2.floor();
@@ -214,19 +215,19 @@ render()
 
      normalObject.y = normalObject.y.abs();
 
-     //Object lookAt
-     Vector3 smjerGledanja = tangentObject.clone().normalize().add(objectManager.ship.position);
-     Matrix4 lookAtObjectMatrix = new Matrix4.identity();
-     lookAtObjectMatrix = makeLookAt(lookAtObjectMatrix, smjerGledanja, objectManager.ship.position, normalObject);
-     objectManager.ship.matrix = lookAtObjectMatrix;
+//     //Object lookAt
+//     Vector3 smjerGledanja = tangentObject.clone().normalize().add(objectManager.ship.position);
+//     Matrix4 lookAtObjectMatrix = new Matrix4.identity();
+//     lookAtObjectMatrix = makeLookAt(lookAtObjectMatrix, smjerGledanja, objectManager.ship.position, normalObject);
+//     objectManager.ship.matrix = lookAtObjectMatrix;
      objectManager.ship.rotation = calcEulerFromRotationMatrix(objectManager.ship.matrix);
-
-     //Adjust strafe movement
+//
+//     //Adjust strafe movement
      Vector3 toMove = binormalObject.clone().normalize();
      toMove.multiply(new Vector3(strafeTotal, strafeTotal, strafeTotal));
      posObject.add(toMove);
      objectManager.ship.position.setFrom(posObject);
-     objectManager.ship.position.y = objectManager.side / 2;
+     objectManager.ship.position.y = objectManager.side / 2;     
 }
 
 checkCollision() 
@@ -270,6 +271,8 @@ animate(num time)
      stats.begin();
      update();
      render();
+     scene.rotation.y += (targetRotation - scene.rotation.y) * 0.05;
+
      checkCollision();
      stats.end();
 //     renderer.render(scene, camera);

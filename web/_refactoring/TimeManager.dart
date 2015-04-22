@@ -39,7 +39,7 @@ class TimeManager
      
      /**
       * Returns [stopwatch.elapsedMilliseconds]'s percentage of [duration]
-      * in interval [0, 1]. Used in render loop to for character's movement.
+      * in interval [0, 1]. Used in render loop for ship's movement.
       */
      double getCurrentTime()
      {

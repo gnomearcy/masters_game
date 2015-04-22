@@ -127,6 +127,8 @@ class CoreManager
              
              previousVertPos = nextVertPos; //get ready for the next void + patch field generation.
         }     
+        
+        parent.updateMatrixWorld(force: true);
    }
 
      /**
@@ -155,6 +157,12 @@ class CoreManager
           int segment = (t * path.segments).floor();
           
 //     Vector3 binormal = tube.binormals[segment].clone(); //clone for safety
+          
+          //Safety measure to prevent index out of bounds exception
+          //binormal in prelast and last segments don't differ that much.
+          if(segment == path.segments) 
+              segment -= 1;
+          
           Vector3 binormal = path.binormals[segment].clone();
           binormal.normalize();
           binormal.scale(strafe);
@@ -375,7 +383,7 @@ class CoreManager
      {
 //     Mesh obstacleMesh = new Mesh(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0xEB07DB));
           Obstacle obstacleMesh = new Obstacle(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0xEB07DB));
-          obstacleMesh.position.setFrom(position);
+          obstacleMesh.position.setFrom(position);          
           parent.add(obstacleMesh);
           hitobjects.add(obstacleMesh);
      }

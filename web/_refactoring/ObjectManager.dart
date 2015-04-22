@@ -15,9 +15,9 @@ import 'dart:html';
 
 class ObjectManager
 {
-     final path_obj = "refactoring_objs/testiram_cijelu_traku_krivulja11.obj";
+     final path_obj = "refactoring_objs/testiram_cijelu_traku_krivulja9.obj";
      final ship_obj = "";
-     final track_obj = "refactoring_objs/testiram_cijelu_traku_traka11.obj";
+     final track_obj = "refactoring_objs/testiram_cijelu_traku_traka9.obj";
      final obstacle_obj = "";
      final scoreItem_obj = "";
      
@@ -51,7 +51,7 @@ class ObjectManager
      handleGeometries(Object3D parent, List<Geometry> geometries)
      {
           //geometries[0] => path;
-          var curve = new SplineCurve3(geometries[0].vertices);
+          var curve = new ClosedSplineCurve3(geometries[0].vertices);
           TubeGeometry tube = new TubeGeometry(curve, curve.points.length - 1, 1.0, 1, false, false);
           path = new Path(tube.binormals, tube.tangents.length, tube.path);
           
@@ -75,7 +75,7 @@ class ObjectManager
           splineCamera = new PerspectiveCamera(movingCam_fov, window.innerWidth / window.innerHeight, movingCam_near, movingCam_far);
           splineCamera.position.setFrom(movingCam_pos);
           splineCamera.lookAt(movingCam_lookAt);
-          PointLight pointlightFollower = new PointLight(0xffffff, intensity: 0.5, distance: 0);
+          PointLight pointlightFollower = new PointLight(0xffffff, intensity: 0.5, distance: 0.0);
           pointlightFollower.position.setFrom(new Vector3(0.0, side / 2, 0.0));
           pointlightFollower.lookAt(spotlightFollower_lookAt);
           ship.add(splineCamera);
@@ -103,7 +103,7 @@ class Path
 {
      List<Vector3> binormals;
      int segments;
-     SplineCurve3 curve;
+     ClosedSplineCurve3 curve;
      
      Path(this.binormals, this.segments, this.curve);
 }
