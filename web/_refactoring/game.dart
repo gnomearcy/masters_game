@@ -47,7 +47,7 @@ double strafeDt = strafe / 60.0;
 double strafeMin = -strafe;
 double strafeMax = strafe;
 double strafeTotal = 0.0;
-int loopSeconds = 150;
+int loopSeconds = 420;
 
 Vector3 binormalObject = new Vector3.zero();
 Vector3 normalObject = new Vector3(0.0, 1.0, 0.0);  //up
@@ -118,8 +118,6 @@ initObjects()
      
      scene = new Scene();
 //     container = document.querySelector('#renderer_wrapper');
-     BoundingBox b = new BoundingBox();
-     b.obj
      camera = new PerspectiveCamera(cameraFov, cameraAspect, cameraNear, cameraFar);
      camera.position.setFrom(cameraPosition); 
      camera.lookAt(scene.position);
@@ -212,8 +210,9 @@ render()
        binormalObject = normalObject.clone().normalize().crossInto(-tangentObject, binormalObject);
        binormalObject.multiply(new Vector3(strafeTotal, 0.0, strafeTotal));
        objectManager.ship.position.setFrom(positionObject.add(binormalObject));
-       objectManager.ship.geometry.computeBoundingBox();
-       objectManager.ship.updateMatrixWorld();
+//       objectManager.ship.geometry.computeBoundingBox();
+//       objectManager.ship.updateMatrixWorld();
+       objectManager.ship.geometry.boundingBox = new BoundingBox.fromObject(objectManager.ship);
 }
 
 checkCollision() 
@@ -226,14 +225,14 @@ checkCollision()
 //         var global = local.applyProjection(objectManager.ship.matrixWorld);
 //         var direction = global.sub(position);
 //         var ray = new Ray(position, direction.clone());
-//         var result = ray.intersectObjects(coreManager.hitobjects);
+//         var result = ray.intersectObjects(objectManager.hitObjects);
 //
 //         if(result.length > 0 && result[0].distance < direction.length)
 ////         if(result.length > 0)
 //         {    
 ////              window.alert("IMAM GA");
 //              scene.remove(result[0].object);
-//              coreManager.hitobjects.remove(result[0].object);
+//              objectManager.hitObjects.remove(result[0].object);
 //              print(result[0].object.runtimeType);
 //              if(result[0].object is ScoreItem)
 //              {

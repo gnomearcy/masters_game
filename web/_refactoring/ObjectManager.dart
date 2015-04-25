@@ -39,7 +39,7 @@ class ObjectManager
      List resources;
      List hitObjects = [];    //collision array
      
-     double side = 0.4;
+     double side = 0.2;
      PerspectiveCamera splineCamera;
      
      ObjectManager() 

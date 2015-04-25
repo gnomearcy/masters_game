@@ -385,8 +385,9 @@ class CoreManager
 //     Mesh scoreItemMesh = new Mesh(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0x09BCED));
           ScoreItem scoreItemMesh = new ScoreItem(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0x09BCED));
           scoreItemMesh.position.setFrom(position);
-          scoreItemMesh.updateMatrixWorld();
-          scoreItemMesh.geometry.computeBoundingBox();
+//          scoreItemMesh.updateMatrixWorld();
+//          scoreItemMesh.geometry.computeBoundingBox();
+          scoreItemMesh.geometry.boundingBox = new BoundingBox.fromObject(scoreItemMesh);
           parent.add(scoreItemMesh);
           objM.hitObjects.add(scoreItemMesh);
      }
@@ -396,8 +397,9 @@ class CoreManager
 //     Mesh obstacleMesh = new Mesh(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0xEB07DB));
           Obstacle obstacleMesh = new Obstacle(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0xEB07DB));
           obstacleMesh.position.setFrom(position);  
-          obstacleMesh.updateMatrixWorld();
-          obstacleMesh.geometry.computeBoundingBox();
+//          obstacleMesh.updateMatrixWorld();
+//          obstacleMesh.geometry.computeBoundingBox();
+          obstacleMesh.geometry.boundingBox = new BoundingBox.fromObject(obstacleMesh);
           parent.add(obstacleMesh);
           objM.hitObjects.add(obstacleMesh);
      }
