@@ -18,6 +18,11 @@ class CoreManager
      
      List vertPositions = [0, 1, 2, 3];
      
+     //defines a coefficient by which to expand (> 1.0) or compress (< 1.0) bounding boxes of obstacle items
+     double obstacleBoxSquish = 0.5;
+     //defines a coefficient by which to expand (> 1.0) or compress (< 1.0) bounding boxes of scoreItem items
+     double scoreItemBoxSquish = 1.0;
+     
 //     int segs;
 //     int binormals;
 //     SplineCurve3 curve;
@@ -381,25 +386,39 @@ class CoreManager
 
      void addScoreItem(Vector3 position)
      {
-          //placeholder score item 
-//     Mesh scoreItemMesh = new Mesh(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0x09BCED));
           ScoreItem scoreItemMesh = new ScoreItem(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0x09BCED));
           scoreItemMesh.position.setFrom(position);
-//          scoreItemMesh.updateMatrixWorld();
-//          scoreItemMesh.geometry.computeBoundingBox();
           scoreItemMesh.geometry.boundingBox = new BoundingBox.fromObject(scoreItemMesh);
+          Vector3 min = scoreItemMesh.geometry.boundingBox.min;
+          Vector3 max = scoreItemMesh.geometry.boundingBox.max;
+          Vector3 center = scoreItemMesh.geometry.boundingBox.center.clone();
+          min.setFrom(min.sub(center).scale(scoreItemBoxSquish).add(center).clone());
+          max.setFrom(max.sub(center).scale(scoreItemBoxSquish).add(center).clone());
           parent.add(scoreItemMesh);
           objM.hitObjects.add(scoreItemMesh);
      }
 
      void addObstacle(Vector3 position)
      {
-//     Mesh obstacleMesh = new Mesh(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0xEB07DB));
           Obstacle obstacleMesh = new Obstacle(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0xEB07DB));
           obstacleMesh.position.setFrom(position);  
-//          obstacleMesh.updateMatrixWorld();
-//          obstacleMesh.geometry.computeBoundingBox();
           obstacleMesh.geometry.boundingBox = new BoundingBox.fromObject(obstacleMesh);
+         
+          //debug
+//          print("Min prije: " + obstacleMesh.geometry.boundingBox.min.toString());
+//          print("Max prije: " + obstacleMesh.geometry.boundingBox.max.toString());
+//          print("Center:  " + obstacleMesh.geometry.boundingBox.center.toString());
+          
+          Vector3 min = obstacleMesh.geometry.boundingBox.min;
+          Vector3 max = obstacleMesh.geometry.boundingBox.max;
+          Vector3 center = obstacleMesh.geometry.boundingBox.center.clone();
+          min.setFrom(min.sub(center).scale(obstacleBoxSquish).add(center).clone());
+          max.setFrom(max.sub(center).scale(obstacleBoxSquish).add(center).clone());
+                    
+          //debug
+//          print("Min poslije: " + obstacleMesh.geometry.boundingBox.min.toString());
+//          print("Max poslije: " + obstacleMesh.geometry.boundingBox.max.toString());
+          
           parent.add(obstacleMesh);
           objM.hitObjects.add(obstacleMesh);
      }

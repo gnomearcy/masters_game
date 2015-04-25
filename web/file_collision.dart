@@ -161,7 +161,8 @@ init() {
 //  secondMesh = new Mesh(new SphereGeometry(r), new MeshBasicMaterial(color: 0xffaa00, wireframe: true);
   secondMesh.position.x = 50.0;
   secondMesh.geometry.boundingBox = new BoundingBox.fromObject(secondMesh);
-//  secondMesh.scale.scale(5.0);
+  //scale the bounding box
+//  secondMesh.geometry.boundingBox.
   secondMesh.add(bbh.outline(secondMesh));
   scene.add(secondMesh);
   
@@ -177,6 +178,17 @@ init() {
 //  firstMesh.updateMatrixWorld();
 //  firstMesh.add(bbh.outline(firstMesh));
   firstMesh.geometry.boundingBox = new BoundingBox.fromObject(firstMesh);
+  Vector3 min = firstMesh.geometry.boundingBox.min;
+  Vector3 max = firstMesh.geometry.boundingBox.max;
+  
+  
+  double faktor = 2.0;
+  (min as Vector3).setFrom(new Vector3.zero());
+  
+  print("Min poslije: " + firstMesh.geometry.boundingBox.min.toString());
+  print("Max poslije: " + firstMesh.geometry.boundingBox.max.toString());
+//  min.scale(faktor);
+//  max.scale(faktor);
   scene.add(firstMesh);
 //  firstMesh.geometry.boundingBox.applyMatrix4(firstMesh.matrixWorld);
 //  hitobjects.addObject(firstMesh);
@@ -231,8 +243,8 @@ updateKeyboard() {
   
   secondMesh.geometry.boundingBox = new BoundingBox.fromObject(secondMesh);
   secondMesh.add(bbh.outline(secondMesh)); 
-  print(secondMesh.geometry.boundingBox.min);
-  print(secondMesh.children.length);  
+//  print(secondMesh.geometry.boundingBox.min);
+//  print(secondMesh.children.length);  
 }
 
 Object3D lineParent;
@@ -451,7 +463,7 @@ class BBHelper
     if(mesh.geometry.boundingBox == null)
       mesh.geometry.computeBoundingBox();
     
-    print(mesh.geometry.boundingBox.size);
+//    print(mesh.geometry.boundingBox.size);
     double sidex = mesh.geometry.boundingBox.size.x;
     double sidey = mesh.geometry.boundingBox.size.y;
     double sidez = mesh.geometry.boundingBox.size.z;

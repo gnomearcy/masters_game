@@ -5,4 +5,3 @@ dependencies:
   browser: any
   three:
     git: https://github.com/threeDart/three.dart
-  vector_math: any

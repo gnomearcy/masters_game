@@ -261,13 +261,13 @@ checkCollision()
             {
                 score++;
                 scoreBtn.value = "Score: " + score.toString();
-                print("pogodio sam score item");
+//                print("pogodio sam score item");
             }
             if(hitObject is Obstacle)
             {
                  health--;
                  healthBtn.value = "Health: " + health.toString();
-                 print("pogodio sam obstacle");
+//                 print("pogodio sam obstacle");
             }
             
             scene.remove(hitObject);
