@@ -252,7 +252,8 @@ printCustom()
 
 
 
-addLight() {
+addLight() 
+{
      AmbientLight ambientLight = new AmbientLight(0xaaaaaa);
      scene.add(ambientLight);
      PointLight pointLight = new PointLight(0xffffff, intensity: 1.0);

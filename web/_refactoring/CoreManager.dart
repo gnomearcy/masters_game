@@ -19,29 +19,31 @@ class CoreManager
      List vertPositions = [0, 1, 2, 3];
      
      //defines a coefficient by which to expand (> 1.0) or compress (< 1.0) bounding boxes of obstacle items
-     double obstacleBoxSquish = 0.5;
+     double obstacleBoxSquish = 0.8;
      //defines a coefficient by which to expand (> 1.0) or compress (< 1.0) bounding boxes of scoreItem items
-     double scoreItemBoxSquish = 1.0;
+     double scoreItemBoxSquish = 0.9;
      
-//     int segs;
-//     int binormals;
-//     SplineCurve3 curve;
-     
-     Random random;
-     
-     List globalTs = [];      //valid t values for scoreitem/obstacle horizontal position
+     Random random;     
+     List globalTs = [];      //valid t values for scoreitem/obstacle horizontal position  
+     ObjectManager objM;
+     double a = 0.125;
+     double b = 0.125;
+     Object3D parent;
+     double strafe;           //maximum vertical offset from middle (binormal multiplier)     
      
      CoreManager();
      
-//     Path path;               //holds curve, number of segments and binormals for vertical offset
-//     Curve3D path;
-     Object3D parent;
-     double strafe;           //maximum vertical offset from middle (binormal multiplier)
-     
-     double a = 0.125;
-     double b = 0.125;
-     
-     ObjectManager objM;
+     /**From three.dart/extras/core/curve.dart - getUtoTmapping quote:
+      * "// less likely to overflow, though probably not issue here
+      *  // JS doesn't really have integers, all numbers are floats."
+      * 
+      * In some cases, getUtoTmapping produced "i" value for which the 
+      * arcLengths[] array exceeded its length thus throwing the OutOfBoundsException,
+      * which explaing the quote. 
+      * 
+      * Not sure if this fix affects JS, but it affects Dartium.    
+      */     
+     int bugFix = 1;
      
      //generate a set of hit objects
      //we need a parent to add the object to
@@ -85,7 +87,7 @@ class CoreManager
         int ignoreFirstN = 0; //ignore first N t-s
         int ignoreLastN = 0; //ignore last N t-s to give time to generate new set of obstacles and score items.
         int currentT = 0 + ignoreFirstN;
-        int totalT = globalTs.length - ignoreLastN; //pretpostavka da je ts veci od ignoreLastN
+        int totalT = globalTs.length - bugFix; //pretpostavka da je ts veci od ignoreLastN
 
         int previousVertPos = random.nextInt(4); //od 0 do 4-1 -> 0,1,2,3 //npr. 2
         int nextVertPos;
@@ -136,7 +138,7 @@ class CoreManager
         }     
         
         parent.updateMatrixWorld(force: true);
-   }
+    }
 
      /**
       * Used in [generateItemPosition] to retrieve value of a 
@@ -384,16 +386,34 @@ class CoreManager
           }
      }
 
+     void generateBoundingBox(Mesh mesh)
+     {
+          double coeff;
+          
+          if(mesh is ScoreItem)
+            coeff = scoreItemBoxSquish;
+          if(mesh is Obstacle)
+            coeff = obstacleBoxSquish;
+          
+          mesh.geometry.boundingBox = new BoundingBox.fromObject(mesh);
+          
+          //debug
+//          print("Min before: " + mesh.geometry.boundingBox.min.toString());
+//          print("Max before: " + mesh.geometry.boundingBox.max.toString());
+//          print("Center:  " + mesh.geometry.boundingBox.center.toString());
+          Vector3 min = mesh.geometry.boundingBox.min;
+          Vector3 max = mesh.geometry.boundingBox.max;
+          Vector3 center = mesh.geometry.boundingBox.center.clone();
+          min.setFrom(min.sub(center).scale(coeff).add(center).clone());
+          max.setFrom(max.sub(center).scale(coeff).add(center).clone());
+//          print("Min after: " + mesh.geometry.boundingBox.min.toString());
+//          print("Max after: " + mesh.geometry.boundingBox.max.toString());
+     }
      void addScoreItem(Vector3 position)
      {
           ScoreItem scoreItemMesh = new ScoreItem(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0x09BCED));
-          scoreItemMesh.position.setFrom(position);
-          scoreItemMesh.geometry.boundingBox = new BoundingBox.fromObject(scoreItemMesh);
-          Vector3 min = scoreItemMesh.geometry.boundingBox.min;
-          Vector3 max = scoreItemMesh.geometry.boundingBox.max;
-          Vector3 center = scoreItemMesh.geometry.boundingBox.center.clone();
-          min.setFrom(min.sub(center).scale(scoreItemBoxSquish).add(center).clone());
-          max.setFrom(max.sub(center).scale(scoreItemBoxSquish).add(center).clone());
+          scoreItemMesh.position.setFrom(position);          
+          generateBoundingBox(scoreItemMesh);
           parent.add(scoreItemMesh);
           objM.hitObjects.add(scoreItemMesh);
      }
@@ -402,23 +422,7 @@ class CoreManager
      {
           Obstacle obstacleMesh = new Obstacle(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0xEB07DB));
           obstacleMesh.position.setFrom(position);  
-          obstacleMesh.geometry.boundingBox = new BoundingBox.fromObject(obstacleMesh);
-         
-          //debug
-//          print("Min prije: " + obstacleMesh.geometry.boundingBox.min.toString());
-//          print("Max prije: " + obstacleMesh.geometry.boundingBox.max.toString());
-//          print("Center:  " + obstacleMesh.geometry.boundingBox.center.toString());
-          
-          Vector3 min = obstacleMesh.geometry.boundingBox.min;
-          Vector3 max = obstacleMesh.geometry.boundingBox.max;
-          Vector3 center = obstacleMesh.geometry.boundingBox.center.clone();
-          min.setFrom(min.sub(center).scale(obstacleBoxSquish).add(center).clone());
-          max.setFrom(max.sub(center).scale(obstacleBoxSquish).add(center).clone());
-                    
-          //debug
-//          print("Min poslije: " + obstacleMesh.geometry.boundingBox.min.toString());
-//          print("Max poslije: " + obstacleMesh.geometry.boundingBox.max.toString());
-          
+          generateBoundingBox(obstacleMesh);
           parent.add(obstacleMesh);
           objM.hitObjects.add(obstacleMesh);
      }

@@ -114,6 +114,7 @@ initObjects()
                          ..left = "0px"
                          ..top = "50px"
                          ..zIndex = "10";
+     
      document.body.append(stats.container);
      
      scene = new Scene();
@@ -151,8 +152,7 @@ initObjects()
       startStopBtn.onClick.listen((MouseEvent e) {timeManager.toggle();});
       
       scoreBtn.value = "Score: " + score.toString();
-      healthBtn.value = "Health: " + health.toString();
-     
+      healthBtn.value = "Health: " + health.toString();     
 }
 
 void addLights()
@@ -210,6 +210,7 @@ render()
        binormalObject = normalObject.clone().normalize().crossInto(-tangentObject, binormalObject);
        binormalObject.multiply(new Vector3(strafeTotal, 0.0, strafeTotal));
        objectManager.ship.position.setFrom(positionObject.add(binormalObject));
+       print(objectManager.ship.position.toString());
 //       objectManager.ship.geometry.computeBoundingBox();
 //       objectManager.ship.updateMatrixWorld();
        objectManager.ship.geometry.boundingBox = new BoundingBox.fromObject(objectManager.ship);
