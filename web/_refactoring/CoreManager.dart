@@ -33,6 +33,12 @@ class CoreManager
      
      CoreManager();
      
+     //path object curve defines referent Y position of obstacles and score items
+     //used to fine tune referent Y position.
+     double obstacleBoxFineTuneY = 0.115;
+     double obstacleBarrelFineTuneY = 0.15; //change accordingly 
+     double scoreItemFineTuneY = 0.1;
+     
      /**From three.dart/extras/core/curve.dart - getUtoTmapping quote:
       * "// less likely to overflow, though probably not issue here
       *  // JS doesn't really have integers, all numbers are floats."
@@ -411,7 +417,9 @@ class CoreManager
      }
      void addScoreItem(Vector3 position)
      {
-          ScoreItem scoreItemMesh = new ScoreItem(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0x09BCED));
+//          ScoreItem scoreItemMesh = new ScoreItem(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0x09BCED));
+          ScoreItem scoreItemMesh = objM.instantiateScoreItem();
+          position.y = scoreItemFineTuneY;
           scoreItemMesh.position.setFrom(position);          
           generateBoundingBox(scoreItemMesh);
           parent.add(scoreItemMesh);
@@ -420,7 +428,19 @@ class CoreManager
 
      void addObstacle(Vector3 position)
      {
-          Obstacle obstacleMesh = new Obstacle(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0xEB07DB));
+          int whichObstacle = random.nextInt(ObjectManager.NR_OF_OBSTACLES);
+          Obstacle obstacleMesh = objM.instantiateObstacle(whichObstacle);
+          
+          switch(whichObstacle)
+          {
+            case ObjectManager.OBSTACLE_BOX:
+              position.y = obstacleBoxFineTuneY;
+              break;
+            case ObjectManager.OBSTACLE_BARREL:
+              position.y = obstacleBarrelFineTuneY;
+              break;
+          }
+          
           obstacleMesh.position.setFrom(position);  
           generateBoundingBox(obstacleMesh);
           parent.add(obstacleMesh);

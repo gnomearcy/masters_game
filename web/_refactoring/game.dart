@@ -195,10 +195,31 @@ render()
        }
        
        t = timeManager.getCurrentTime();
+       
+       /*
+        * double t = timeManager.getCurrentTime();
++     double someT = ((t + 2 / path.curve.length) % 1);
++     double pickt2 = someT * path.segments; //unfloored
++     int pick2 = (someT * path.segments).floor(); //floored
++     double bScaleObject = pickt2 - pick2;
++     int pickNext2 = (pick2 + 1) % path.segments; //sljedeci segment
+        */
+       
+       double nekiT = (t + 2 / objectManager.path.length) % 1;
+       if(nekiT > 1.0)
+         nekiT -= 1.0;
+//       int nextSeg = (nekiT * objectManager.segments).floor();
+       
+       print("current: " + t.toString() + " | next: " + nekiT.toString());
        //center
        positionObject = objectManager.path.getPointAt(t);
+//       Vector3 positionEye = objectManager.path.getPointAt(nekiT);
        //eye
        tangentObject = -objectManager.path.getTangentAt(t);
+//       Vector3 tangentEye = -objectManager.path.getTangentAt(nekiT);
+//       Vector3 tangentObjectNext = -objectManager.path.getTangentAt(nekiT);
+//       Vector3 eye = objectManager.path.getPointAt(nekiT);
+//       Vector3 eye = tangentObject.clone().normalize().add(positionObject);
        Vector3 eye = tangentObject.clone().normalize().add(positionObject);
        
        //lookatmatrix
@@ -210,7 +231,7 @@ render()
        binormalObject = normalObject.clone().normalize().crossInto(-tangentObject, binormalObject);
        binormalObject.multiply(new Vector3(strafeTotal, 0.0, strafeTotal));
        objectManager.ship.position.setFrom(positionObject.add(binormalObject));
-       print(objectManager.ship.position.toString());
+//       print(objectManager.ship.position.toString());
 //       objectManager.ship.geometry.computeBoundingBox();
 //       objectManager.ship.updateMatrixWorld();
        objectManager.ship.geometry.boundingBox = new BoundingBox.fromObject(objectManager.ship);
