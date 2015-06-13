@@ -420,7 +420,7 @@ class CoreManager
 //          ScoreItem scoreItemMesh = new ScoreItem(new CubeGeometry(a, a, a), new MeshBasicMaterial(color: 0x09BCED));
           ScoreItem scoreItemMesh = objM.instantiateScoreItem();
           position.y = scoreItemFineTuneY;
-          scoreItemMesh.position.setFrom(position);          
+          scoreItemMesh.position.setFrom(position);    
           generateBoundingBox(scoreItemMesh);
           parent.add(scoreItemMesh);
           objM.hitObjects.add(scoreItemMesh);
@@ -442,6 +442,10 @@ class CoreManager
           }
           
           obstacleMesh.position.setFrom(position);  
+          
+          //random rotation
+          int rotation = random.nextInt(360);
+          obstacleMesh.rotation.y = rotation * PI / 360.0;
           generateBoundingBox(obstacleMesh);
           parent.add(obstacleMesh);
           objM.hitObjects.add(obstacleMesh);

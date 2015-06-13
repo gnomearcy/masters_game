@@ -47,7 +47,7 @@ double strafeDt = strafe / 60.0;
 double strafeMin = -strafe;
 double strafeMax = strafe;
 double strafeTotal = 0.0;
-int loopSeconds = 420;
+int loopSeconds = 400;
 
 Vector3 binormalObject = new Vector3.zero();
 Vector3 normalObject = new Vector3(0.0, 1.0, 0.0);  //up
