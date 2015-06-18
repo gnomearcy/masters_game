@@ -15,19 +15,27 @@ import 'dart:html';
 
 class ObjectManager
 {
-     final path_obj = "refactoring_objs/curve_test_sirine.obj";
-     final ship_obj = "refactoring_objs/ship_test_sirine_small.obj";
-     final track_obj = "refactoring_objs/corridor_test_sirine.obj";
-     final obstacle_box_obj = "refactoring_objs/obstacle_barrel_1.obj";
-     final obstacle_barrel_obj = "refactoring_objs/obstacle_box_1.obj";
-     final scoreItem_obj = "refactoring_objs/score_item_1.obj";
+     static const String suffix = "_1.obj";
+     final path_obj = "refactoring_objs/curve_final" + suffix;
+     final ship_obj = "refactoring_objs/ship_final" + suffix;
+     final track_obj = "refactoring_objs/corridor_final" + suffix;
+     final obstacle_box_obj = "refactoring_objs/box_final" + suffix;
+     final obstacle_barrel_obj = "refactoring_objs/barrel_final" + suffix;
+     final scoreItem_obj = "refactoring_objs/scoreitem_final" + suffix;
+     
+//     final path_obj = "refactoring_objs/curve_test_sirine" + suffix;
+//     final ship_obj = "refactoring_objs/ship_test_sirine_small" + suffix;
+//     final track_obj = "refactoring_objs/corridor_test_sirine_fixed" + suffix;
+//     final obstacle_box_obj = "refactoring_objs/obstacle_box" + suffix;
+//     final obstacle_barrel_obj = "refactoring_objs/obstacle_barrel" + suffix;
+//     final scoreItem_obj = "refactoring_objs/score_item" + suffix;
      
      final ship_texture = "refactoring_objs/ship_uv_layout_textured_1.png";
      final track_texture = "refactoring_objs/corridor_uv_layout_2048_1_textured_1.png";
      final asset_texture = "refactoring_objs/asset_uv_layout_2048_3_textured2.png";
      
      int nekibroj;
-     
+     bool useBasic = true;
 //     Path path;
      int segments;
      Curve3D path;
@@ -70,7 +78,12 @@ class ObjectManager
           
           //geometries[1] => track          
           Texture tex = ImageUTILS.loadTexture(track_texture);
-          MeshPhongMaterial track_material = new MeshPhongMaterial(map: tex);
+          Material track_material;
+          
+          if(useBasic)
+              track_material = new MeshBasicMaterial(map: tex);
+          else
+              track_material = new MeshPhongMaterial(map: tex);
           track = new Mesh(geometries[1], track_material);
 //          track = new Mesh(geometries[1]);
           parent.add(track);
@@ -80,7 +93,7 @@ class ObjectManager
           double movingCam_near = 0.1;
           double movingCam_far = 5000.0;
 //          Vector3 movingCam_pos = new Vector3(0.0, 0.2, 0.4 * 6.0); //parented to moving object
-          Vector3 movingCam_pos = new Vector3(0.0, 0.2, 0.0);
+          Vector3 movingCam_pos = new Vector3(0.0, 0.5, 0.5);
           Vector3 movingCam_lookAt = new Vector3(0.0, 0.0, -0.8);
           
           //Following values test the obstacle box collision
@@ -89,7 +102,15 @@ class ObjectManager
           
           Vector3 spotlightFollower_lookAt = new Vector3.zero();
           Texture shipTex = ImageUTILS.loadTexture(ship_texture);
-          MeshPhongMaterial ship_material = new MeshPhongMaterial(map: shipTex);
+          
+          Material ship_material;
+          if(useBasic)
+              ship_material = new MeshBasicMaterial(map: shipTex);
+          else
+              ship_material = new MeshPhongMaterial(map: shipTex);
+//          MeshBasicMaterial ship_material = new MeshBasicMaterial(map: shipTex);
+//          MeshPhongMaterial ship_material = new MeshPhongMaterial(map: shipTex);
+
           ship = new Mesh(geometries[2], ship_material);
           ship.geometry.computeBoundingBox();
           
@@ -97,7 +118,8 @@ class ObjectManager
           splineCamera.position.setFrom(movingCam_pos);
           splineCamera.lookAt(movingCam_lookAt);
           PointLight pointlightFollower = new PointLight(0xffffff, intensity: 0.5, distance: 0.0);
-          pointlightFollower.position.setFrom(new Vector3(0.0, 5.0 / 2, 0.0)); //TODO extract variable
+//          pointlightFollower.position.setFrom(new Vector3(0.0, 5.0 / 2, 0.0)); //TODO extract variable
+          pointlightFollower.position.setFrom(new Vector3(0.0, 0.0, 0.0)); //TODO extract variable
           pointlightFollower.lookAt(spotlightFollower_lookAt);
           ship.add(splineCamera);
           ship.add(pointlightFollower);          
@@ -107,17 +129,36 @@ class ObjectManager
           Texture texAssets = ImageUTILS.loadTexture(asset_texture);
           
           //geometries[3] => obstacle box
-          MeshPhongMaterial obstacleBoxMat = new MeshPhongMaterial(map: texAssets);
+          Material obstacleBoxMat;
+           if(useBasic)
+             obstacleBoxMat = new MeshBasicMaterial(map: texAssets);
+           else
+             obstacleBoxMat = new MeshPhongMaterial(map: texAssets);
+//          MeshPhongMaterial obstacleBoxMat = new MeshPhongMaterial(map: texAssets);          
+//          MeshBasicMaterial obstacleBoxMat = new MeshBasicMaterial(map: texAssets);
           obstacleBox = new Obstacle(geometries[3], obstacleBoxMat);
 //          parent.add(obstacle_box);
           
           //geometries[4] => obstacle barrel
-          MeshPhongMaterial obstacleBarrelMat = new MeshPhongMaterial(map: texAssets);
+          Material obstacleBarrelMat;
+           if(useBasic)
+             obstacleBarrelMat = new MeshBasicMaterial(map: texAssets);
+           else
+             obstacleBarrelMat = new MeshPhongMaterial(map: texAssets);
+//          MeshPhongMaterial obstacleBarrelMat = new MeshPhongMaterial(map: texAssets);
+//          MeshBasicMaterial obstacleBarrelMat = new MeshBasicMaterial(map: texAssets);
           obstacleBarrel = new Obstacle(geometries[4], obstacleBarrelMat);
 //          parent.add(obstacle_barrel);     
           
           //geometries[5] => score item
-          MeshPhongMaterial scoreItemMat = new MeshPhongMaterial(map: texAssets);
+//          MeshPhongMaterial scoreItemMat = new MeshPhongMaterial(map: texAssets);
+          Material scoreItemMat;
+           if(useBasic)
+             scoreItemMat = new MeshBasicMaterial(map: texAssets);
+           else
+             scoreItemMat = new MeshPhongMaterial(map: texAssets);
+//          MeshBasicMaterial scoreItemMat = new MeshBasicMaterial(map: texAssets);
+
           scoreItem = new ScoreItem(geometries[5], scoreItemMat);
      }
      

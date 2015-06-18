@@ -1,0 +1,13 @@
+# Blender MTL File: 'zajebancija.blend'
+# Material Count: 1
+
+newmtl kocka_mat
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Bump D:\\- DEV -\\blender\\zahebancija\\assets\\asset_uv_layout_2048_1_textured4.png
+map_Kd D:\\- DEV -\\blender\\zahebancija\\assets\\asset_uv_layout_2048_1_textured4.png

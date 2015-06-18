@@ -35,11 +35,14 @@ class CoreManager
      
      //path object curve defines referent Y position of obstacles and score items
      //used to fine tune referent Y position.
-     double obstacleBoxFineTuneY = 0.115;
-     double obstacleBarrelFineTuneY = 0.15; //change accordingly 
-     double scoreItemFineTuneY = 0.1;
+//     double obstacleBoxFineTuneY = 0.115;
+//     double obstacleBarrelFineTuneY = 0.15; //change accordingly 
+//     double scoreItemFineTuneY = 0.1;
      
-     /**From three.dart/extras/core/curve.dart - getUtoTmapping quote:
+     double obstacleBoxFineTuneY = 0.0;
+          double obstacleBarrelFineTuneY = 0.0; //change accordingly 
+          double scoreItemFineTuneY = 0.0;
+     /**From three.dart/extras/core/curve.daat - getUtoTmapping quote:
       * "// less likely to overflow, though probably not issue here
       *  // JS doesn't really have integers, all numbers are floats."
       * 
@@ -50,6 +53,8 @@ class CoreManager
       * Not sure if this fix affects JS, but it affects Dartium.    
       */     
      int bugFix = 1;
+     
+     int nrOfGenered = 0;
      
      //generate a set of hit objects
      //we need a parent to add the object to
@@ -144,6 +149,7 @@ class CoreManager
         }     
         
         parent.updateMatrixWorld(force: true);
+        print("Coremanager - " + nrOfGenered.toString());
     }
 
      /**
@@ -421,9 +427,12 @@ class CoreManager
           ScoreItem scoreItemMesh = objM.instantiateScoreItem();
           position.y = scoreItemFineTuneY;
           scoreItemMesh.position.setFrom(position);    
+          
           generateBoundingBox(scoreItemMesh);
           parent.add(scoreItemMesh);
           objM.hitObjects.add(scoreItemMesh);
+          
+          nrOfGenered++;
      }
 
      void addObstacle(Vector3 position)

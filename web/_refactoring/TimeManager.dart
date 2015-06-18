@@ -4,16 +4,16 @@ library TimeManager;
 class TimeManager
 {
      //duration of one loop in milliseconds
-     int duration;     
+     int duration = 420 * 1000;
      Stopwatch stopwatch;
      
      bool _isRunning;    
      bool get isRunning => _isRunning;
      
      //set the duration in seconds, use as milliseconds
-     TimeManager(int duration, [bool forceStart])
+     TimeManager({bool forceStart})
      {          
-          this.duration = duration * 1000;
+//          this.duration = duration * 1000;
           stopwatch = new Stopwatch();
           
           if(forceStart)
