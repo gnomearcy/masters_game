@@ -8,9 +8,12 @@ import 'dart:async';
 import 'ObjectManager.dart';
 import 'Parser.dart';
 import 'CoreManager.dart';
-import 'Keyboard.dart';
+//import 'Keyboard.dart';
 import 'TimeManager.dart';
 import 'package:stats/stats.dart';
+import 'dart:math';
+import 'dart:collection';
+import 'dart:core';
 
 Scene scene;
 PerspectiveCamera camera;
@@ -37,13 +40,13 @@ CoreManager coreManager;
 ObjectManager objectManager;
 Parser parser;
 //Path path;
-Keyboard keyboard;
+//Keyboard keyboard;
 TimeManager timeManager;
 Stats stats;
 
 //Gameplay
 double strafe = 0.6;
-double strafeDt = strafe / 60.0;
+double strafeDt = strafe / 15.0;
 double strafeMin = -strafe;
 double strafeMax = strafe;
 double strafeTotal = 0.0;
@@ -68,7 +71,74 @@ bool animation = false;
 int score = 0;
 int health = 3;
 
+//time used to calculate strafe in internalUpdate()
+int previousTime = 0;
+int currentTime = 0;
+int elapsedTime = 0;
+int threshhold = 500; 
+double increment = 0.0001; //todo adjust
+
+HashMap<int, int> _keys = new HashMap<int, int>();
+     
+     
+isPressed(int keyCode) => _keys.containsKey(keyCode);
+     
+     
+       //make sure render function got executed at least once
+//       if(timeManager != null)
+//       {
+//         currentTime = timeManager.getCurrentTime();
+//         
+//         if((currentTime - previousTime).abs() > threshhold) //currtime = 0.2, previous = 0.0, threshhold = 0.01667
+//         {
+//           double a, b;
+//           //which one is higher
+//            if(currentTime > previousTime)
+//            {
+//              a = currentTime;
+//              b = previousTime;
+//            }
+//            else
+//            {
+//              //overflow on t = 1.0
+//              a = previousTime;
+//              b = currentTime;
+//            }       
+//         }
+updateInternal(KeyboardEvent e)
+ {
+   if (isPressed(KeyCode.D)) {
+       
+       strafeTotal -= strafeDt;
+       print("Update D -> " + strafeTotal.toString());
+       if (strafeTotal <= strafeMin) strafeTotal = strafeMin;
+     }
+
+     if (isPressed(KeyCode.A)) {
+       print("Update A -> " + strafeTotal.toString());
+       strafeTotal += strafeDt;
+       if (strafeTotal >= strafeMax) strafeTotal = strafeMax;
+     }
+ }
+
 void main() {
+  
+     window.onKeyDown.listen((KeyboardEvent e)
+     {        
+          if (!_keys.containsKey(e.keyCode))
+          {
+               _keys[e.keyCode] = e.timeStamp;  
+          }
+          else
+            updateInternal(e);
+
+     });
+     
+     window.onKeyUp.listen((KeyboardEvent e)
+     {
+          _keys.remove(e.keyCode);          
+     });
+
   initObjects();
 
   var string_literals = objectManager.resources;
@@ -94,12 +164,12 @@ void main() {
           strafe); //generiraj prepreke i iteme za bodove, ubaci ih u scenu
 
       //print out number of generated score items
-      int generated = 0;
-      scene.children.forEach((a) {
-        if (a.runtimeType == ScoreItem) generated++;
-        print(a.runtimeType);
-        print(generated);
-      });
+//      int generated = 0;
+//      scene.children.forEach((a) {
+//        if (a.runtimeType == ScoreItem) generated++;
+//        print(a.runtimeType);
+//        print(generated);
+//      });
 
       animate(0);
     });
@@ -115,7 +185,7 @@ initObjects() {
   objectManager = new ObjectManager();
   coreManager = new CoreManager();
   parser = new Parser();
-  keyboard = new Keyboard();
+//  keyboard = new Keyboard();
   stats = new Stats();
 
   stats.container.style
@@ -188,17 +258,25 @@ void animateCamera(bool t) {
   }
 }
 
-update() {
-  if (keyboard.isPressed(KeyCode.D)) {
-    strafeTotal -= strafeDt;
-    if (strafeTotal <= strafeMin) strafeTotal = strafeMin;
-  }
+//update(KeyboardEvent event) {
+//  
+////  print("key event " + event.keyCode.toString());
+////  if(event.keyCode == KeyCode.D)
+//  if (keyboard.isPressed(KeyCode.D)) {
+//    
+//    strafeTotal -= strafeDt;
+//    print("Update D -> " + strafeTotal.toString());
+//    if (strafeTotal <= strafeMin) strafeTotal = strafeMin;
+//  }
+//
+//  if (keyboard.isPressed(KeyCode.A)) {
+//    print("Update A -> " + strafeTotal.toString());
+//    strafeTotal += strafeDt;
+//    if (strafeTotal >= strafeMax) strafeTotal = strafeMax;
+//  }
+//}
 
-  if (keyboard.isPressed(KeyCode.A)) {
-    strafeTotal += strafeDt;
-    if (strafeTotal >= strafeMax) strafeTotal = strafeMax;
-  }
-}
+double currentStrafe = 0.0;
 
 render() {
   if (timeManager == null) {
@@ -207,6 +285,33 @@ render() {
   }
 
   t = timeManager.getCurrentTime();
+  
+  currentTime = new DateTime.now().millisecondsSinceEpoch;
+  elapsedTime = currentTime - previousTime;
+  previousTime = currentTime;
+  
+  double percentage = elapsedTime / threshhold;
+  double toMove = percentage * strafe;
+    
+  if(!(isPressed(KeyCode.D) && isPressed(KeyCode.A)))
+  {
+    if(isPressed(KeyCode.A))
+    {
+      if(currentStrafe + toMove > strafe)
+        currentStrafe = strafe;
+      else
+        currentStrafe += toMove;
+    }
+    
+    if(isPressed(KeyCode.D))
+    {
+      if(currentStrafe - toMove < -strafe)
+        currentStrafe = -strafe;
+      else
+        currentStrafe -= toMove;
+    }
+  }
+  
 
   /*
         * double t = timeManager.getCurrentTime();
@@ -244,13 +349,22 @@ render() {
       .clone()
       .normalize()
       .crossInto(-tangentObject, binormalObject);
-  binormalObject.multiply(new Vector3(strafeTotal, 0.0, strafeTotal));
+  //trenutni strafe total
+//  print("Render -> " + strafeTotal.toString());
+//  binormalObject.multiply(new Vector3(strafeTotal, 0.0, strafeTotal));
+  binormalObject.multiply(new Vector3(currentStrafe, 0.0, currentStrafe));
   objectManager.ship.position.setFrom(positionObject.add(binormalObject));
 //       print(objectManager.ship.position.toString());
 //       objectManager.ship.geometry.computeBoundingBox();
 //       objectManager.ship.updateMatrixWorld();
   objectManager.ship.geometry.boundingBox =
       new BoundingBox.fromObject(objectManager.ship);
+  
+  //update score item rotation
+  scene.children.forEach((child){
+    if(child.runtimeType == ScoreItem)
+      (child as ScoreItem).rotation.y += 2 * PI / 180.0;
+  });
 }
 
 checkCollision() {
@@ -310,15 +424,26 @@ checkCollision() {
   }
 }
 
+int trenutno = 0;
+int proslo = 0;
+
 animate(num time) {
   stats.begin();
-  update();
+//  update(null);
   render();
   scene.rotation.y += (targetRotation - scene.rotation.y) * 0.05;
+  
+  //time management
+  trenutno = new DateTime.now().millisecondsSinceEpoch;
+  proslo = trenutno - proslo;
+  proslo = trenutno;
+  
+  print("Proslo: " + proslo.toString());
 
   checkCollision();
   stats.end();
 //     renderer.render(scene, camera);
+//  print("RENDERING");
   renderer.render(
       scene, animation == true ? objectManager.splineCamera : camera);
   window.requestAnimationFrame(animate);

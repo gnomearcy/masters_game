@@ -134,6 +134,14 @@ void main() {
      
      lll[1] = 2;
      print(lll);
+     
+     double zero = 0.0001;
+     double first = 0.1;
+     double second = 0.3;
+     print(((second/first)));
+//     print(first.remainder(second));
+//     first.truncate()
+     print(second/zero);
 }
 
 timerCallback()
