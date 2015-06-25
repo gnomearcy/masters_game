@@ -10,6 +10,7 @@ import 'Parser.dart';
 import 'CoreManager.dart';
 //import 'Keyboard.dart';
 import 'TimeManager.dart';
+import 'HUDManager.dart';
 import 'package:stats/stats.dart';
 import 'dart:math';
 import 'dart:collection';
@@ -42,6 +43,7 @@ Parser parser;
 //Path path;
 //Keyboard keyboard;
 TimeManager timeManager;
+HUDManager hudManager;
 
 //Gameplay
 double strafe = 0.6;
@@ -185,7 +187,8 @@ initObjects() {
   coreManager = new CoreManager();
   parser = new Parser();
 //  timeManager = new TimeManager(forceStart: false);
- 
+  hudManager = new HUDManager();
+  
   scene = new Scene();
 //     container = document.querySelector('#renderer_wrapper');
   camera =
@@ -221,6 +224,8 @@ initObjects() {
       new MeshBasicMaterial(color: 0xff0000));
 //     scene.add(cube);
 
+  ButtonInputElement randomize = querySelector("#randomize");
+  randomize.onClick.listen((event){hudManager.updateScore(2245);});
   toggleBtn = querySelector('#toggle');
 //     toggleBtn.onClick.listen((e) => toggle = !toggle);
   toggleBtn.onClick.listen((e) => animateCamera(true));

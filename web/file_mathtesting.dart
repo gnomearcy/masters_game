@@ -143,15 +143,23 @@ void main() {
 //     first.truncate()
      print(second/zero);
      
-     //tajmer
      
-     Duration d = new Duration(seconds: 5);
-     new Timer(d, asd());
-     
+     // digit parsing
+     int nekibroj = 5674;
+     parseDigits(nekibroj);
 }
-asd()
+
+parseDigits(int parse)
 {
-  print("IASFLČANSLFNALSFNLASF");  
+  int thousands =  parse ~/ 1000;
+  print(thousands);
+  int hundred = (parse - thousands * 1000) ~/ 100;
+  print(hundred);
+  int ten = (parse - thousands * 1000 - hundred * 100) ~/ 10;
+  print(ten);
+  
+  int ones = parse % 10;
+  print(ones);
 }
 
 timerCallback()
