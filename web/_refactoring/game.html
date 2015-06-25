@@ -52,20 +52,25 @@
           <input type="button" id="countdown" value="Count down!" onclick="triggerCountDown()"/>           
           <div id="log" style="color: white"></div>
     </div>-->
-    
+    <div id="div_script_trigger" onclick="triggerCountDown()"></div>
     <div id="div_message_wrapper">          
-          <input type="button" id="toggle" value="Toggle"/>
-          <input type="button" id="score" value="Score: "/>
-          <input type="button" id="health" value="Health: "/>  
-          <input type="button" id="startstop" />
-          <input type="button" id="randomize" value="randomize!""/>
-          
-          <div id="div_countdown_number_1"></div>
-          <div id="div_countdown_number_2"></div>
-          <div id="div_countdown_number_3"></div>
-          <div id="div_start" onclick="triggerCountDown()"></div>   
-          <div id="div_go"></div>
-          <div id="div_game_over"></div> 
+      <input type="button" id="toggle" value="Toggle"/>
+      <input type="button" id="score" value="Score: "/>
+      <input type="button" id="health" value="Health: "/>  
+      <input type="button" id="startstop" />
+      <input type="button" id="randomize" value="randomize!"/>
+      <input type="button" id="reset" value="reset"/>
+      
+      <div id="div_countdown_number_1"></div>
+      <div id="div_countdown_number_2"></div>
+      <div id="div_countdown_number_3"></div>
+      <!--<div id="div_start" onclick="triggerCountDown()"></div>-->   
+      <div id="div_start"></div>
+      <div id="div_go"></div>
+      <div id="div_game_over_try_again_wrapper">
+        <div id="div_game_over"></div>
+        <div id="div_try_again"></div>
+      </div> 
     </div>
     
     <div id="div_score_wrapper">

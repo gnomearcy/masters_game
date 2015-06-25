@@ -109,8 +109,8 @@ html, body
      height: 100%;
      /*background-color: rgba(255,0,0, 1.0);*/
      border: 5px solid #ff0;
-     /*visibility: hidden;*/
-     /*display: block;*/
+     visibility: visible;
+     display: block;
      
      box-sizing: border-box;
      -webkit-box-sizing: border-box;
@@ -144,23 +144,53 @@ html, body
      -moz-box-sizing: border-box;
 }
 
+#div_game_over_try_again_wrapper
+{
+   position: absolute;
+   border: 1px solid #00ffac;
+   z-index: 10;
+   width: 858px;
+   height: 205px;
+   border: 1px solid red;
+   visibility: hidden;
+   /* Center content vertically and horizontally */
+   top: 0;
+   bottom: 0;
+   left: 0;
+   right: 0;
+   margin: auto;
+}
+
 #div_game_over
 {
      background-image: url('../images/game_over_resized.png');
      background-repeat: no-repeat;
      background-position: center;
-     z-index: 1;
+     /*z-index: 1;*/
      position: absolute;
-     width: 100%;
-     height: 100%;
+     width: inherit;
+     height: 121px;
      /*background-color: rgba(255,0,0, 1.0);*/
-     border: 5px solid #0f0;
-     visibility: hidden;
+     border: 1px solid #0f0;
+     /*visibility: hidden;*/
      /*display: none;*/
      
      box-sizing: border-box;
      -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
+}
+#div_try_again
+{
+  background-image: url('../images/try_again_resized.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  position: absolute;
+  width: 505px;
+  height: 64px;
+  bottom: 0;
+  margin-left: 176px;
+  border: 1px solid #f0f;
+  
 }
 /* Wrapps Start, Game Over, 3, 2, 1, Go countdown messages */
 #div_message_wrapper
@@ -168,7 +198,7 @@ html, body
    position: absolute;
    border: 1px solid #00ffac;
    z-index: 10;
-   
+         
    /* Center content vertically and horizontally */
    top: 0;
    bottom: 0;

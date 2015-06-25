@@ -27,7 +27,7 @@ class TimeManager
           }
      }
      
-     void toggle()
+     toggle()
      {          
           if(stopwatch != null)
           {
@@ -44,6 +44,35 @@ class TimeManager
           }
      }
      
+     start()
+     {
+       if(stopwatch != null && !_isRunning)
+       {
+         stopwatch.start;
+         _isRunning = true;
+       }
+     }
+     
+     stop()
+     {
+       if(stopwatch != null && _isRunning)
+       {
+         stopwatch.stop;
+         _isRunning = false;
+       }
+     }
+     
+     reset()
+     {       
+       stopwatch.stop();
+       stopwatch.reset();
+       _isRunning = false;
+     }
+     
+//     bool isRunning()
+//     {
+//       return _isRunning;
+//     }
      /**
       * Returns [stopwatch.elapsedMilliseconds]'s percentage of [duration]
       * in interval [0, 1]. Used in render loop to determined ship's position

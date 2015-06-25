@@ -78,13 +78,20 @@ int previousTime = 0;
 int currentTime = 0;
 int elapsedTime = 0;
 int threshhold = 250; 
-double increment = 0.0001; //todo adjust
+double increment = 0.0001; //TODO remove
+
 
 //html total countdown animation length in milliseconds
 const countdownLength = 4050;
 bool countdownFinished = false;
+bool isStartVisible = true;
 
 bool isGameOver = false;
+bool isTimerRunning = false;
+
+double previousTimerTime = 0.0;
+double currentTimerTime = 0.0;
+bool isNewLap = false;
 
 HashMap<int, int> _keys = new HashMap<int, int>();
      
@@ -93,17 +100,58 @@ isPressed(int keyCode) => _keys.containsKey(keyCode);
 //handle div animations
 initDivs()
 {
-  querySelector("#div_start").onClick.listen((event){
-    
-    print("Starting countdown...");
-    const d = const Duration(milliseconds: countdownLength);
-    new Timer.periodic(d, (Timer t) {
-      print("Stopping countdown!");
-      t.cancel();
-      countdownFinished = true;      
-      //set the flag indicating movement can begin
-    });
+//  querySelector("#div_start").onClick.listen((event)
+  hudManager.start.onClick.listen((event)
+  {
+//    print("Starting countdown...");
+//    const d = const Duration(milliseconds: countdownLength);
+//    new Timer.periodic(d, (Timer t) 
+//    {
+//      print("Stopping countdown!");
+//      t.cancel();
+//      countdownFinished = true;      
+//    });
+        print("Starting countdown...");
+        if(isStartVisible)
+        {
+          isStartVisible = false;
+          const d = const Duration(milliseconds: countdownLength);
+          new Timer.periodic(d, (Timer t) 
+          {
+            print("Stopping countdown!");
+            t.cancel();
+            countdownFinished = true; 
+            isStartVisible = true;
+          });
+          hudManager.countdown();
+        }
   });
+  
+  hudManager.tryAgain.onClick.listen((event)
+      {
+        print("tryAgain click handler");
+        objectManager.ship.position.setFrom(new Vector3.zero());
+        objectManager.ship.rotation.y = -90 * PI/180.0;
+        countdownFinished = false;
+        isGameOver = false;
+        timeManager.reset();
+        unhideAssets();
+        hudManager.reset();
+      });
+  
+//  hudManager.start.onClick.listen((event)
+//      {
+//          if(isStartVisible)
+//          {
+//            isStartVisible = false;
+//            const d = const Duration(milliseconds: 500);
+//            new Timer.periodic(d, (Timer t)
+//                {
+//                  isStartVisible = true;
+//                });
+//            hudManager.countdown();
+//          }
+//      });
 }
 
 updateInternal(KeyboardEvent e)
@@ -188,7 +236,7 @@ initObjects() {
   objectManager = new ObjectManager();
   coreManager = new CoreManager();
   parser = new Parser();
-//  timeManager = new TimeManager(forceStart: false);
+  timeManager = new TimeManager(forceStart: false);
   hudManager = new HUDManager();
   
   scene = new Scene();
@@ -222,8 +270,8 @@ initObjects() {
   window.addEventListener('resize', onWindowResize, false);
 
   //ADD OBJECTS TO SCENE HERE
-  cube = new Mesh(new CubeGeometry(20.0, 20.0, 20.0),
-      new MeshBasicMaterial(color: 0xff0000));
+//  cube = new Mesh(new CubeGeometry(20.0, 20.0, 20.0),
+//      new MeshBasicMaterial(color: 0xff0000));
 //     scene.add(cube);
   
   //TODO obsolete
@@ -231,9 +279,21 @@ initObjects() {
   randomize.onClick.listen((event){
     
     //testenvironment
-    querySelector("#div_game_over").style.visibility = "visible";
+//    querySelector("#div_game_over").style.visibility = "visible";
 //    hudManager.updateScore(new Random().nextInt(9999));
     });
+  
+  ButtonInputElement reset = querySelector("#reset");
+  
+  reset.onClick.listen((event)
+  {
+//    print("Inside reset button click event.");
+//    //reset everything
+//    countdownFinished = false;
+//    objectManager.ship.position.setFrom(new Vector3.zero());
+//    unhideAssets();
+//    hudManager.reset();
+  });
   
   toggleBtn = querySelector('#toggle');
 //     toggleBtn.onClick.listen((e) => toggle = !toggle);
@@ -268,6 +328,13 @@ void animateCamera(bool t) {
   }
 }
 
+unhideAssets()
+{
+  for (int i = 0; i < objectManager.hitObjects.length; i++)
+  {
+    (objectManager.hitObjects[i] as Mesh).visible = true;
+  }
+}
 update() 
 {
 //  if (timeManager == null) {
@@ -275,8 +342,22 @@ update()
 //    timeManager = new TimeManager(forceStart: true);
 //  }
 
-  print("inside ---------");
   t = timeManager.getCurrentTime();
+  
+  currentTimerTime = t;
+//  print("Current / Previous: [" + currentTimerTime.toString() + " | " + previousTimerTime.toString() + "]");
+  if(currentTimerTime < previousTimerTime) // 0.1 < 0.0, ne,
+  {
+    isNewLap = true;
+//    print("NEW LAP!!!!!!!!");
+  }
+  previousTimerTime = currentTimerTime;
+  
+  if(isNewLap)
+  {
+    unhideAssets();
+    isNewLap = false;
+  }
   
   currentTime = new DateTime.now().millisecondsSinceEpoch;
   elapsedTime = currentTime - previousTime;
@@ -377,11 +458,11 @@ collision()
       if (hitObject is Obstacle) 
       {
         health--;
-        print("Hit an obstacle!!! current health " + health.toString());
+        print("Hit an obstacle!!! current health " + health.toString()); //TODO remove
 
         if(health == 0)
         {
-          print("Health is zero, setting flag to true");
+          print("Health is zero, setting flag to true"); //TODO remove
           isGameOver = true;
         }
         
@@ -390,8 +471,9 @@ collision()
         healthBtn.value = "Health: " + health.toString(); //TODO remove
       }
 
-      scene.remove(hitObject);
-      objectManager.hitObjects.remove(hitObject);
+      hitObject.visible = false;
+//      scene.remove(hitObject);
+//      objectManager.hitObjects.remove(hitObject);
     }
   }
 }
@@ -400,10 +482,14 @@ gameLoop(num time)
 {
   if(countdownFinished)
   {
-     if(timeManager == null)
-     {
-        timeManager = new TimeManager(forceStart: true);
-     }
+//     if(timeManager == null)
+//     {
+//        timeManager = new TimeManager(forceStart: true);
+//     }
+    if(!timeManager.isRunning)
+    {
+      timeManager.start();
+    }
      
      if(!isGameOver)
      {
@@ -414,7 +500,6 @@ gameLoop(num time)
    
     //TODO remove
   scene.rotation.y += (targetRotation - scene.rotation.y) * 0.05;
-  
   renderer.render(
         scene, animation == true ? objectManager.splineCamera : camera);
   window.requestAnimationFrame(gameLoop);

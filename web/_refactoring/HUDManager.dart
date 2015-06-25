@@ -40,17 +40,33 @@ class HUDManager
   DivElement healthHeart2;
   DivElement healthHeart3;
   
-  // Constructor
+  //Message selectors and reference holders
+  static const selector_start = "#div_start";
+  static const selector_game_over_try_again = "#div_game_over_try_again_wrapper";
+  static const selector_try_again = "#div_try_again";
+  DivElement start;
+  DivElement gameOverTryAgain;
+  DivElement tryAgain;
+  
+  static const selector_script_trigger = "#div_script_trigger";
+  DivElement scriptTrigger;
+  
   HUDManager()
   {
-    digitThousands  = querySelector(selector_thousands);
-    digitHundredths = querySelector(selector_hundredths);
-    digitTenths     = querySelector(selector_tenths);
-    digitOnes       = querySelector(selector_ones);
+    digitThousands    = querySelector(selector_thousands);
+    digitHundredths   = querySelector(selector_hundredths);
+    digitTenths       = querySelector(selector_tenths);
+    digitOnes         = querySelector(selector_ones);
     
-    healthHeart1 = querySelector(selector_heart1);
-    healthHeart2 = querySelector(selector_heart2);
-    healthHeart3 = querySelector(selector_heart3);
+    healthHeart1      = querySelector(selector_heart1);
+    healthHeart2      = querySelector(selector_heart2);
+    healthHeart3      = querySelector(selector_heart3);
+    
+    start             = querySelector(selector_start);
+    gameOverTryAgain  = querySelector(selector_game_over_try_again);
+    tryAgain          = querySelector(selector_try_again);
+    
+    scriptTrigger     = querySelector(selector_script_trigger);
   }
   
   updateScore(int score) 
@@ -125,12 +141,31 @@ class HUDManager
     switch(health)
     {
       case 0:
-            healthHeart1.style.visibility = "hidden";
-            querySelector("#div_game_over").style.visibility = "visible";
+            healthHeart3.style.visibility = "hidden";
+            gameOverTryAgain.style.visibility = "visible";
             break;
             
       case 1: healthHeart2.style.visibility = "hidden"; break;
-      case 2: healthHeart3.style.visibility = "hidden"; break;
+      case 2: healthHeart1.style.visibility = "hidden"; break;
     }
+  }
+  
+  reset()
+  {
+    healthHeart1.style.visibility = "visible";
+    healthHeart2.style.visibility = "visible";
+    healthHeart3.style.visibility = "visible";
+
+    updateScore(0);
+    gameOverTryAgain.style.visibility = "hidden";
+    
+    //fadeOut animation sets the display to "none", we have to set it back;
+    start.style.display = "block";
+    start.style.visibility = "visible";    
+  }
+  
+  countdown()
+  {
+    scriptTrigger.click(); 
   }
 }

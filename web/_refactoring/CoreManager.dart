@@ -9,29 +9,29 @@ import 'ObjectManager.dart';
 
 class CoreManager
 {
-     //Fine tuning interface
-     double Lref = 20.0;
-     //referentni pomak za izracun aktualnog pomaka ovisno o duljini krivulje
-     double dtref = 0.03;
-     //threshold iznad kojeg biljezim trenutnu vrijednost "t"
-     double dist = 0.8;
+      //Fine tuning interface
+      double Lref = 20.0;
+      //referentni pomak za izracun aktualnog pomaka ovisno o duljini krivulje
+      double dtref = 0.03;
+      //threshold iznad kojeg biljezim trenutnu vrijednost "t"
+      double dist = 0.8;
      
-     List vertPositions = [0, 1, 2, 3];
+      List vertPositions = [0, 1, 2, 3];
      
-     //defines a coefficient by which to expand (> 1.0) or compress (< 1.0) bounding boxes of obstacle items
-     double obstacleBoxSquish = 0.8;
-     //defines a coefficient by which to expand (> 1.0) or compress (< 1.0) bounding boxes of scoreItem items
-     double scoreItemBoxSquish = 0.9;
+      //defines a coefficient by which to expand (> 1.0) or compress (< 1.0) bounding boxes of obstacle items
+      double obstacleBoxSquish = 0.8;
+      //defines a coefficient by which to expand (> 1.0) or compress (< 1.0) bounding boxes of scoreItem items
+      double scoreItemBoxSquish = 0.9;
      
-     Random random;     
-     List globalTs = [];      //valid t values for scoreitem/obstacle horizontal position  
-     ObjectManager objM;
-     double a = 0.125;
-     double b = 0.125;
-     Object3D parent;
-     double strafe;           //maximum vertical offset from middle (binormal multiplier)     
+      Random random;     
+      List globalTs = [];      //valid t values for scoreitem/obstacle horizontal position  
+      ObjectManager objM;
+      double a = 0.125;
+      double b = 0.125;
+      Object3D parent;
+      double strafe;           //maximum vertical offset from middle (binormal multiplier)     
      
-     CoreManager();
+      CoreManager();
      
      //path object curve defines referent Y position of obstacles and score items
      //used to fine tune referent Y position.
@@ -39,9 +39,10 @@ class CoreManager
 //     double obstacleBarrelFineTuneY = 0.15; //change accordingly 
 //     double scoreItemFineTuneY = 0.1;
      
-     double obstacleBoxFineTuneY = 0.0;
-          double obstacleBarrelFineTuneY = 0.0; //change accordingly 
-          double scoreItemFineTuneY = 0.0;
+      double obstacleBoxFineTuneY = 0.0;
+      double obstacleBarrelFineTuneY = 0.0; //change accordingly 
+      double scoreItemFineTuneY = 0.0;
+          
      /**From three.dart/extras/core/curve.daat - getUtoTmapping quote:
       * "// less likely to overflow, though probably not issue here
       *  // JS doesn't really have integers, all numbers are floats."
@@ -95,10 +96,10 @@ class CoreManager
           //generiranje prepreka
         int patchSize; //3/4/5
         int voidSize; //0/1/2/3
-        int ignoreFirstN = 0; //ignore first N t-s
-        int ignoreLastN = 0; //ignore last N t-s to give time to generate new set of obstacles and score items.
+        int ignoreFirstN = 5; //ignore first N t-s
+        int ignoreLastN = 2; //ignore last N t-s to give time to generate new set of obstacles and score items.
         int currentT = 0 + ignoreFirstN;
-        int totalT = globalTs.length - bugFix; //pretpostavka da je ts veci od ignoreLastN
+        int totalT = globalTs.length - bugFix - ignoreLastN; //pretpostavka da je ts veci od ignoreLastN
 
         int previousVertPos = random.nextInt(4); //od 0 do 4-1 -> 0,1,2,3 //npr. 2
         int nextVertPos;
@@ -149,7 +150,7 @@ class CoreManager
         }     
         
         parent.updateMatrixWorld(force: true);
-        print("Coremanager - " + nrOfGenered.toString());
+        print("Coremanager - " + nrOfGenered.toString()); //TODO remove
     }
 
      /**
