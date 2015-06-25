@@ -42,7 +42,6 @@ Parser parser;
 //Path path;
 //Keyboard keyboard;
 TimeManager timeManager;
-Stats stats;
 
 //Gameplay
 double strafe = 0.6;
@@ -50,7 +49,8 @@ double strafeDt = strafe / 15.0;
 double strafeMin = -strafe;
 double strafeMax = strafe;
 double strafeTotal = 0.0;
-int loopSeconds = 400;
+double currentStrafe = 0.0;
+//int loopSeconds = 400;
 
 Vector3 binormalObject = new Vector3.zero();
 Vector3 normalObject = new Vector3(0.0, 1.0, 0.0); //up
@@ -66,45 +66,42 @@ ButtonInputElement startStopBtn;
 bool toggle = false;
 String start = "Start";
 String stop = "Stop";
-bool animation = false;
+bool animation = true;
 
 int score = 0;
 int health = 3;
 
-//time used to calculate strafe in internalUpdate()
+//time used to calculate strafe in render()
 int previousTime = 0;
 int currentTime = 0;
 int elapsedTime = 0;
-int threshhold = 500; 
+int threshhold = 250; 
 double increment = 0.0001; //todo adjust
+
+//html total countdown animation length in milliseconds
+const countdownLength = 4050;
+bool countdownFinished = false;
 
 HashMap<int, int> _keys = new HashMap<int, int>();
      
-     
 isPressed(int keyCode) => _keys.containsKey(keyCode);
-     
-     
-       //make sure render function got executed at least once
-//       if(timeManager != null)
-//       {
-//         currentTime = timeManager.getCurrentTime();
-//         
-//         if((currentTime - previousTime).abs() > threshhold) //currtime = 0.2, previous = 0.0, threshhold = 0.01667
-//         {
-//           double a, b;
-//           //which one is higher
-//            if(currentTime > previousTime)
-//            {
-//              a = currentTime;
-//              b = previousTime;
-//            }
-//            else
-//            {
-//              //overflow on t = 1.0
-//              a = previousTime;
-//              b = currentTime;
-//            }       
-//         }
+
+//handle div animations
+initDivs()
+{
+  querySelector("#div_start").onClick.listen((event){
+    
+    print("Starting countdown...");
+    const d = const Duration(milliseconds: countdownLength);
+    new Timer.periodic(d, (Timer t) {
+      print("Stopping countdown!");
+      t.cancel();
+      countdownFinished = true;      
+      //set the flag indicating movement can begin
+    });
+  });
+}
+
 updateInternal(KeyboardEvent e)
  {
    if (isPressed(KeyCode.D)) {
@@ -140,7 +137,9 @@ void main() {
      });
 
   initObjects();
-
+  initDivs();
+  
+  
   var string_literals = objectManager.resources;
 
   Future
@@ -171,7 +170,7 @@ void main() {
 //        print(generated);
 //      });
 
-      animate(0);
+      gameLoop(0);
     });
   });
 }
@@ -185,17 +184,8 @@ initObjects() {
   objectManager = new ObjectManager();
   coreManager = new CoreManager();
   parser = new Parser();
-//  keyboard = new Keyboard();
-  stats = new Stats();
-
-  stats.container.style
-    ..position = "absolute"
-    ..left = "0px"
-    ..top = "50px"
-    ..zIndex = "10";
-
-  document.body.append(stats.container);
-
+//  timeManager = new TimeManager(forceStart: false);
+ 
   scene = new Scene();
 //     container = document.querySelector('#renderer_wrapper');
   camera =
@@ -212,6 +202,12 @@ initObjects() {
 
   //add id - external css script will take care of the rest
   renderer.domElement.id = "renderer";
+  
+  /**testing inserting renderer dom element into a wrapper*/  
+//  renderer.domElement.style..width = "400px"..height = "250px";
+//  querySelector("#renderer_wrapper").append(renderer.domElement);  
+  
+//  renderer.domElement.style.zIndex = "0";
   document.body.append(renderer.domElement);
 
   renderer.domElement.addEventListener('mousedown', onDocumentMouseDown, false);
@@ -258,31 +254,11 @@ void animateCamera(bool t) {
   }
 }
 
-//update(KeyboardEvent event) {
-//  
-////  print("key event " + event.keyCode.toString());
-////  if(event.keyCode == KeyCode.D)
-//  if (keyboard.isPressed(KeyCode.D)) {
-//    
-//    strafeTotal -= strafeDt;
-//    print("Update D -> " + strafeTotal.toString());
-//    if (strafeTotal <= strafeMin) strafeTotal = strafeMin;
+update() {
+//  if (timeManager == null) {
+////    print("Initializing a new TimeManager object");
+//    timeManager = new TimeManager(forceStart: true);
 //  }
-//
-//  if (keyboard.isPressed(KeyCode.A)) {
-//    print("Update A -> " + strafeTotal.toString());
-//    strafeTotal += strafeDt;
-//    if (strafeTotal >= strafeMax) strafeTotal = strafeMax;
-//  }
-//}
-
-double currentStrafe = 0.0;
-
-render() {
-  if (timeManager == null) {
-    print("Initializing a new TimeManager object");
-    timeManager = new TimeManager(forceStart: true);
-  }
 
   t = timeManager.getCurrentTime();
   
@@ -367,39 +343,8 @@ render() {
   });
 }
 
-checkCollision() {
-//    Vector3 position = objectManager.ship.position.clone();
-//
-//    for(int i = 0; i < objectManager.ship.geometry.vertices.length; i++)
-//    {
-//         var local = objectManager.ship.geometry.vertices[i].clone();
-//         var global = local.applyProjection(objectManager.ship.matrixWorld);
-//         var direction = global.sub(position);
-//         var ray = new Ray(position, direction.clone());
-//         var result = ray.intersectObjects(objectManager.hitObjects);
-//
-//         if(result.length > 0 && result[0].distance < direction.length)
-////         if(result.length > 0)
-//         {
-////              window.alert("IMAM GA");
-//              scene.remove(result[0].object);
-//              objectManager.hitObjects.remove(result[0].object);
-//              print(result[0].object.runtimeType);
-//              if(result[0].object is ScoreItem)
-//              {
-//                   score++;
-//                   scoreBtn.value = "Score: " + score.toString();
-//                   print("pogodio sam score item");
-//              }
-//              if(result[0].object is Obstacle)
-//              {
-//                   health--;
-//                   healthBtn.value = "Health: " + health.toString();
-//                   print("pogodio sam obstacle");
-//              }
-//         }
-//    }
-
+checkCollision() 
+{
   Mesh hitObject;
 
   for (int i = 0; i < objectManager.hitObjects.length; i++) {
@@ -410,12 +355,10 @@ checkCollision() {
       if (hitObject is ScoreItem) {
         score++;
         scoreBtn.value = "Score: " + score.toString();
-//                print("pogodio sam score item");
       }
       if (hitObject is Obstacle) {
         health--;
         healthBtn.value = "Health: " + health.toString();
-//                 print("pogodio sam obstacle");
       }
 
       scene.remove(hitObject);
@@ -427,26 +370,25 @@ checkCollision() {
 int trenutno = 0;
 int proslo = 0;
 
-animate(num time) {
-  stats.begin();
-//  update(null);
-  render();
+gameLoop(num time) 
+{
+  if(countdownFinished)
+  {
+     if(timeManager == null)
+     {
+       timeManager = new TimeManager(forceStart: true);
+     }
+     update();
+     checkCollision();
+  }
+    
+  
+  //todo remove
   scene.rotation.y += (targetRotation - scene.rotation.y) * 0.05;
   
-  //time management
-  trenutno = new DateTime.now().millisecondsSinceEpoch;
-  proslo = trenutno - proslo;
-  proslo = trenutno;
-  
-  print("Proslo: " + proslo.toString());
-
-  checkCollision();
-  stats.end();
-//     renderer.render(scene, camera);
-//  print("RENDERING");
   renderer.render(
-      scene, animation == true ? objectManager.splineCamera : camera);
-  window.requestAnimationFrame(animate);
+        scene, animation == true ? objectManager.splineCamera : camera);
+  window.requestAnimationFrame(gameLoop);
 }
 
 onWindowResize(Event e) {

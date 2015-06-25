@@ -4,7 +4,7 @@ library TimeManager;
 class TimeManager
 {
      //duration of one loop in milliseconds
-     int duration = 120 * 1000;
+     int duration = 40 * 1000;
      Stopwatch stopwatch;
      
      bool _isRunning;    
@@ -18,7 +18,12 @@ class TimeManager
           
           if(forceStart)
           {
-               stopwatch.start();
+             stopwatch.start();
+             _isRunning = true;
+          }
+          else
+          {
+            _isRunning = false;
           }
      }
      
@@ -29,17 +34,20 @@ class TimeManager
               if(stopwatch.isRunning)
               {
                    stopwatch.stop();
+                   _isRunning = false;
               }
               else
               {
                    stopwatch.start();
+                   _isRunning = true;
               }
           }
      }
      
      /**
       * Returns [stopwatch.elapsedMilliseconds]'s percentage of [duration]
-      * in interval [0, 1]. Used in render loop for ship's movement.
+      * in interval [0, 1]. Used in render loop to determined ship's position
+      * along the curve (0 being the start and 1 being the end)
       */
      double getCurrentTime()
      {

@@ -142,6 +142,16 @@ void main() {
 //     print(first.remainder(second));
 //     first.truncate()
      print(second/zero);
+     
+     //tajmer
+     
+     Duration d = new Duration(seconds: 5);
+     new Timer(d, asd());
+     
+}
+asd()
+{
+  print("IASFLČANSLFNALSFNLASF");  
 }
 
 timerCallback()

@@ -12,18 +12,238 @@ html, body
      width: 100%;
      height: 100%;
      position: absolute;
+     background-color: rgba(255,0,0, 0.4);
+}
+
+#renderer_wrapper
+{
+     width: 400px;
+     height: 250px;
+     position: absolute;
+     background-color: rgba(255,0,0, 0.4);
 }*/
 
 #renderer
 {
-     z-index: 2;
+     z-index: 0;
      position: absolute;
      width: 100%;
      height: 100%;
-     background-color: rgba(255,0,0, 0.5);
+     /*background-color: rgba(255,0,0, 0.5);*/
      border: 5px solid #0f0;
+     
      /*removes the scrollbars, div is automatically scaled when resizing window*/
      box-sizing: border-box;
      -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
+}
+
+#div_countdown_number_1
+{
+     background-image: url('../images/countdown_number_1_resized.png');
+     background-repeat: no-repeat;
+     background-position: center;
+     z-index: 3;
+     position: absolute;
+     width: 100%;
+     height: 100%;
+     /*background-color: rgba(255,0,0, 1.0);*/
+     border: 5px solid #0f0;
+     /*visibility: hidden;*/
+     display: none;
+     
+     box-sizing: border-box;
+     -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+}
+
+#div_countdown_number_2
+{
+     background-image: url('../images/countdown_number_2_resized.png');
+     background-repeat: no-repeat;
+     background-position: center;
+     z-index: 4;
+     position: absolute;
+     width: 100%;
+     height: 100%;
+     /*background-color: rgba(255,0,0, 1.0);*/
+     border: 5px solid #0f0;
+     /*visibility: hidden;*/
+     display: none;
+     
+     box-sizing: border-box;
+     -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+}
+
+#div_countdown_number_3
+{
+     background-image: url('../images/countdown_number_3_resized.png');
+     background-repeat: no-repeat;
+     background-position: center;
+     z-index: 5;
+     position: absolute;
+     width: 100%;
+     height: 100%;
+     /*background-color: rgba(255,0,0, 1.0);*/
+     border: 5px solid #0f0;
+     /*visibility: hidden;*/
+     display: none;
+     
+     box-sizing: border-box;
+     -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+}
+
+
+#div_start
+{
+     background-image: url('../images/start_resized.png');
+     background-repeat: no-repeat;
+     background-position: center;
+     z-index: 6;
+     position: absolute;
+     /*width: 495px;
+     height: 118px;*/
+     /* Fixed width/height require top/bottom/left/right = 0 and margin: auto to center itself */
+     width: 100%;
+     height: 100%;
+     /*background-color: rgba(255,0,0, 1.0);*/
+     border: 5px solid #ff0;
+     /*visibility: hidden;*/
+     /*display: block;*/
+     
+     box-sizing: border-box;
+     -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+     
+     /* Center itself */
+     /*top: 0;
+     bottom: 0;
+     left: 0;
+     right: 0;
+
+     margin: auto;*/
+}
+
+#div_go
+{
+     background-image: url('../images/go_resized.png');
+     background-repeat: no-repeat;
+     background-position: center;
+     z-index: 6;
+     position: absolute;
+     width: 100%;
+     height: 100%;
+     /*background-color: rgba(255,0,0, 1.0);*/
+     border: 5px solid #0f0;
+     /*visibility: hidden;*/
+     display: none;
+     
+     box-sizing: border-box;
+     -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+}
+
+#div_game_over
+{
+     background-image: url('../images/game_over_resized.png');
+     background-repeat: no-repeat;
+     background-position: center;
+     z-index: 1;
+     position: absolute;
+     width: 100%;
+     height: 100%;
+     /*background-color: rgba(255,0,0, 1.0);*/
+     border: 5px solid #0f0;
+     /*visibility: hidden;*/
+     display: none;
+     
+     box-sizing: border-box;
+     -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+}
+/* Wrapps Start, Game Over, 3, 2, 1, Go countdown messages */
+#div_message_wrapper
+{
+   position: absolute;
+   border: 1px solid #00ffac;
+   z-index: 10;
+   
+   /* Center content vertically and horizontally */
+   top: 0;
+   bottom: 0;
+   left: 0;
+   right: 0;
+   margin: auto;
+}
+
+#div_score_wrapper
+{
+     z-index: 10;
+     border: 1px solid #0f0;
+     width: 363px;
+     height: 138px;
+     position: absolute;
+     margin-top: 10px;
+     margin-left: 10px;     
+}
+
+#div_score_img
+{
+     background-image: url('../images/score_item_resized.png');
+     background-repeat: no-repeat;
+     position: absolute;
+     width: 59px;        	/* width of image */
+     height: 118px;      	/* height of image */
+     /*padding-top: 10px;  	/* x */
+     /*padding-left: 10px; 	/* x */
+     margin-top: 10px;
+     margin-left: 10px;
+}
+
+#div_score_digits_wrapper
+{
+     border: 1px solid #0ff;
+     position: absolute;
+     width: 269px;       	/* z/img/y/img/y/img/y/img/z */
+     height: 80px;       	/* height of digit image height */
+     margin-left: 84px;  	/* x/div_score_img height/c */
+     margin-top: 29px;   	/* ((div_score_wrapper height, 138) - (div_score_digits_wrapper, 80))/2 */
+}
+#div_score_digit_thousands
+{
+     background-image: url('../images/score_number_0_resized.png');
+     /*border: 1px solid #fA0;*/
+     position: absolute;
+     width: 61px;
+     height: inherit;    	/* inherits 80px from div_score_digits_wrapper */
+     margin-left: 5px;   	/* z */
+}
+#div_score_digit_hundredths
+{
+     background-image: url('../images/score_number_0_resized.png');
+     /*border: 1px solid #fA0;*/
+     position: absolute;
+     width: 61px;
+     height: inherit;    	/* inherits 80px from div_score_digits_wrapper */
+     margin-left: 71px;     /* z/img/y */
+}
+#div_score_digit_tenths
+{
+     background-image: url('../images/score_number_0_resized.png');
+     /*border: 1px solid #fA0;*/
+     position: absolute;
+     width: 61px;
+     height: inherit;    	/* inherits 80px from div_score_digits_wrapper */
+     margin-left: 137px;     /* z/img/y/img/y */
+}
+#div_score_digit_ones
+{
+     background-image: url('../images/score_number_0_resized.png');
+     /*border: 1px solid #fA0;*/
+     position: absolute;
+     width: 61px;
+     height: inherit;    	/* inherits 80px from div_score_digits_wrapper */
+     margin-left: 203px;     /* z/img/y/img/y/img/y */
 }
