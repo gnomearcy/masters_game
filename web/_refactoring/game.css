@@ -247,3 +247,42 @@ html, body
      height: inherit;    	/* inherits 80px from div_score_digits_wrapper */
      margin-left: 203px;     /* z/img/y/img/y/img/y */
 }
+
+#div_health_wrapper
+{
+  z-index: 10;
+  position: absolute;
+  right: 0;
+  width: 304px;
+  height: 90px;
+  margin-top: 25px;
+  margin-right: 25px;
+  
+  border: 1px solid blue;
+}
+
+#div_health_heart_1
+{
+  position: absolute;
+  width: 98px;
+  height: inherit;
+  background-image: url('../images/health_heart_resized.png');
+}
+
+#div_health_heart_2
+{
+  position: absolute;
+  width: 98px;
+  height: inherit;
+  background-image: url('../images/health_heart_resized.png');
+  margin-left: 103px;
+}
+
+#div_health_heart_3
+{
+  position: absolute;
+  width: 98px;
+  height: inherit;
+  background-image: url('../images/health_heart_resized.png');
+  margin-left: 206px;
+}

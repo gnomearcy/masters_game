@@ -82,12 +82,19 @@ html, body
 
 #wrapper
 {
+  position: absolute;
   border: 1px solid #0f0;
   width: 363px;
   height: 138px;
   margin-top: 10px;
   margin-left: 10px;
   
+}
+#wrapper2
+{
+  position: absolute;
+  right: 0;
+  width: 
 }
 
 #content
