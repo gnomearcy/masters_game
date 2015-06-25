@@ -84,6 +84,8 @@ double increment = 0.0001; //todo adjust
 const countdownLength = 4050;
 bool countdownFinished = false;
 
+bool isGameOver = false;
+
 HashMap<int, int> _keys = new HashMap<int, int>();
      
 isPressed(int keyCode) => _keys.containsKey(keyCode);
@@ -223,9 +225,16 @@ initObjects() {
   cube = new Mesh(new CubeGeometry(20.0, 20.0, 20.0),
       new MeshBasicMaterial(color: 0xff0000));
 //     scene.add(cube);
-
-  ButtonInputElement randomize = querySelector("#randomize");
-  randomize.onClick.listen((event){hudManager.updateScore(2245);});
+  
+  //TODO obsolete
+  ButtonInputElement randomize = querySelector("#randomize");  
+  randomize.onClick.listen((event){
+    
+    //testenvironment
+    querySelector("#div_game_over").style.visibility = "visible";
+//    hudManager.updateScore(new Random().nextInt(9999));
+    });
+  
   toggleBtn = querySelector('#toggle');
 //     toggleBtn.onClick.listen((e) => toggle = !toggle);
   toggleBtn.onClick.listen((e) => animateCamera(true));
@@ -259,12 +268,14 @@ void animateCamera(bool t) {
   }
 }
 
-update() {
+update() 
+{
 //  if (timeManager == null) {
 ////    print("Initializing a new TimeManager object");
 //    timeManager = new TimeManager(forceStart: true);
 //  }
 
+  print("inside ---------");
   t = timeManager.getCurrentTime();
   
   currentTime = new DateTime.now().millisecondsSinceEpoch;
@@ -348,7 +359,7 @@ update() {
   });
 }
 
-checkCollision() 
+collision() 
 {
   Mesh hitObject;
 
@@ -356,14 +367,27 @@ checkCollision()
     hitObject = objectManager.hitObjects[i];
 
     if (hitObject.geometry.boundingBox
-        .isIntersectionBox(objectManager.ship.geometry.boundingBox)) {
-      if (hitObject is ScoreItem) {
-        score++;
-        scoreBtn.value = "Score: " + score.toString();
+        .isIntersectionBox(objectManager.ship.geometry.boundingBox)) 
+    {
+      if (hitObject is ScoreItem)
+      {
+        hudManager.updateScore(score++);
+        scoreBtn.value = "Score: " + score.toString(); //TODO remove
       }
-      if (hitObject is Obstacle) {
+      if (hitObject is Obstacle) 
+      {
         health--;
-        healthBtn.value = "Health: " + health.toString();
+        print("Hit an obstacle!!! current health " + health.toString());
+
+        if(health == 0)
+        {
+          print("Health is zero, setting flag to true");
+          isGameOver = true;
+        }
+        
+        hudManager.updateHealth(health);
+        
+        healthBtn.value = "Health: " + health.toString(); //TODO remove
       }
 
       scene.remove(hitObject);
@@ -372,23 +396,23 @@ checkCollision()
   }
 }
 
-int trenutno = 0;
-int proslo = 0;
-
 gameLoop(num time) 
 {
   if(countdownFinished)
   {
      if(timeManager == null)
      {
-       timeManager = new TimeManager(forceStart: true);
+        timeManager = new TimeManager(forceStart: true);
      }
-     update();
-     checkCollision();
+     
+     if(!isGameOver)
+     {
+        update();
+        collision();
+     }     
   }
-    
-  
-  //todo remove
+   
+    //TODO remove
   scene.rotation.y += (targetRotation - scene.rotation.y) * 0.05;
   
   renderer.render(
@@ -396,7 +420,8 @@ gameLoop(num time)
   window.requestAnimationFrame(gameLoop);
 }
 
-onWindowResize(Event e) {
+onWindowResize(Event e) 
+{
   windowHalfX = window.innerWidth / 2;
   windowHalfY = window.innerHeight / 2;
 

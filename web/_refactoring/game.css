@@ -95,7 +95,6 @@ html, body
      -moz-box-sizing: border-box;
 }
 
-
 #div_start
 {
      background-image: url('../images/start_resized.png');
@@ -156,8 +155,8 @@ html, body
      height: 100%;
      /*background-color: rgba(255,0,0, 1.0);*/
      border: 5px solid #0f0;
-     /*visibility: hidden;*/
-     display: none;
+     visibility: hidden;
+     /*display: none;*/
      
      box-sizing: border-box;
      -webkit-box-sizing: border-box;
@@ -214,6 +213,7 @@ html, body
 #div_score_digit_thousands
 {
      background-image: url('../images/score_number_0_resized.png');
+     background-repeat: no-repeat;
      /*border: 1px solid #fA0;*/
      position: absolute;
      width: 61px;
@@ -223,6 +223,7 @@ html, body
 #div_score_digit_hundredths
 {
      background-image: url('../images/score_number_0_resized.png');
+     background-repeat: no-repeat;
      /*border: 1px solid #fA0;*/
      position: absolute;
      width: 61px;
@@ -232,6 +233,7 @@ html, body
 #div_score_digit_tenths
 {
      background-image: url('../images/score_number_0_resized.png');
+     background-repeat: no-repeat;
      /*border: 1px solid #fA0;*/
      position: absolute;
      width: 61px;
@@ -241,6 +243,7 @@ html, body
 #div_score_digit_ones
 {
      background-image: url('../images/score_number_0_resized.png');
+     background-repeat: no-repeat;
      /*border: 1px solid #fA0;*/
      position: absolute;
      width: 61px;
@@ -267,6 +270,7 @@ html, body
   width: 98px;
   height: inherit;
   background-image: url('../images/health_heart_resized.png');
+  background-repeat: no-repeat;
 }
 
 #div_health_heart_2
@@ -274,7 +278,8 @@ html, body
   position: absolute;
   width: 98px;
   height: inherit;
-  background-image: url('../images/health_heart_resized.png');
+  background-image: url('../images/health_heart_resized.png');    
+  background-repeat: no-repeat;
   margin-left: 103px;
 }
 
@@ -284,5 +289,6 @@ html, body
   width: 98px;
   height: inherit;
   background-image: url('../images/health_heart_resized.png');
+  background-repeat: no-repeat;
   margin-left: 206px;
 }

@@ -4,13 +4,12 @@ import 'dart:html';
 
 class HUDManager 
 {
-  // Images
-  static const ROOT = "../";
-  static const FOLDER = "images/";
-  static const URL_PREFIX = "url('";
-  static const URL_POSTFIX = "')";
-  static const PREFIX = "score_number_";
-  static const POSTFIX = "_resized.png";
+  static const ROOT         = "../";
+  static const FOLDER       = "images/";
+  static const PREFIX       = "score_number_";
+  static const POSTFIX      = "_resized.png";
+  static const URL_PREFIX   = "url('";
+  static const URL_POSTFIX  = "')";
   
   static const score_number_0 = URL_PREFIX + ROOT + FOLDER + PREFIX + "0" + POSTFIX + URL_POSTFIX;
   static const score_number_1 = URL_PREFIX + ROOT + FOLDER + PREFIX + "1" + POSTFIX + URL_POSTFIX;
@@ -23,77 +22,115 @@ class HUDManager
   static const score_number_8 = URL_PREFIX + ROOT + FOLDER + PREFIX + "8" + POSTFIX + URL_POSTFIX;
   static const score_number_9 = URL_PREFIX + ROOT + FOLDER + PREFIX + "9" + POSTFIX + URL_POSTFIX;
 
-  // Selectors
-  static const selector_thousands = "#div_score_digit_thousands";
-  static const selector_hundredths = "#div_score_digit_hundredths";
-  static const selector_tenths = "#div_score_digit_tenths";
-  static const selector_ones = "#div_score_digit_ones";
-
+  //Score selectors and reference holders
+  static const selector_thousands   = "#div_score_digit_thousands";
+  static const selector_hundredths  = "#div_score_digit_hundredths";
+  static const selector_tenths      = "#div_score_digit_tenths";
+  static const selector_ones        = "#div_score_digit_ones";
+  DivElement digitThousands;
+  DivElement digitHundredths;
+  DivElement digitTenths;
+  DivElement digitOnes;
+  
+  //Health selectors and reference holders
+  static const selector_heart1 = "#div_health_heart_1";
+  static const selector_heart2 = "#div_health_heart_2";
+  static const selector_heart3 = "#div_health_heart_3";
+  DivElement healthHeart1;
+  DivElement healthHeart2;
+  DivElement healthHeart3;
+  
+  // Constructor
+  HUDManager()
+  {
+    digitThousands  = querySelector(selector_thousands);
+    digitHundredths = querySelector(selector_hundredths);
+    digitTenths     = querySelector(selector_tenths);
+    digitOnes       = querySelector(selector_ones);
+    
+    healthHeart1 = querySelector(selector_heart1);
+    healthHeart2 = querySelector(selector_heart2);
+    healthHeart3 = querySelector(selector_heart3);
+  }
+  
   updateScore(int score) 
   {
+//    print("Score: " + score.toString());
     // Parse score on digits and update accordingly
     int thousands = score ~/ 1000;
-    print(thousands);
     int hundredths = (score - thousands * 1000) ~/ 100;
-    print(hundredths);
     int tenths = (score - thousands * 1000 - hundredths * 100) ~/ 10;
-    print(tenths);
     int ones = score % 10;
-    print(ones);
+    
+//    print("T/H/T/O: " + thousands.toString() + "/" + hundredths.toString() + "/" + tenths.toString() + "/" + ones.toString());
 
     switch (thousands) {
-      case 0: querySelector(selector_thousands).style.backgroundImage = score_number_0; break;
-      case 1: querySelector(selector_thousands).style.backgroundImage = score_number_1; break;
-      case 2: querySelector(selector_thousands).style.backgroundImage = score_number_2; break;
-      case 3: querySelector(selector_thousands).style.backgroundImage = score_number_3; break;
-      case 4: querySelector(selector_thousands).style.backgroundImage = score_number_4; break;
-      case 5: querySelector(selector_thousands).style.backgroundImage = score_number_5; break;
-      case 6: querySelector(selector_thousands).style.backgroundImage = score_number_6; break;
-      case 7: querySelector(selector_thousands).style.backgroundImage = score_number_7; break;
-      case 8: querySelector(selector_thousands).style.backgroundImage = score_number_8; break;
-      case 9: querySelector(selector_thousands).style.backgroundImage = score_number_9; break;
+      case 0: digitThousands.style.backgroundImage = score_number_0; break;
+      case 1: digitThousands.style.backgroundImage = score_number_1; break;
+      case 2: digitThousands.style.backgroundImage = score_number_2; break;
+      case 3: digitThousands.style.backgroundImage = score_number_3; break;
+      case 4: digitThousands.style.backgroundImage = score_number_4; break;
+      case 5: digitThousands.style.backgroundImage = score_number_5; break;
+      case 6: digitThousands.style.backgroundImage = score_number_6; break;
+      case 7: digitThousands.style.backgroundImage = score_number_7; break;
+      case 8: digitThousands.style.backgroundImage = score_number_8; break;
+      case 9: digitThousands.style.backgroundImage = score_number_9; break;
     }
     
     switch(hundredths)
     {
-      case 0: querySelector(selector_hundredths).style.backgroundImage = score_number_0; break;
-      case 1: querySelector(selector_hundredths).style.backgroundImage = score_number_1; break;
-      case 2: querySelector(selector_hundredths).style.backgroundImage = score_number_2; break;
-      case 3: querySelector(selector_hundredths).style.backgroundImage = score_number_3; break;
-      case 4: querySelector(selector_hundredths).style.backgroundImage = score_number_4; break;
-      case 5: querySelector(selector_hundredths).style.backgroundImage = score_number_5; break;
-      case 6: querySelector(selector_hundredths).style.backgroundImage = score_number_6; break;
-      case 7: querySelector(selector_hundredths).style.backgroundImage = score_number_7; break;
-      case 8: querySelector(selector_hundredths).style.backgroundImage = score_number_8; break;
-      case 9: querySelector(selector_hundredths).style.backgroundImage = score_number_9; break;
+      case 0: digitHundredths.style.backgroundImage = score_number_0; break;
+      case 1: digitHundredths.style.backgroundImage = score_number_1; break;
+      case 2: digitHundredths.style.backgroundImage = score_number_2; break;
+      case 3: digitHundredths.style.backgroundImage = score_number_3; break;
+      case 4: digitHundredths.style.backgroundImage = score_number_4; break;
+      case 5: digitHundredths.style.backgroundImage = score_number_5; break;
+      case 6: digitHundredths.style.backgroundImage = score_number_6; break;
+      case 7: digitHundredths.style.backgroundImage = score_number_7; break;
+      case 8: digitHundredths.style.backgroundImage = score_number_8; break;
+      case 9: digitHundredths.style.backgroundImage = score_number_9; break;
     }
     
     switch(tenths)
     {
-      case 0: querySelector(selector_tenths).style.backgroundImage = score_number_0; break;
-      case 1: querySelector(selector_tenths).style.backgroundImage = score_number_1; break;
-      case 2: querySelector(selector_tenths).style.backgroundImage = score_number_2; break;
-      case 3: querySelector(selector_tenths).style.backgroundImage = score_number_3; break;
-      case 4: querySelector(selector_tenths).style.backgroundImage = score_number_4; break;
-      case 5: querySelector(selector_tenths).style.backgroundImage = score_number_5; break;
-      case 6: querySelector(selector_tenths).style.backgroundImage = score_number_6; break;
-      case 7: querySelector(selector_tenths).style.backgroundImage = score_number_7; break;
-      case 8: querySelector(selector_tenths).style.backgroundImage = score_number_8; break;
-      case 9: querySelector(selector_tenths).style.backgroundImage = score_number_9; break;
+      case 0: digitTenths.style.backgroundImage = score_number_0; break;
+      case 1: digitTenths.style.backgroundImage = score_number_1; break;
+      case 2: digitTenths.style.backgroundImage = score_number_2; break;
+      case 3: digitTenths.style.backgroundImage = score_number_3; break;
+      case 4: digitTenths.style.backgroundImage = score_number_4; break;
+      case 5: digitTenths.style.backgroundImage = score_number_5; break;
+      case 6: digitTenths.style.backgroundImage = score_number_6; break;
+      case 7: digitTenths.style.backgroundImage = score_number_7; break;
+      case 8: digitTenths.style.backgroundImage = score_number_8; break;
+      case 9: digitTenths.style.backgroundImage = score_number_9; break;
     }
     
-    switch(tenths)
+    switch(ones)
      {
-       case 0: querySelector(selector_ones).style.backgroundImage = score_number_0; break;
-       case 1: querySelector(selector_ones).style.backgroundImage = score_number_1; break;
-       case 2: querySelector(selector_ones).style.backgroundImage = score_number_2; break;
-       case 3: querySelector(selector_ones).style.backgroundImage = score_number_3; break;
-       case 4: querySelector(selector_ones).style.backgroundImage = score_number_4; break;
-       case 5: querySelector(selector_ones).style.backgroundImage = score_number_5; break;
-       case 6: querySelector(selector_ones).style.backgroundImage = score_number_6; break;
-       case 7: querySelector(selector_ones).style.backgroundImage = score_number_7; break;
-       case 8: querySelector(selector_ones).style.backgroundImage = score_number_8; break;
-       case 9: querySelector(selector_ones).style.backgroundImage = score_number_9; break;
+       case 0: digitOnes.style.backgroundImage = score_number_0; break;
+       case 1: digitOnes.style.backgroundImage = score_number_1; break;
+       case 2: digitOnes.style.backgroundImage = score_number_2; break;
+       case 3: digitOnes.style.backgroundImage = score_number_3; break;
+       case 4: digitOnes.style.backgroundImage = score_number_4; break;
+       case 5: digitOnes.style.backgroundImage = score_number_5; break;
+       case 6: digitOnes.style.backgroundImage = score_number_6; break;
+       case 7: digitOnes.style.backgroundImage = score_number_7; break;
+       case 8: digitOnes.style.backgroundImage = score_number_8; break;
+       case 9: digitOnes.style.backgroundImage = score_number_9; break;
      }
+  }
+  
+  updateHealth(int health)
+  {
+    switch(health)
+    {
+      case 0:
+            healthHeart1.style.visibility = "hidden";
+            querySelector("#div_game_over").style.visibility = "visible";
+            break;
+            
+      case 1: healthHeart2.style.visibility = "hidden"; break;
+      case 2: healthHeart3.style.visibility = "hidden"; break;
+    }
   }
 }
