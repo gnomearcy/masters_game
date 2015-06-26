@@ -28,26 +28,33 @@ class TimeManager
      }
      
      toggle()
-     {          
-          if(stopwatch != null)
-          {
-              if(stopwatch.isRunning)
-              {
-                   stopwatch.stop();
-                   _isRunning = false;
-              }
-              else
-              {
-                   stopwatch.start();
-                   _isRunning = true;
-              }
-          }
+     {         
+//        print("Toggling stopwatch...");
+        if(stopwatch != null)
+        {
+            if(stopwatch.isRunning)
+            {
+              print("Toggling stopwatch... -> STOP");
+
+                 stopwatch.stop();
+                 _isRunning = false;
+            }
+            else
+            {
+              print("Toggling stopwatch... -> START");
+
+                 stopwatch.start();
+                 _isRunning = true;
+            }
+        }
      }
      
      start()
      {
        if(stopwatch != null && !_isRunning)
+//        if(stopwatch != null && !stopwatch.isRunning)
        {
+         print("Starting stopwatch...");
          stopwatch.start;
          _isRunning = true;
        }
@@ -56,20 +63,24 @@ class TimeManager
      stop()
      {
        if(stopwatch != null && _isRunning)
+//       if(stopwatch != null && stopwatch.isRunning)
        {
+         print("Stopping stopwatch...");
          stopwatch.stop;
          _isRunning = false;
        }
      }
      
      reset()
-     {       
-       stopwatch.stop();
-       stopwatch.reset();
-       _isRunning = false;
+     {    
+       toggle();
+       this.stopwatch.reset();
+//       stopwatch.stop();
+//       stopwatch.reset();
+//       _isRunning = false;
      }
      
-//     bool isRunning()
+//     bool isRunning() 
 //     {
 //       return _isRunning;
 //     }

@@ -322,3 +322,9 @@ html, body
   background-repeat: no-repeat;
   margin-left: 206px;
 }
+
+#div_script_trigger
+{
+  width: 0px;
+  height: 0px;
+}

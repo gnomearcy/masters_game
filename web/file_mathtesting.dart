@@ -147,6 +147,10 @@ void main() {
      // digit parsing
      int nekibroj = 5674;
      parseDigits(nekibroj);
+     
+     List listaA = [];
+     
+     listaA.add(2);
 }
 
 parseDigits(int parse)

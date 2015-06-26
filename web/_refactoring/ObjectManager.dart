@@ -34,7 +34,6 @@ class ObjectManager
      final track_texture = "refactoring_objs/corridor_uv_layout_2048_1_textured_1.png";
      final asset_texture = "refactoring_objs/asset_uv_layout_2048_3_textured2.png";
      
-     int nekibroj;
      bool useBasic = true;
 //     Path path;
      int segments;
@@ -47,7 +46,8 @@ class ObjectManager
      
      Parser parser;
      List resources;
-     List hitObjects = [];    //collision array
+     List assets = [];    //collision array
+     List assetHitStatus = [];
      
      double side = 0.2;
      PerspectiveCamera splineCamera;
@@ -58,14 +58,14 @@ class ObjectManager
      
      ObjectManager() 
      {
-          parser = new Parser();
-          resources = [];
-          resources.add(path_obj);
-          resources.add(track_obj);
-          resources.add(ship_obj);
-          resources.add(obstacle_box_obj);
-          resources.add(obstacle_barrel_obj);
-          resources.add(scoreItem_obj);
+        parser = new Parser();
+        resources = [];
+        resources.add(path_obj);
+        resources.add(track_obj);
+        resources.add(ship_obj);
+        resources.add(obstacle_box_obj);
+        resources.add(obstacle_barrel_obj);
+        resources.add(scoreItem_obj);
      }       
      
      handleGeometries(Object3D parent, List<Geometry> geometries)
@@ -215,6 +215,33 @@ class ObjectManager
        return clonedGeometry;
      }
      
+     resetAssetsState()
+     {
+         for (int i = 0; i < assets.length; i++)
+         {
+           (assets[i] as Mesh).visible = true;
+           assetHitStatus[i] = false;
+         }
+     }
+     
+     updateAssetsState(int index)
+     {
+        (assets[index] as Mesh).visible = false;
+        assetHitStatus[index] = true;
+     }
+     
+     initHitStatus()
+     {
+       for(int i = 0; i < assets.length; i++)
+       {
+         assetHitStatus.add(false);
+       }
+     }
+     
+     getHitStatus(int index)
+     {
+       return assetHitStatus[index];
+     }
 }
 
 //class Path

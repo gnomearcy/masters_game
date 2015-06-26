@@ -54,8 +54,7 @@ class CoreManager
       * Not sure if this fix affects JS, but it affects Dartium.    
       */     
      int bugFix = 1;
-     
-     int nrOfGenered = 0;
+   
      
      //generate a set of hit objects
      //we need a parent to add the object to
@@ -150,7 +149,9 @@ class CoreManager
         }     
         
         parent.updateMatrixWorld(force: true);
-        print("Coremanager - " + nrOfGenered.toString()); //TODO remove
+        
+//        print(objM.assets.length);
+        objM.initHitStatus(); 
     }
 
      /**
@@ -431,9 +432,7 @@ class CoreManager
           
           generateBoundingBox(scoreItemMesh);
           parent.add(scoreItemMesh);
-          objM.hitObjects.add(scoreItemMesh);
-          
-          nrOfGenered++;
+          objM.assets.add(scoreItemMesh);
      }
 
      void addObstacle(Vector3 position)
@@ -458,7 +457,7 @@ class CoreManager
           obstacleMesh.rotation.y = rotation * PI / 360.0;
           generateBoundingBox(obstacleMesh);
           parent.add(obstacleMesh);
-          objM.hitObjects.add(obstacleMesh);
+          objM.assets.add(obstacleMesh);
      }
 
      /**

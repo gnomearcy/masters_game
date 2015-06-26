@@ -78,7 +78,7 @@ class HUDManager
     int tenths = (score - thousands * 1000 - hundredths * 100) ~/ 10;
     int ones = score % 10;
     
-//    print("T/H/T/O: " + thousands.toString() + "/" + hundredths.toString() + "/" + tenths.toString() + "/" + ones.toString());
+    print("T/H/T/O: " + thousands.toString() + "/" + hundredths.toString() + "/" + tenths.toString() + "/" + ones.toString());
 
     switch (thousands) {
       case 0: digitThousands.style.backgroundImage = score_number_0; break;

@@ -117,11 +117,4 @@ html, body
   margin-left: 84px;
 }
 
-/*removes the scrollbars, div is automatically scaled when resizing window*/
-
-/*
-#wrapper {width:500px; height:300px; position:relative;}
-.float {background-color:black; height:300px; margin:0; padding:0; color:white;}
-.left {background-color:blue; position:fixed; width:400px; display: none}
-.right {float:right; width:100px; visibility: visible; display: none}*/
 

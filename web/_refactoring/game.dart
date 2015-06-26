@@ -8,7 +8,7 @@ import 'dart:async';
 import 'ObjectManager.dart';
 import 'Parser.dart';
 import 'CoreManager.dart';
-//import 'Keyboard.dart';
+import 'Keyboard.dart';
 import 'TimeManager.dart';
 import 'HUDManager.dart';
 import 'package:stats/stats.dart';
@@ -35,13 +35,13 @@ var mouseXOnMouseDown = 0;
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
 
-Mesh cube;
+//Mesh cube;
 
 CoreManager coreManager;
 ObjectManager objectManager;
 Parser parser;
 //Path path;
-//Keyboard keyboard;
+Keyboard keyboard;
 TimeManager timeManager;
 HUDManager hudManager;
 
@@ -50,7 +50,7 @@ double strafe = 0.6;
 double strafeDt = strafe / 15.0;
 double strafeMin = -strafe;
 double strafeMax = strafe;
-double strafeTotal = 0.0;
+//double strafeTotal = 0.0;
 double currentStrafe = 0.0;
 //int loopSeconds = 400;
 
@@ -77,8 +77,8 @@ int health = 3;
 int previousTime = 0;
 int currentTime = 0;
 int elapsedTime = 0;
-int threshhold = 250; 
-double increment = 0.0001; //TODO remove
+int threshhold = 240; 
+//double increment = 0.0001; //TODO remove
 
 
 //html total countdown animation length in milliseconds
@@ -93,9 +93,9 @@ double previousTimerTime = 0.0;
 double currentTimerTime = 0.0;
 bool isNewLap = false;
 
-HashMap<int, int> _keys = new HashMap<int, int>();
+//HashMap<int, int> _keys = new HashMap<int, int>();
      
-isPressed(int keyCode) => _keys.containsKey(keyCode);
+//isPressed(int keyCode) => _keys.containsKey(keyCode);
 
 //handle div animations
 initDivs()
@@ -129,64 +129,49 @@ initDivs()
   
   hudManager.tryAgain.onClick.listen((event)
       {
-        print("tryAgain click handler");
-        objectManager.ship.position.setFrom(new Vector3.zero());
-        objectManager.ship.rotation.y = -90 * PI/180.0;
-        countdownFinished = false;
-        isGameOver = false;
-        timeManager.reset();
-        unhideAssets();
-        hudManager.reset();
+          resetGameState();
       });
   
-//  hudManager.start.onClick.listen((event)
-//      {
-//          if(isStartVisible)
-//          {
-//            isStartVisible = false;
-//            const d = const Duration(milliseconds: 500);
-//            new Timer.periodic(d, (Timer t)
-//                {
-//                  isStartVisible = true;
-//                });
-//            hudManager.countdown();
-//          }
-//      });
+
 }
 
-updateInternal(KeyboardEvent e)
- {
-   if (isPressed(KeyCode.D)) {
-       
-       strafeTotal -= strafeDt;
-       print("Update D -> " + strafeTotal.toString());
-       if (strafeTotal <= strafeMin) strafeTotal = strafeMin;
-     }
-
-     if (isPressed(KeyCode.A)) {
-       print("Update A -> " + strafeTotal.toString());
-       strafeTotal += strafeDt;
-       if (strafeTotal >= strafeMax) strafeTotal = strafeMax;
-     }
- }
+resetGameState()
+{
+    objectManager.ship.position.setFrom(new Vector3.zero());
+    objectManager.ship.rotation.y = -90 * PI/180.0;
+    
+    timeManager.reset();
+    objectManager.resetAssetsState();
+    hudManager.reset();
+    
+    score = 0;
+    health = 3;    
+    currentStrafe = 0.0;
+    
+    previousTimerTime = 0.0;
+    currentTimerTime = 0.0;
+    previousTime = 0;
+    currentTime = 0;
+    
+    countdownFinished = false;
+    isGameOver = false;
+    isNewLap = false;
+}
 
 void main() {
   
-     window.onKeyDown.listen((KeyboardEvent e)
-     {        
-          if (!_keys.containsKey(e.keyCode))
-          {
-               _keys[e.keyCode] = e.timeStamp;  
-          }
-          else
-            updateInternal(e);
-
-     });
-     
-     window.onKeyUp.listen((KeyboardEvent e)
-     {
-          _keys.remove(e.keyCode);          
-     });
+//     window.onKeyDown.listen((KeyboardEvent e)
+//     {        
+//        if (!_keys.containsKey(e.keyCode))
+//        {
+//             _keys[e.keyCode] = e.timeStamp;  
+//        }
+//     });
+//     
+//     window.onKeyUp.listen((KeyboardEvent e)
+//     {
+//        _keys.remove(e.keyCode);          
+//     });
 
   initObjects();
   initDivs();
@@ -238,6 +223,7 @@ initObjects() {
   parser = new Parser();
   timeManager = new TimeManager(forceStart: false);
   hudManager = new HUDManager();
+  keyboard = new Keyboard();
   
   scene = new Scene();
 //     container = document.querySelector('#renderer_wrapper');
@@ -328,13 +314,13 @@ void animateCamera(bool t) {
   }
 }
 
-unhideAssets()
-{
-  for (int i = 0; i < objectManager.hitObjects.length; i++)
-  {
-    (objectManager.hitObjects[i] as Mesh).visible = true;
-  }
-}
+//unhideAssets()
+//{
+//  for (int i = 0; i < objectManager.hitObjects.length; i++)
+//  {
+//    (objectManager.hitObjects[i] as Mesh).visible = true;
+//  }
+//}
 update() 
 {
 //  if (timeManager == null) {
@@ -343,6 +329,7 @@ update()
 //  }
 
   t = timeManager.getCurrentTime();
+//  print(t); //TODO remove
   
   currentTimerTime = t;
 //  print("Current / Previous: [" + currentTimerTime.toString() + " | " + previousTimerTime.toString() + "]");
@@ -355,7 +342,7 @@ update()
   
   if(isNewLap)
   {
-    unhideAssets();
+    objectManager.resetAssetsState();
     isNewLap = false;
   }
   
@@ -366,9 +353,9 @@ update()
   double percentage = elapsedTime / threshhold;
   double toMove = percentage * strafe;
     
-  if(!(isPressed(KeyCode.D) && isPressed(KeyCode.A)))
+  if(!(keyboard.isPressed(KeyCode.D) && keyboard.isPressed(KeyCode.A)))
   {
-    if(isPressed(KeyCode.A))
+    if(keyboard.isPressed(KeyCode.A))
     {
       if(currentStrafe + toMove > strafe)
         currentStrafe = strafe;
@@ -376,7 +363,7 @@ update()
         currentStrafe += toMove;
     }
     
-    if(isPressed(KeyCode.D))
+    if(keyboard.isPressed(KeyCode.D))
     {
       if(currentStrafe - toMove < -strafe)
         currentStrafe = -strafe;
@@ -384,23 +371,7 @@ update()
         currentStrafe -= toMove;
     }
   }
-  
 
-  /*
-        * double t = timeManager.getCurrentTime();
-+     double someT = ((t + 2 / path.curve.length) % 1);
-+     double pickt2 = someT * path.segments; //unfloored
-+     int pick2 = (someT * path.segments).floor(); //floored
-+     double bScaleObject = pickt2 - pick2;
-+     int pickNext2 = (pick2 + 1) % path.segments; //sljedeci segment
-        */
-
-//       double nekiT = (t + 2 / objectManager.path.length) % 1;
-//       if(nekiT > 1.0)
-//         nekiT -= 1.0;
-//       int nextSeg = (nekiT * objectManager.segments).floor();
-
-//       print("current: " + t.toString() + " | next: " + nekiT.toString());
   //center
   positionObject = objectManager.path.getPointAt(t);
 //       Vector3 positionEye = objectManager.path.getPointAt(nekiT);
@@ -442,20 +413,20 @@ update()
 
 collision() 
 {
-  Mesh hitObject;
+  Mesh asset;
 
-  for (int i = 0; i < objectManager.hitObjects.length; i++) {
-    hitObject = objectManager.hitObjects[i];
+  for (int i = 0; i < objectManager.assets.length; i++) {
+    asset = objectManager.assets[i];
 
-    if (hitObject.geometry.boundingBox
-        .isIntersectionBox(objectManager.ship.geometry.boundingBox)) 
+    if (asset.geometry.boundingBox
+        .isIntersectionBox(objectManager.ship.geometry.boundingBox) && !objectManager.getHitStatus(i)) 
     {
-      if (hitObject is ScoreItem)
+      if (asset is ScoreItem)
       {
         hudManager.updateScore(score++);
         scoreBtn.value = "Score: " + score.toString(); //TODO remove
       }
-      if (hitObject is Obstacle) 
+      if (asset is Obstacle) 
       {
         health--;
         print("Hit an obstacle!!! current health " + health.toString()); //TODO remove
@@ -471,9 +442,10 @@ collision()
         healthBtn.value = "Health: " + health.toString(); //TODO remove
       }
 
-      hitObject.visible = false;
+//      asset.visible = false;
+        objectManager.updateAssetsState(i);
 //      scene.remove(hitObject);
-//      objectManager.hitObjects.remove(hitObject);
+//      objectManager.assets.remove(asset);
     }
   }
 }
@@ -488,7 +460,7 @@ gameLoop(num time)
 //     }
     if(!timeManager.isRunning)
     {
-      timeManager.start();
+      timeManager.toggle();
     }
      
      if(!isGameOver)
@@ -500,6 +472,7 @@ gameLoop(num time)
    
     //TODO remove
   scene.rotation.y += (targetRotation - scene.rotation.y) * 0.05;
+  
   renderer.render(
         scene, animation == true ? objectManager.splineCamera : camera);
   window.requestAnimationFrame(gameLoop);
