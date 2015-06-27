@@ -19,7 +19,7 @@ class CoreManager
       List vertPositions = [0, 1, 2, 3];
      
       //defines a coefficient by which to expand (> 1.0) or compress (< 1.0) bounding boxes of obstacle items
-      double obstacleBoxSquish = 0.8;
+      double obstacleBoxSquish = 0.5;
       //defines a coefficient by which to expand (> 1.0) or compress (< 1.0) bounding boxes of scoreItem items
       double scoreItemBoxSquish = 0.9;
      

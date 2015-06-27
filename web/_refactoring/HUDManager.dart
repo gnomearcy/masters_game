@@ -71,7 +71,6 @@ class HUDManager
   
   updateScore(int score) 
   {
-//    print("Score: " + score.toString());
     // Parse score on digits and update accordingly
     int thousands = score ~/ 1000;
     int hundredths = (score - thousands * 1000) ~/ 100;
@@ -159,7 +158,7 @@ class HUDManager
     updateScore(0);
     gameOverTryAgain.style.visibility = "hidden";
     
-    //fadeOut animation sets the display to "none", we have to set it back;
+    //fadeOut animation sets the display to "none", which prevents visibility
     start.style.display = "block";
     start.style.visibility = "visible";    
   }

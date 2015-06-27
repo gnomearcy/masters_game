@@ -12,16 +12,25 @@ import 'Parser.dart';
 import 'dart:async';
 import 'dart:collection';
 import 'dart:html';
+import 'dart:math' show PI;
 
 class ObjectManager
 {
-     static const String suffix = "_1.obj";
-     final path_obj = "refactoring_objs/curve_final" + suffix;
-     final ship_obj = "refactoring_objs/ship_final" + suffix;
-     final track_obj = "refactoring_objs/corridor_final" + suffix;
-     final obstacle_box_obj = "refactoring_objs/box_final" + suffix;
-     final obstacle_barrel_obj = "refactoring_objs/barrel_final" + suffix;
-     final scoreItem_obj = "refactoring_objs/scoreitem_final" + suffix;
+//     static const String suffix = "_1.obj";
+//     final path_obj = "refactoring_objs/curve_final" + suffix;
+//     final ship_obj = "refactoring_objs/ship.obj";
+//     final track_obj = "refactoring_objs/corridor_final" + suffix;
+//     final obstacle_box_obj = "refactoring_objs/box_final" + suffix;
+//     final obstacle_barrel_obj = "refactoring_objs/barrel_final" + suffix;
+//     final scoreItem_obj = "refactoring_objs/scoreitem_final" + suffix;
+     
+     static const String suffix = ".obj";
+     final path_obj = "refactoring_objs/path" + suffix;
+     final ship_obj = "refactoring_objs/ship" + suffix;
+     final track_obj = "refactoring_objs/corridor" + suffix;
+     final obstacle_box_obj = "refactoring_objs/box" + suffix;
+     final obstacle_barrel_obj = "refactoring_objs/barrel" + suffix;
+     final scoreItem_obj = "refactoring_objs/score_item" + suffix;
      
 //     final path_obj = "refactoring_objs/curve_test_sirine" + suffix;
 //     final ship_obj = "refactoring_objs/ship_test_sirine_small" + suffix;
@@ -94,7 +103,9 @@ class ObjectManager
           double movingCam_far = 5000.0;
 //          Vector3 movingCam_pos = new Vector3(0.0, 0.2, 0.4 * 6.0); //parented to moving object
           Vector3 movingCam_pos = new Vector3(0.0, 0.5, 0.5);
+//          Vector3 movingCam_pos = new Vector3(-0.5, 0.5, 0.0);
           Vector3 movingCam_lookAt = new Vector3(0.0, 0.0, -0.8);
+//          Vector3 movingCam_lookAt = new Vector3(0.8, 0.0, 0.0); //x, y, z
           
           //Following values test the obstacle box collision
 //          Vector3 movingCam_pos = new Vector3(0.0, 0.4, -0.7);
@@ -117,12 +128,14 @@ class ObjectManager
           splineCamera = new PerspectiveCamera(movingCam_fov, window.innerWidth / window.innerHeight, movingCam_near, movingCam_far);
           splineCamera.position.setFrom(movingCam_pos);
           splineCamera.lookAt(movingCam_lookAt);
+
           PointLight pointlightFollower = new PointLight(0xffffff, intensity: 0.5, distance: 0.0);
 //          pointlightFollower.position.setFrom(new Vector3(0.0, 5.0 / 2, 0.0)); //TODO extract variable
           pointlightFollower.position.setFrom(new Vector3(0.0, 0.0, 0.0)); //TODO extract variable
           pointlightFollower.lookAt(spotlightFollower_lookAt);
           ship.add(splineCamera);
-          ship.add(pointlightFollower);          
+          ship.add(pointlightFollower);
+          ship.rotation.y = -90 * PI/180.0;
           parent.add(ship);
           
           //global texture for assets

@@ -77,7 +77,7 @@ int health = 3;
 int previousTime = 0;
 int currentTime = 0;
 int elapsedTime = 0;
-int threshhold = 240; 
+int threshhold = 250; 
 //double increment = 0.0001; //TODO remove
 
 
@@ -321,6 +321,7 @@ void animateCamera(bool t) {
 //    (objectManager.hitObjects[i] as Mesh).visible = true;
 //  }
 //}
+int asdad = 0;
 update() 
 {
 //  if (timeManager == null) {
@@ -344,6 +345,7 @@ update()
   {
     objectManager.resetAssetsState();
     isNewLap = false;
+    print("NEWEAWEAWEAWEAWEAWEAWE " + (++asdad).toString());
   }
   
   currentTime = new DateTime.now().millisecondsSinceEpoch;
@@ -374,18 +376,17 @@ update()
 
   //center
   positionObject = objectManager.path.getPointAt(t);
-//       Vector3 positionEye = objectManager.path.getPointAt(nekiT);
   //eye
   tangentObject = -objectManager.path.getTangentAt(t);
-//       Vector3 tangentEye = -objectManager.path.getTangentAt(nekiT);
-//       Vector3 tangentObjectNext = -objectManager.path.getTangentAt(nekiT);
-//       Vector3 eye = objectManager.path.getPointAt(nekiT);
-//       Vector3 eye = tangentObject.clone().normalize().add(positionObject);
   Vector3 eye = tangentObject.clone().normalize().add(positionObject);
+//  Vector3 eye = -tangentObject;
+
+//  print("Pos / Tan / Eye - " + positionObject.toString() + " | " + tangentObject.toString() + " | " + eye.toString());
 
   //lookatmatrix
   lookAtMatrix = makeLookAt(lookAtMatrix, eye, positionObject, normalObject);
   objectManager.ship.rotation = calcEulerFromRotationMatrix(lookAtMatrix);
+//  print("Rotation - " + objectManager.ship.rotation.toString());
 
   //adjust strafe
   binormalObject = new Vector3.zero();
@@ -393,14 +394,9 @@ update()
       .clone()
       .normalize()
       .crossInto(-tangentObject, binormalObject);
-  //trenutni strafe total
-//  print("Render -> " + strafeTotal.toString());
-//  binormalObject.multiply(new Vector3(strafeTotal, 0.0, strafeTotal));
+  
   binormalObject.multiply(new Vector3(currentStrafe, 0.0, currentStrafe));
   objectManager.ship.position.setFrom(positionObject.add(binormalObject));
-//       print(objectManager.ship.position.toString());
-//       objectManager.ship.geometry.computeBoundingBox();
-//       objectManager.ship.updateMatrixWorld();
   objectManager.ship.geometry.boundingBox =
       new BoundingBox.fromObject(objectManager.ship);
   
@@ -423,7 +419,8 @@ collision()
     {
       if (asset is ScoreItem)
       {
-        hudManager.updateScore(score++);
+//        score++;
+        hudManager.updateScore(++score);
         scoreBtn.value = "Score: " + score.toString(); //TODO remove
       }
       if (asset is Obstacle) 
@@ -431,13 +428,13 @@ collision()
         health--;
         print("Hit an obstacle!!! current health " + health.toString()); //TODO remove
 
-        if(health == 0)
-        {
-          print("Health is zero, setting flag to true"); //TODO remove
-          isGameOver = true;
-        }
-        
-        hudManager.updateHealth(health);
+//        if(health == 0)
+//        {
+//          print("Health is zero, setting flag to true"); //TODO remove
+//          isGameOver = true;
+//        }
+//        
+//        hudManager.updateHealth(health);
         
         healthBtn.value = "Health: " + health.toString(); //TODO remove
       }
@@ -474,7 +471,9 @@ gameLoop(num time)
   scene.rotation.y += (targetRotation - scene.rotation.y) * 0.05;
   
   renderer.render(
-        scene, animation == true ? objectManager.splineCamera : camera);
+//        scene, animation == true ? objectManager.splineCamera : camera);
+      scene, objectManager.splineCamera);
+
   window.requestAnimationFrame(gameLoop);
 }
 

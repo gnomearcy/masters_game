@@ -4,7 +4,7 @@ library TimeManager;
 class TimeManager
 {
      //duration of one loop in milliseconds
-     int duration = 40 * 1000;
+     int duration = 120 * 1000;
      Stopwatch stopwatch;
      
      bool _isRunning;    
