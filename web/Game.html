@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+     <title>Toma's game</title>  
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="Game.css">
+     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>    
+     <script src="packages/browser/dart.js"></script> 
+     <script type="application/dart" src="Game.dart"></script>
+     
+     <script>
+        function triggerCountDown()
+        {
+            var numberDelay = 700;
+            var numberFadeIn = 250;
+            var numberFadeOut = 100;
+            var startFadeOut = 600;
+            var goFadeIn = 100;
+            var goFadeOut = 2000;
+            var goDelay = 1000;
+            
+        	$("#div_start").fadeOut(startFadeOut, function()
+        	    {
+        	  		//trigger 3,2,1
+        	  		$("#div_countdown_number_3").fadeIn( numberFadeIn ).delay(numberDelay).fadeOut(numberFadeOut, function()
+        	  		    {
+        	  		  		$("#div_countdown_number_2").fadeIn( numberFadeIn ).delay(numberDelay).fadeOut(numberFadeOut, function()
+        	  		  		    {
+        	  		  		  		$("#div_countdown_number_1").fadeIn( numberFadeIn ).delay(numberDelay).fadeOut(numberFadeOut, function()
+        	  		  		  		    {
+        	  		  		  		  		$("#div_go").fadeIn( goFadeIn ).delay(goDelay).fadeOut(goFadeOut);
+        	  		  		  		    });
+        	  		  		    });
+ 	       	  		    });
+ 	       	    });
+        }
+        
+     </script>
+  </head>
+ 
+  <body>
+    <div id="div_script_trigger" onclick="triggerCountDown()"></div>
+    <div id="div_message_wrapper">          
+      <div id="div_countdown_number_1"></div>
+      <div id="div_countdown_number_2"></div>
+      <div id="div_countdown_number_3"></div>
+      <div id="div_start"></div>
+      <div id="div_go"></div>
+      <div id="div_game_over_try_again_wrapper">
+        <div id="div_game_over"></div>
+        <div id="div_try_again"></div>
+      </div> 
+    </div>
+    <div id="div_score_wrapper">
+      <div id="div_score_img"></div>
+      <div id="div_score_digits_wrapper">
+        <div id="div_score_digit_thousands"></div>
+        <div id="div_score_digit_hundredths"></div>
+        <div id="div_score_digit_tenths"></div>
+        <div id="div_score_digit_ones"></div>  
+      </div>
+    </div>
+    <div id="div_health_wrapper">
+        <div id="div_health_heart_1"></div>
+        <div id="div_health_heart_2"></div>
+        <div id="div_health_heart_3"></div>
+    </div>  
+  </body>
+</html>

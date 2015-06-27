@@ -1,0 +1,270 @@
+html, body
+{
+   height: 100%;
+   width: 100%;
+   margin: 0;
+   padding: 0;
+}
+
+#renderer
+{
+   z-index: 0;
+   position: absolute;
+   width: 100%;
+   height: 100%;
+   
+   /*removes the scrollbars, div is automatically scaled when resizing window*/
+   box-sizing: border-box;
+   -webkit-box-sizing: border-box;
+   -moz-box-sizing: border-box;
+}
+
+#div_countdown_number_1
+{
+   background-image: url('../images/countdown_number_1.png');
+   background-repeat: no-repeat;
+   background-position: center;
+   z-index: 3;
+   position: absolute;
+   width: 100%;
+   height: 100%;
+   display: none;
+   
+   box-sizing: border-box;
+   -webkit-box-sizing: border-box;
+   -moz-box-sizing: border-box;
+}
+
+#div_countdown_number_2
+{
+   background-image: url('../images/countdown_number_2.png');
+   background-repeat: no-repeat;
+   background-position: center;
+   z-index: 4;
+   position: absolute;
+   width: 100%;
+   height: 100%;
+   display: none;
+   
+   box-sizing: border-box;
+   -webkit-box-sizing: border-box;
+   -moz-box-sizing: border-box;
+}
+
+#div_countdown_number_3
+{
+   background-image: url('../images/countdown_number_3.png');
+   background-repeat: no-repeat;
+   background-position: center;
+   z-index: 5;
+   position: absolute;
+   width: 100%;
+   height: 100%;
+   display: none;
+   
+   box-sizing: border-box;
+   -webkit-box-sizing: border-box;
+   -moz-box-sizing: border-box;
+}
+
+#div_start
+{
+   background-image: url('../images/start.png');
+   background-repeat: no-repeat;
+   background-position: center;
+   z-index: 6;
+   position: absolute;
+   
+   /* Fixed width/height require top/bottom/left/right = 0 and margin: auto to center itself */
+   width: 100%;
+   height: 100%;
+   visibility: visible;
+   display: block;
+   
+   box-sizing: border-box;
+   -webkit-box-sizing: border-box;
+   -moz-box-sizing: border-box;
+}
+
+#div_go
+{
+   background-image: url('../images/go.png');
+   background-repeat: no-repeat;
+   background-position: center;
+   z-index: 6;
+   position: absolute;
+   width: 100%;
+   height: 100%;
+   display: none;
+   
+   box-sizing: border-box;
+   -webkit-box-sizing: border-box;
+   -moz-box-sizing: border-box;
+}
+
+#div_game_over_try_again_wrapper
+{
+   position: absolute;
+   z-index: 10;
+   width: 858px;
+   height: 205px;
+   visibility: hidden;
+   
+   /* Center content vertically and horizontally */
+   top: 0;
+   bottom: 0;
+   left: 0;
+   right: 0;
+   margin: auto;
+}
+
+#div_game_over
+{
+   background-image: url('../images/game_over.png');
+   background-repeat: no-repeat;
+   background-position: center;
+   position: absolute;
+   width: inherit;
+   height: 121px;
+   
+   box-sizing: border-box;
+   -webkit-box-sizing: border-box;
+   -moz-box-sizing: border-box;
+}
+#div_try_again
+{
+   background-image: url('../images/try_again.png');
+   background-repeat: no-repeat;
+   background-position: center;
+   position: absolute;
+   width: 505px;
+   height: 64px;
+   bottom: 0;
+   margin-left: 176px;
+}
+
+/* Wrapps Start, Game Over, 3, 2, 1, Go countdown messages */
+#div_message_wrapper
+{
+   position: absolute;
+   z-index: 10;
+         
+   /* Center content vertically and horizontally */
+   top: 0;
+   bottom: 0;
+   left: 0;
+   right: 0;
+   margin: auto;
+}
+
+#div_score_wrapper
+{
+   z-index: 10;
+   width: 363px;
+   height: 138px;
+   position: absolute;
+   margin-top: 10px;
+   margin-left: 10px;     
+}
+
+#div_score_img
+{
+   background-image: url('../images/score_item.png');
+   background-repeat: no-repeat;
+   position: absolute;
+   width: 59px;        	/* width of image */
+   height: 118px;      	/* height of image */
+   margin-top: 10px;      /* x */
+   margin-left: 10px;     /* x */
+}
+
+#div_score_digits_wrapper
+{
+   position: absolute;
+   width: 269px;       	/* z/img/y/img/y/img/y/img/z */
+   height: 80px;       	/* height of digit image height */
+   margin-left: 84px;  	/* x/div_score_img height/c */
+   margin-top: 29px;   	/* ((div_score_wrapper height, 138) - (div_score_digits_wrapper, 80))/2 */
+}
+#div_score_digit_thousands
+{
+   background-image: url('../images/score_number_0.png');
+   background-repeat: no-repeat;
+   position: absolute;
+   width: 61px;
+   height: inherit;    	/* inherits 80px from div_score_digits_wrapper */
+   margin-left: 5px;   	/* z */
+}
+#div_score_digit_hundredths
+{
+   background-image: url('../images/score_number_0.png');
+   background-repeat: no-repeat;
+   position: absolute;
+   width: 61px;
+   height: inherit;    		/* inherits 80px from div_score_digits_wrapper */
+   margin-left: 71px;       /* z/img/y */
+}
+#div_score_digit_tenths
+{
+   background-image: url('../images/score_number_0.png');
+   background-repeat: no-repeat;
+   position: absolute;
+   width: 61px;
+   height: inherit;    		/* inherits 80px from div_score_digits_wrapper */
+   margin-left: 137px;    	/* z/img/y/img/y */
+}
+#div_score_digit_ones
+{
+   background-image: url('../images/score_number_0.png');
+   background-repeat: no-repeat;
+   position: absolute;
+   width: 61px;
+   height: inherit;    		/* inherits 80px from div_score_digits_wrapper */
+   margin-left: 203px;    	/* z/img/y/img/y/img/y */
+}
+
+#div_health_wrapper
+{
+   z-index: 10;
+   position: absolute;
+   right: 0;
+   width: 304px;
+   height: 90px;
+   margin-top: 25px;
+   margin-right: 25px;
+}
+
+#div_health_heart_1
+{
+   position: absolute;
+   width: 98px;
+   height: inherit;
+   background-image: url('../images/health_heart.png');
+   background-repeat: no-repeat;
+}
+
+#div_health_heart_2
+{
+   position: absolute;
+   width: 98px;
+   height: inherit;
+   background-image: url('../images/health_heart.png');    
+   background-repeat: no-repeat;
+   margin-left: 103px;
+}
+
+#div_health_heart_3
+{
+   position: absolute;
+   width: 98px;
+   height: inherit;
+   background-image: url('../images/health_heart.png');
+   background-repeat: no-repeat;
+   margin-left: 206px;
+}
+
+#div_script_trigger
+{
+   width: 0px;
+   height: 0px;
+}
