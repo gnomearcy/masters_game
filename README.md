@@ -3,7 +3,7 @@
 This is a master's degree project made in collaboration with the Department for visual computing at the Faculty of electrical and computer
 engineering and information technologies in Osijek, Croatia.
 
-## How was it done?
+## Why was it done?
 
 The idea behind the project was to implement a 3D game using Dart programming language and WebGL rendering API. At the time the project was started (spring
 of 2015), the Dart language was a newborn and therefor the sole purpose was to prove that something visual in 3D space can be achieved
