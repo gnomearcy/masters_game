@@ -10,8 +10,8 @@ of 2015), the Dart language was a newborn and therefor the sole purpose was to p
 through its' usage.
 
 ## Tech details:
-* [ThreeJS](threejs.org) wrapper library around WebGL was used for all things 3D
+* [ThreeJS](threejs.org) wrapper library around [WebGL](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) was used for all things 3D
 * 3D models are made in [Blender](www.blender.org) and exported as OBJ
 * 2D texture maps are made in [GIMP](www.gimp.com) and exported as JPEG images
-* Logic is implemented in Dart language using, now deprecated, Dart Editor with Dart SDK
-* Front end side is standard HTML markup and CSS styling
+* Logic is implemented in [Dart](https://www.dartlang.org/) language using, now deprecated, Dart Editor with [Dart SDK](https://www.dartlang.org/tools/sdk)
+* Front end side is standard [HTML](https://www.w3schools.com/html/) markup and [CSS](https://www.w3schools.com/css/) styling
