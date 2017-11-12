@@ -15,3 +15,9 @@ through its' usage.
 * 2D texture maps are made in [GIMP](https://www.gimp.org) and exported as JPEG images
 * Logic is implemented in [Dart](https://www.dartlang.org/) language using, now deprecated, Dart Editor with [Dart SDK](https://www.dartlang.org/tools/sdk)
 * Front end side is standard [HTML](https://www.w3schools.com/html/) markup and [CSS](https://www.w3schools.com/css/) styling
+
+
+## Screenshots
+<img src='/docs/screenshot_start_game.png' alt='start game'>
+<img src='/docs/screenshot_assets.png' alt='start game'>
+<img src='/docs/screenshot_ship.png' alt='start game'>
